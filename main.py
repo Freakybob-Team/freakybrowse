@@ -9,7 +9,9 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
 
         self.browser = QWebEngineView()
-        self.browser.setUrl(QUrl("https://search.freakybob.site/chrome/newtab#gsc.tab=0"))
+        self.browser.setUrl(QUrl("https://search.freakybob.site/"))
+        # please dont use the new tab page unless u are actually theming it around a new tab <3
+        # its hard to remember to update both pages
         self.browser.loadFinished.connect(self.update_title)
         self.setCentralWidget(self.browser)
 
