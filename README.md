@@ -1,5 +1,5 @@
 # Freakybrowse is back !!
-FreakyBrowse is not meant for daily use (Unless you really like it 😭) 
+FreakyBrowse is ~~not~~ meant for daily use (Unless you really like it 😭) 
 
 This is just meant for fun so please keep that in mind :3
 
