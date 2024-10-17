@@ -1,0 +1,1 @@
+This is gonna be a website with info about Freakybrowse or a download page LMAO
