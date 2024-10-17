@@ -66,7 +66,7 @@ class MainWindow(QMainWindow):
         self.update_urlbar(self.browser.url())
 
     def navigate_home(self):
-        self.browser.setUrl(QUrl("https://search.freakybob.site/chrome/newtab#gsc.tab=0"))
+        self.browser.setUrl(QUrl("https://search.freakybob.site/"))
 
     def navigate_to_url(self):
         q = QUrl(self.urlbar.text())
