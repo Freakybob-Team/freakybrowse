@@ -5,7 +5,7 @@ from PyQt5.QtWebEngineWidgets import *
 import sys
 
 class MainWindow(QMainWindow):
-    HOME_URL = "https://search.freakybob.site/chrome/newtab#gsc.tab=0"
+    HOME_URL = "https://search.freakybob.site/"
     DARK_MODE_STYLE = """
     QMainWindow {
         background-color: #2b2b2b;
@@ -44,7 +44,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
 
         try:
-            self.setWindowIcon(QIcon("icon.png"))
+            self.setWindowIcon(QIcon("logo.ico"))
         except Exception as e:
             print(f"Error loading icon: {e}")
 
@@ -60,7 +60,6 @@ class MainWindow(QMainWindow):
         self.status = QStatusBar()
         self.setStatusBar(self.status)
 
-        
         self.navtb = QToolBar("Navigation")
         self.addToolBar(self.navtb)
 
@@ -100,8 +99,6 @@ class MainWindow(QMainWindow):
         settings_btn.triggered.connect(self.open_settings)
         self.navtb.addAction(settings_btn)
 
-        
-
         bookmark_btn = QAction("Bookmark", self)
         bookmark_btn.setStatusTip("Bookmark this page")
         bookmark_btn.triggered.connect(self.bookmark_page)
@@ -112,7 +109,6 @@ class MainWindow(QMainWindow):
         view_bookmarks_btn.triggered.connect(self.show_bookmarks)
         self.navtb.addAction(view_bookmarks_btn)
 
-        
         view_source_btn = QAction("View Page Source", self)
         view_source_btn.setStatusTip("View the source of the current page")
         view_source_btn.triggered.connect(self.view_page_source)
@@ -123,18 +119,15 @@ class MainWindow(QMainWindow):
         save_page_btn.triggered.connect(self.save_page)
         self.navtb.addAction(save_page_btn)
 
-       
         self.settings = QSettings("FreakyBrowse", "UserPreferences")
         self.dark_mode_enabled = self.settings.value("dark_mode", False, type=bool)
         self.nav_toolbar_visible = self.settings.value("nav_toolbar_visible", True, type=bool)
 
-        self.bookmarks = []
+        self.bookmarks = self.settings.value("bookmarks", [], type=list)
 
-        
         self.navtb.setVisible(True)
         self.toggle_dark_mode(self.dark_mode_enabled)
 
-        
         self.add_new_tab(QUrl(self.HOME_URL), "New Tab")
         self.show()
 
@@ -225,61 +218,82 @@ class MainWindow(QMainWindow):
         url = self.current_browser().url().toString()
         if url not in self.bookmarks:
             self.bookmarks.append(url)
+            self.settings.setValue("bookmarks", self.bookmarks)
             QMessageBox.information(self, "Bookmark Added", f"{url} has been bookmarked.")
         else:
             QMessageBox.warning(self, "Already Bookmarked", "This page is already in your bookmarks.")
 
     def show_bookmarks(self):
-        bookmark_list = "\n".join(self.bookmarks) if self.bookmarks else "No bookmarks available."
-        QMessageBox.information(self, "Bookmarks", bookmark_list)
-
-    def view_page_source(self):
-     
-        current_browser = self.current_browser()
-        
-       
-        current_browser.page().toHtml(lambda html: self.show_html(html))
-
-    def show_html(self, html):
-        html_viewer = QDialog(self)
-        html_viewer.setWindowTitle("Page Source")
-        html_viewer.setMinimumSize(800, 600)
+        bookmarks_dialog = QDialog(self)
+        bookmarks_dialog.setWindowTitle("Bookmarks")
 
         layout = QVBoxLayout()
-        html_text_edit = QTextEdit()
-        html_text_edit.setPlainText(html)
-        html_text_edit.setReadOnly(True)
 
-        layout.addWidget(html_text_edit)
+        for url in self.bookmarks:
+            bookmark_layout = QHBoxLayout()
+
+            bookmark_label = QLabel(url)
+            bookmark_layout.addWidget(bookmark_label)
+
+            open_btn = QPushButton("Open")
+            open_btn.clicked.connect(lambda _, url=url: self.add_new_tab(QUrl(url), url))
+            bookmark_layout.addWidget(open_btn)
+
+            delete_btn = QPushButton("Delete")
+            delete_btn.clicked.connect(lambda _, url=url: self.delete_bookmark(url, bookmarks_dialog))
+            bookmark_layout.addWidget(delete_btn)
+
+            layout.addLayout(bookmark_layout)
 
         close_button = QPushButton("Close")
-        close_button.clicked.connect(html_viewer.accept)
+        close_button.clicked.connect(bookmarks_dialog.accept)
         layout.addWidget(close_button)
 
-        html_viewer.setLayout(layout)
-        html_viewer.exec_()
+        bookmarks_dialog.setLayout(layout)
+        bookmarks_dialog.exec_()
+
+    def delete_bookmark(self, url, dialog):
+        if url in self.bookmarks:
+            self.bookmarks.remove(url)
+            self.settings.setValue("bookmarks", self.bookmarks)
+            dialog.accept()
+            self.show_bookmarks()
+
+    def view_page_source(self):
+        page_source_dialog = QDialog(self)
+        page_source_dialog.setWindowTitle("Page Source")
+
+        layout = QVBoxLayout()
+
+        source_browser = QTextEdit()
+        source_browser.setReadOnly(True)
+        page = self.current_browser().page()
+        page.toHtml(lambda html: source_browser.setText(html))
+
+        layout.addWidget(source_browser)
+
+        close_button = QPushButton("Close")
+        close_button.clicked.connect(page_source_dialog.accept)
+        layout.addWidget(close_button)
+
+        page_source_dialog.setLayout(layout)
+        page_source_dialog.exec_()
 
     def save_page(self):
-        current_browser = self.current_browser()
+        filename, _ = QFileDialog.getSaveFileName(self, "Save Page", "", "HTML Files (*.html)")
+        if filename:
+            page = self.current_browser().page()
+            page.toHtml(lambda html: self.write_to_file(filename, html))
 
-       
-        current_browser.page().toHtml(lambda html: self.save_html_to_file(html))
-
-    def save_html_to_file(self, html):
-     
-        options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getSaveFileName(self, "Save HTML File", "", "HTML Files (*.html);;All Files (*)", options=options)
-
-        if file_name:
-            try:
-                with open(file_name, 'w', encoding='utf-8') as file:
-                    file.write(html)
-                QMessageBox.information(self, "Success", "Page saved successfully!")
-            except Exception as e:
-                QMessageBox.critical(self, "Error", f"Could not save file: {e}")
-
-if __name__ == '__main__':
+    def write_to_file(self, filename, content):
+        with open(filename, "w", encoding="utf-8") as file:
+            file.write(content)
+        QMessageBox.information(self, "Page Saved", f"Page has been saved to {filename}.")
+if __name__ == "__main__":
     app = QApplication(sys.argv)
+    app.setApplicationName("FreakyBrowse")
+    app.setWindowIcon(QIcon("logo.ico")) 
+    
     window = MainWindow()
-    sys.exit(app.exec_())
-#!!!!!!!!!grgeg rgeg I am steve
+    app.exec_()
+#I am steve :33333 GREG GREG GREG I HATE YOU !!!!VFYUGEIHLJ:K:D<MNFKGILEHQODJLK:A?<
