@@ -260,24 +260,25 @@ class MainWindow(QMainWindow):
             self.show_bookmarks()
 
     def view_page_source(self):
-        page_source_dialog = QDialog(self)
-        page_source_dialog.setWindowTitle("Page Source")
-
+     
+        current_browser = self.current_browser()
+        
+       
+        current_browser.page().toHtml(lambda html: self.show_html(html))
+    def show_html(self, html):
+        html_viewer = QDialog(self)
+        html_viewer.setWindowTitle("Page Source")
+        html_viewer.setMinimumSize(800, 600)
         layout = QVBoxLayout()
-
-        source_browser = QTextEdit()
-        source_browser.setReadOnly(True)
-        page = self.current_browser().page()
-        page.toHtml(lambda html: source_browser.setText(html))
-
-        layout.addWidget(source_browser)
-
+        html_text_edit = QTextEdit()
+        html_text_edit.setPlainText(html)
+        html_text_edit.setReadOnly(True)
+        layout.addWidget(html_text_edit)
         close_button = QPushButton("Close")
-        close_button.clicked.connect(page_source_dialog.accept)
+        close_button.clicked.connect(html_viewer.accept)
         layout.addWidget(close_button)
-
-        page_source_dialog.setLayout(layout)
-        page_source_dialog.exec_()
+        html_viewer.setLayout(layout)
+        html_viewer.exec_()
 
     def save_page(self):
         filename, _ = QFileDialog.getSaveFileName(self, "Save Page", "", "HTML Files (*.html)")
