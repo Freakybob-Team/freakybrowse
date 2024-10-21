@@ -39,7 +39,14 @@ class MainWindow(QMainWindow):
         color: white;
     }
     """
-
+ef keyPressEvent(self, e):  
+    if e.key() == QtCore.Qt.Key_Escape:
+        self.close()
+    if e.key() == QtCore.Qt.Key_F11:
+        if self.isMaximized():
+            self.showNormal()
+        else:
+            self.showMaximized()
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
