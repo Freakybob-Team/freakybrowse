@@ -186,11 +186,7 @@ class MainWindow(QMainWindow):
         self.dark_mode_enabled = enabled
         self.settings.setValue("dark_mode", self.dark_mode_enabled)
 
-    def toggle_nav_toolbar(self, enabled):
-        self.navtb.setVisible(enabled)
-        self.nav_toolbar_visible = enabled
-        self.settings.setValue("nav_toolbar_visible", self.nav_toolbar_visible)
-
+   
     def open_settings(self):
         settings_dialog = QDialog(self)
         settings_dialog.setWindowTitle("Settings")
@@ -202,10 +198,7 @@ class MainWindow(QMainWindow):
         dark_mode_checkbox.stateChanged.connect(lambda: self.toggle_dark_mode(dark_mode_checkbox.isChecked()))
         layout.addWidget(dark_mode_checkbox)
 
-        nav_toolbar_checkbox = QCheckBox("Show Navigation Toolbar")
-        nav_toolbar_checkbox.setChecked(self.nav_toolbar_visible)
-        nav_toolbar_checkbox.stateChanged.connect(lambda: self.toggle_nav_toolbar(nav_toolbar_checkbox.isChecked()))
-        layout.addWidget(nav_toolbar_checkbox)
+       # so uh, You don't see the nav thing here cause I deleted it. greg :3
 
         close_button = QPushButton("Close")
         close_button.clicked.connect(settings_dialog.accept)
