@@ -39,6 +39,39 @@ class MainWindow(QMainWindow):
         color: white;
     }
     """
+    PINK_MODE_STYLE = """
+    QMainWindow {
+        background-color: #2b2b2b;
+        color: white;
+    }
+    QToolBar, QLineEdit, QStatusBar {
+        background-color: #fc3bed;
+        color: #0a0109;
+    }
+    QLineEdit {
+        border: 1px solid #5c5c5c;
+    }
+    QToolButton {
+        background-color: #fc3bed;
+        color: #0a0109;
+    }
+    QTabWidget::pane {
+        border-top: 1px solid #444;
+    }
+    QTabBar::tab {
+        background-color: #cf09c0;
+        color: #0a0109;
+        padding: 5px;
+    }
+    QTabBar::tab:selected {
+        background-color: #fc3bed;
+        color: #0a0109;
+    }
+    QTabBar::tab:hover {
+        background-color: #a70c9b;
+        color: #0a0109;
+    }
+    """
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
@@ -121,15 +154,18 @@ class MainWindow(QMainWindow):
 
         self.settings = QSettings("FreakyBrowse", "UserPreferences")
         self.dark_mode_enabled = self.settings.value("dark_mode", False, type=bool)
-        self.nav_toolbar_visible = self.settings.value("nav_toolbar_visible", True, type=bool)
+        self.pink_mode_enabled = self.settings.value("pink_mode", False, type=bool)
 
         self.bookmarks = self.settings.value("bookmarks", [], type=list)
 
-        self.navtb.setVisible(True)
-        self.toggle_dark_mode(self.dark_mode_enabled)
+    
+        self.toggle_mode()
 
         self.add_new_tab(QUrl(self.HOME_URL), "New Tab")
         self.show()
+        self.bookmarks = self.settings.value("bookmarks", [], type=list)
+
+        
 
     def add_new_tab(self, qurl=None, label="New Tab"):
         if qurl is None:
@@ -178,15 +214,30 @@ class MainWindow(QMainWindow):
             return
         self.tabs.removeTab(i)
 
-    def toggle_dark_mode(self, enabled):
-        if enabled:
+    def toggle_mode(self):
+        if self.dark_mode_enabled:
             self.setStyleSheet(self.DARK_MODE_STYLE)
+        elif self.pink_mode_enabled:
+            self.setStyleSheet(self.PINK_MODE_STYLE)
         else:
             self.setStyleSheet("")
-        self.dark_mode_enabled = enabled
-        self.settings.setValue("dark_mode", self.dark_mode_enabled)
 
-   
+    def toggle_dark_mode(self, enabled):
+        if enabled:
+            self.pink_mode_enabled = False
+        self.dark_mode_enabled = enabled
+        self.settings.setValue("dark_mode", enabled)
+        self.settings.setValue("pink_mode", self.pink_mode_enabled)
+        self.toggle_mode()
+
+    def toggle_pink_mode(self, enabled):
+        if enabled:
+            self.dark_mode_enabled = False
+        self.pink_mode_enabled = enabled
+        self.settings.setValue("pink_mode", enabled)
+        self.settings.setValue("dark_mode", self.dark_mode_enabled)
+        self.toggle_mode()
+
     def open_settings(self):
         settings_dialog = QDialog(self)
         settings_dialog.setWindowTitle("Settings")
@@ -198,7 +249,11 @@ class MainWindow(QMainWindow):
         dark_mode_checkbox.stateChanged.connect(lambda: self.toggle_dark_mode(dark_mode_checkbox.isChecked()))
         layout.addWidget(dark_mode_checkbox)
 
-       # so uh, You don't see the nav thing here cause I deleted it. greg :3
+        pink_mode_checkbox = QCheckBox("Enable Triston's Color: Hot Pink!")
+        pink_mode_checkbox.setChecked(self.pink_mode_enabled)
+        pink_mode_checkbox.stateChanged.connect(lambda: self.toggle_pink_mode(pink_mode_checkbox.isChecked()))
+        layout.addWidget(pink_mode_checkbox)
+
 
         close_button = QPushButton("Close")
         close_button.clicked.connect(settings_dialog.accept)
@@ -283,6 +338,7 @@ class MainWindow(QMainWindow):
         with open(filename, "w", encoding="utf-8") as file:
             file.write(content)
         QMessageBox.information(self, "Page Saved", f"Page has been saved to {filename}.")
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setApplicationName("FreakyBrowse")
