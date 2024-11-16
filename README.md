@@ -1,5 +1,5 @@
 # WARNING!
-We have switched to PyQt6! Before running, run these commands in your terminal:
+We have switched to PyQt6! Before running 1.6+, run these commands in your terminal:
 > pip install PyQt6
 
 
