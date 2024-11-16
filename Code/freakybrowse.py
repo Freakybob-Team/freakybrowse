@@ -261,7 +261,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(close_button)
 
         settings_dialog.setLayout(layout)
-        settings_dialog.exec_()
+        settings_dialog.exec() # settings_dialog.exec_() is deprecated in PyQt6
 
     def bookmark_page(self):
         url = self.current_browser().url().toString()
@@ -299,7 +299,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(close_button)
 
         bookmarks_dialog.setLayout(layout)
-        bookmarks_dialog.exec_()
+        bookmarks_dialog.exec() # bookmarks_dialog.exec_() is deprecated in PyQt6
 
     def delete_bookmark(self, url, dialog):
         if url in self.bookmarks:
@@ -327,7 +327,7 @@ class MainWindow(QMainWindow):
         close_button.clicked.connect(html_viewer.accept)
         layout.addWidget(close_button)
         html_viewer.setLayout(layout)
-        html_viewer.exec_()
+        html_viewer.exec() # html_viewer.exec_() is deprecated in PyQt6
 
     def save_page(self):
         filename, _ = QFileDialog.getSaveFileName(self, "Save Page", "", "HTML Files (*.html)")
