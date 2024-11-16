@@ -1,8 +1,9 @@
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtWebEngineWidgets import *
+from PyQt6.QtCore import *
+from PyQt6.QtWidgets import *
+from PyQt6.QtGui import *
+from PyQt6.QtWebEngineWidgets import *
 import sys
+from subprocess import Popen
 
 class MainWindow(QMainWindow):
     HOME_URL = "https://search.freakybob.site/"
@@ -345,5 +346,5 @@ if __name__ == "__main__":
     app.setWindowIcon(QIcon("logo.ico")) 
     
     window = MainWindow()
-    app.exec_()
+    app.exec() # app.exec_() is deprecated in PyQt6
 #I am steve :33333 GREG GREG GREG I HATE YOU !!!!VFYUGEIHLJ:K:D<MNFKGILEHQODJLK:A?<
