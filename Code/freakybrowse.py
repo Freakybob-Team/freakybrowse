@@ -3,6 +3,9 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 from PyQt6.QtWebEngineWidgets import *
 import sys
+import PyQtInspect
+import os
+
 class MainWindow(QMainWindow):
     HOME_URL = "https://search.freakybob.site/"
     DARK_MODE_STYLE = """
@@ -163,6 +166,11 @@ class MainWindow(QMainWindow):
         self.add_new_tab(QUrl(self.HOME_URL), "New Tab")
         self.show()
         self.bookmarks = self.settings.value("bookmarks", [], type=list)
+
+        dev_btn = QAction("DevTools", self)
+        dev_btn.setStatusTip("Opens PyQtInspect (WARNING: VOIDS WARRENTY)")
+        dev_btn.triggered.connect(lambda: os.system("pqi-server && python -m PyQtInspect"))
+        self.navtb.addAction(dev_btn)
 
         
 
