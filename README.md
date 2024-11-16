@@ -1,6 +1,11 @@
-# FreakyBrowse!
-This is a Browser completly written in Python! We used a lot of guides for the app so keep in mind that we are not THAT smart. 
+# WARNING!
+We have switched to PyQt6! Before running, run these commands in your terminal:
+> pip install PyQt6
 
+
+> pip install PyQt6-WebEngine
+# FreakyBrowse!
+This is a browser completly written in Python! We used a lot of guides for the app so keep in mind that we are not THAT smart. 
 This gets updates pretty often so make sure to delete the old FreakyBrowse before installing the new version unless you really want it still!
 
 Latest Version: V.1.5
@@ -15,5 +20,3 @@ Search.freakybob.site(5th background Image)
 FreakyBrowse Screenshots! 
 ![image](https://github.com/user-attachments/assets/15825aa2-c08f-4ae4-894c-89f076c8a7a6)
 ![image](https://github.com/user-attachments/assets/244b5f9e-4544-4a33-9a13-e844908f9549)
-
-# ⚠️This is not meant to compete. This is all completly for fun ⚠️
