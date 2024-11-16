@@ -3,8 +3,6 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 from PyQt6.QtWebEngineWidgets import *
 import sys
-from subprocess import Popen
-
 class MainWindow(QMainWindow):
     HOME_URL = "https://search.freakybob.site/"
     DARK_MODE_STYLE = """
