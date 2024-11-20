@@ -3,10 +3,6 @@ We have switched to PyQt6! Before running 1.6+, run these commands in your termi
 > pip install PyQt6
 > pip install PyQt6-WebEngine
 
-Optional
-
-> pip install PyQtInspect
-
 # FreakyBrowse!
 This is a browser completly written in Python! We used a lot of guides for the app so keep in mind that we are not THAT smart. 
 This gets updates pretty often so make sure to delete the old FreakyBrowse before installing the new version unless you really want it still!
