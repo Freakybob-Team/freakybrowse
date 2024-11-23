@@ -2,6 +2,9 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 from PyQt6.QtWebEngineWidgets import *
+from PyQt6.QtWidgets import QToolBar, QPushButton
+from PyQt6.QtGui import QIcon
+from PyQt6.QtCore import QSize
 import sys
 
 class MainWindow(QMainWindow):
@@ -96,23 +99,23 @@ class MainWindow(QMainWindow):
         self.navtb = QToolBar("Navigation")
         self.addToolBar(self.navtb)
 
-        back_btn = QAction("Back", self)
+        back_btn = QAction(QIcon("icons/back.png"), "Back", self)
         back_btn.setStatusTip("Go back")
         back_btn.triggered.connect(lambda: self.current_browser().back())
         self.navtb.addAction(back_btn)
 
-        next_btn = QAction("Forward", self)
+        next_btn = QAction(QIcon("icons/forward.png"), "Forward", self)
         next_btn.setStatusTip("Go forward")
         next_btn.triggered.connect(lambda: self.current_browser().forward())
         self.navtb.addAction(next_btn)
 
-        reload_btn = QAction("Reload", self)
+        reload_btn = QAction(QIcon("icons/refresh.png"), "Reload", self)
         reload_btn.setStatusTip("Reload the page")
         reload_btn.triggered.connect(lambda: self.current_browser().reload())
         self.navtb.addAction(reload_btn)
 
-        home_btn = QAction("Home", self)
-        home_btn.setStatusTip("Go home")
+        home_btn = QAction(QIcon("icons/home.png"), "Home", self)
+        home_btn.setStatusTip("Go back to home")
         home_btn.triggered.connect(self.navigate_home)
         self.navtb.addAction(home_btn)
 
@@ -122,32 +125,32 @@ class MainWindow(QMainWindow):
         self.urlbar.returnPressed.connect(self.navigate_to_url)
         self.navtb.addWidget(self.urlbar)
 
-        stop_btn = QAction("Stop", self)
+        stop_btn = QAction(QIcon("icons/stop.png"), "Stop", self)
         stop_btn.setStatusTip("Stop loading the page")
         stop_btn.triggered.connect(lambda: self.current_browser().stop())
         self.navtb.addAction(stop_btn)
 
-        settings_btn = QAction("Settings", self)
+        settings_btn = QAction(QIcon("icons/settings.png"), "Settings", self)
         settings_btn.setStatusTip("Open Settings")
         settings_btn.triggered.connect(self.open_settings)
         self.navtb.addAction(settings_btn)
 
-        bookmark_btn = QAction("Bookmark", self)
+        bookmark_btn = QAction(QIcon("icons/bookmark.png"), "Bookmark", self)
         bookmark_btn.setStatusTip("Bookmark this page")
         bookmark_btn.triggered.connect(self.bookmark_page)
         self.navtb.addAction(bookmark_btn)
 
-        view_bookmarks_btn = QAction("View Bookmarks", self)
+        view_bookmarks_btn = QAction(QIcon("icons/bookmarks.png"), "Home", self)
         view_bookmarks_btn.setStatusTip("View all bookmarks")
         view_bookmarks_btn.triggered.connect(self.show_bookmarks)
         self.navtb.addAction(view_bookmarks_btn)
 
-        view_source_btn = QAction("View Page Source", self)
+        view_source_btn = QAction(QIcon("icons/source.png"), "View Source", self)
         view_source_btn.setStatusTip("View the source of the current page")
         view_source_btn.triggered.connect(self.view_page_source)
         self.navtb.addAction(view_source_btn)
 
-        save_page_btn = QAction("Save Page", self)
+        save_page_btn = QAction(QIcon("icons/download.png"), "Save Page", self)
         save_page_btn.setStatusTip("Save the current page as HTML")
         save_page_btn.triggered.connect(self.save_page)
         self.navtb.addAction(save_page_btn)
