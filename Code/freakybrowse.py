@@ -140,7 +140,7 @@ class MainWindow(QMainWindow):
         bookmark_btn.triggered.connect(self.bookmark_page)
         self.navtb.addAction(bookmark_btn)
 
-        view_bookmarks_btn = QAction(QIcon("icons/bookmarks.png"), "Home", self)
+        view_bookmarks_btn = QAction(QIcon("icons/bookmarks.png"), "Bookmarks", self)
         view_bookmarks_btn.setStatusTip("View all bookmarks")
         view_bookmarks_btn.triggered.connect(self.show_bookmarks)
         self.navtb.addAction(view_bookmarks_btn)
