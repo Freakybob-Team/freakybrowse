@@ -147,7 +147,7 @@ class MainWindow(QMainWindow):
         self.navtb.addAction(settings_btn)
 
         bookmark_btn = QAction(QIcon(resource_path("icons/bookmark.png")), "Bookmark", self)
-        bookmark_btn.setStatusTip("test greg")
+        bookmark_btn.setStatusTip("Bookmark this page!")
         bookmark_btn.triggered.connect(self.bookmark_page)
         self.navtb.addAction(bookmark_btn)
 
