@@ -29,18 +29,30 @@ class MainWindow(QMainWindow):
     }
     QLineEdit {
         border: 1px solid #5c5c5c;
+        border-radius: 5px;
+        padding: 5px;
     }
     QToolButton {
         background-color: #3c3c3c;
         color: white;
+        border-radius: 5px;
+        padding: 5px;
+    }
+    QToolButton:hover {
+        background-color: #5c5c5c;
     }
     QTabWidget::pane {
         border-top: 1px solid #444;
+        background-color: #2b2b2b;
     }
     QTabBar::tab {
         background-color: #3c3c3c;
         color: white;
-        padding: 5px;
+        padding: 10px;
+        border-top-left-radius: 0px;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+        border-bottom-left-radius: 0px;
     }
     QTabBar::tab:selected {
         background-color: #5c5c5c;
@@ -50,40 +62,79 @@ class MainWindow(QMainWindow):
         background-color: #4c4c4c;
         color: white;
     }
+    QStatusBar {
+        border-top: 2px solid #3c3c3c;
+    }
+    QMenuBar {
+        background-color: #3c3c3c;
+        color: white;
+    }
+    QMenuBar::item:selected {
+        background-color: #5c5c5c;
+    }
+    QDockWidget {
+        background-color: #3c3c3c;
+    }
     """
     PINK_MODE_STYLE = """
     QMainWindow {
-        background-color: #2b2b2b;
+        background-color: #ff8ad1;
         color: white;
     }
     QToolBar, QLineEdit, QStatusBar {
-        background-color: #fc3bed;
-        color: #0a0109;
+        background-color: #ff8ad1;
+        color: #2a2a2a;
     }
     QLineEdit {
-        border: 1px solid #5c5c5c;
-    }
-    QToolButton {
-        background-color: #fc3bed;
-        color: #0a0109;
-    }
-    QTabWidget::pane {
-        border-top: 1px solid #444;
-    }
-    QTabBar::tab {
-        background-color: #cf09c0;
-        color: #0a0109;
+        border: 1px solid #ff6bc2;
+        border-radius: 5px;
         padding: 5px;
     }
+    QToolButton {
+        background-color: #ff8ad1;
+        color: #2a2a2a;
+        border-radius: 5px;
+        padding: 5px;
+    }
+    QToolButton:hover {
+        background-color: #ff6bc2;
+    }
+    QTabWidget::pane {
+        border: none;
+        background-color: #ff8ad1;
+    }
+    QTabBar::tab {
+        background-color: #b61396;
+        color: #21f0d7;
+        padding: 10px;
+        border-top-left-radius: 0px;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+        border-bottom-left-radius: 0px;
+    }
     QTabBar::tab:selected {
-        background-color: #fc3bed;
-        color: #0a0109;
+        background-color: #923872;
+        color: #19eada;
     }
     QTabBar::tab:hover {
-        background-color: #a70c9b;
-        color: #0a0109;
+        background-color: #b91c81;
+        color: #84f4f9;
+    }
+    QStatusBar {
+        border-top: 2px solid #ff8ad1;
+    }
+    QMenuBar {
+        background-color: #ff8ad1;
+        color: #2a2a2a;
+    }
+    QMenuBar::item:selected {
+        background-color: #ff6bc2;
+    }
+    QDockWidget {
+        background-color: #ff8ad1;
     }
     """
+
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
@@ -265,7 +316,7 @@ class MainWindow(QMainWindow):
         dark_mode_checkbox.stateChanged.connect(lambda: self.toggle_dark_mode(dark_mode_checkbox.isChecked()))
         layout.addWidget(dark_mode_checkbox)
 
-        pink_mode_checkbox = QCheckBox("Enable Triston's Color: Hot Pink!")
+        pink_mode_checkbox = QCheckBox("Enable Pink Mode")
         pink_mode_checkbox.setChecked(self.pink_mode_enabled)
         pink_mode_checkbox.stateChanged.connect(lambda: self.toggle_pink_mode(pink_mode_checkbox.isChecked()))
         layout.addWidget(pink_mode_checkbox)
