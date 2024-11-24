@@ -5,8 +5,17 @@ from PyQt6.QtWebEngineWidgets import *
 from PyQt6.QtWidgets import QToolBar, QPushButton
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import QSize
+from PyQt6.QtGui import QAction
+from PyQt6.QtCore import QUrl, QSettings
 import sys
-
+import os
+def resource_path(relative_path):
+    """ Get the absolute path to a resource, works for dev and bundled apps """
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 class MainWindow(QMainWindow):
     HOME_URL = "https://search.freakybob.site/"
     DARK_MODE_STYLE = """
@@ -75,15 +84,16 @@ class MainWindow(QMainWindow):
         color: #0a0109;
     }
     """
-
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
         try:
-            self.setWindowIcon(QIcon("logo.ico"))
+            icon_path = resource_path("icons/logo.ico")
+            self.setWindowIcon(QIcon(icon_path))
         except Exception as e:
             print(f"Error loading icon: {e}")
 
+         
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
         self.tabs.setTabsClosable(True)
@@ -99,22 +109,23 @@ class MainWindow(QMainWindow):
         self.navtb = QToolBar("Navigation")
         self.addToolBar(self.navtb)
 
-        back_btn = QAction(QIcon("icons/back.png"), "Back", self)
+        
+        back_btn = QAction(QIcon(resource_path("icons/back.png")), "Back", self)
         back_btn.setStatusTip("Go back")
         back_btn.triggered.connect(lambda: self.current_browser().back())
         self.navtb.addAction(back_btn)
 
-        next_btn = QAction(QIcon("icons/forward.png"), "Forward", self)
+        next_btn = QAction(QIcon(resource_path("icons/forward.png")), "Forward", self)
         next_btn.setStatusTip("Go forward")
         next_btn.triggered.connect(lambda: self.current_browser().forward())
         self.navtb.addAction(next_btn)
 
-        reload_btn = QAction(QIcon("icons/refresh.png"), "Reload", self)
+        reload_btn = QAction(QIcon(resource_path("icons/refresh.png")), "Reload", self)
         reload_btn.setStatusTip("Reload the page")
         reload_btn.triggered.connect(lambda: self.current_browser().reload())
         self.navtb.addAction(reload_btn)
 
-        home_btn = QAction(QIcon("icons/home.png"), "Home", self)
+        home_btn = QAction(QIcon(resource_path("icons/home.png")), "Home", self)
         home_btn.setStatusTip("Go back to home")
         home_btn.triggered.connect(self.navigate_home)
         self.navtb.addAction(home_btn)
@@ -125,32 +136,32 @@ class MainWindow(QMainWindow):
         self.urlbar.returnPressed.connect(self.navigate_to_url)
         self.navtb.addWidget(self.urlbar)
 
-        stop_btn = QAction(QIcon("icons/stop.png"), "Stop", self)
+        stop_btn = QAction(QIcon(resource_path("icons/stop.png")), "Stop", self)
         stop_btn.setStatusTip("Stop loading the page")
         stop_btn.triggered.connect(lambda: self.current_browser().stop())
         self.navtb.addAction(stop_btn)
 
-        settings_btn = QAction(QIcon("icons/settings.png"), "Settings", self)
+        settings_btn = QAction(QIcon(resource_path("icons/settings.png")), "Settings", self)
         settings_btn.setStatusTip("Open Settings")
         settings_btn.triggered.connect(self.open_settings)
         self.navtb.addAction(settings_btn)
 
-        bookmark_btn = QAction(QIcon("icons/bookmark.png"), "Bookmark", self)
-        bookmark_btn.setStatusTip("Bookmark this page")
+        bookmark_btn = QAction(QIcon(resource_path("icons/bookmark.png")), "Bookmark", self)
+        bookmark_btn.setStatusTip("test greg")
         bookmark_btn.triggered.connect(self.bookmark_page)
         self.navtb.addAction(bookmark_btn)
 
-        view_bookmarks_btn = QAction(QIcon("icons/bookmarks.png"), "Bookmarks", self)
+        view_bookmarks_btn = QAction(QIcon(resource_path("icons/bookmarks.png")), "Bookmarks", self)
         view_bookmarks_btn.setStatusTip("View all bookmarks")
         view_bookmarks_btn.triggered.connect(self.show_bookmarks)
         self.navtb.addAction(view_bookmarks_btn)
 
-        view_source_btn = QAction(QIcon("icons/source.png"), "View Source", self)
+        view_source_btn = QAction(QIcon(resource_path("icons/source.png")), "View Source", self)
         view_source_btn.setStatusTip("View the source of the current page")
         view_source_btn.triggered.connect(self.view_page_source)
         self.navtb.addAction(view_source_btn)
 
-        save_page_btn = QAction(QIcon("icons/download.png"), "Save Page", self)
+        save_page_btn = QAction(QIcon(resource_path("icons/download.png")), "Save Page", self)
         save_page_btn.setStatusTip("Save the current page as HTML")
         save_page_btn.triggered.connect(self.save_page)
         self.navtb.addAction(save_page_btn)
@@ -158,14 +169,16 @@ class MainWindow(QMainWindow):
         self.settings = QSettings("FreakyBrowse", "UserPreferences")
         self.dark_mode_enabled = self.settings.value("dark_mode", False, type=bool)
         self.pink_mode_enabled = self.settings.value("pink_mode", False, type=bool)
-
         self.bookmarks = self.settings.value("bookmarks", [], type=list)
 
-    
+       
         self.toggle_mode()
 
+        
         self.add_new_tab(QUrl(self.HOME_URL), "New Tab")
         self.show()
+
+        
         self.bookmarks = self.settings.value("bookmarks", [], type=list)
 
         
