@@ -7,7 +7,7 @@ We have switched to PyQt6! Before running 1.6+, run these commands in your termi
 This is a browser completly written in Python! We used a lot of guides for the app so keep in mind that we are not THAT smart. 
 This gets updates pretty often so make sure to delete the old FreakyBrowse before installing the new version unless you really want it still!
 
-Latest Version: V.1.6
+Latest Version: V.1.7
 
 Software supported: Windows
 
