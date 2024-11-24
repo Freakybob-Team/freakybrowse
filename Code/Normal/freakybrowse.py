@@ -7,6 +7,10 @@ from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QAction
 from PyQt6.QtCore import QUrl, QSettings
+from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QListWidget, QTextEdit, QInputDialog, QMessageBox
+from PyQt6.QtGui import QImage, QPixmap
+from PyQt6.QtWidgets import QApplication, QTextEdit, QInputDialog
+from PyQt6.QtCore import Qt
 import sys
 import os
 def resource_path(relative_path):
@@ -322,12 +326,151 @@ class MainWindow(QMainWindow):
         layout.addWidget(pink_mode_checkbox)
 
 
+        
+        notes_button = QPushButton("Manage Notes")
+        notes_button.clicked.connect(self.manage_notes)
+        layout.addWidget(notes_button)
+
+        
         close_button = QPushButton("Close")
         close_button.clicked.connect(settings_dialog.accept)
         layout.addWidget(close_button)
 
         settings_dialog.setLayout(layout)
-        settings_dialog.exec() # settings_dialog.exec_() is deprecated in PyQt6
+        settings_dialog.exec()
+
+    def manage_notes(self):
+        notes_dialog = QDialog(self)
+        notes_dialog.setWindowTitle("Notes Manager")
+        notes_dialog.setMinimumSize(600, 400)
+
+        layout = QVBoxLayout()
+
+    
+        notes_list = QListWidget()
+        layout.addWidget(notes_list)
+
+    
+        saved_notes = self.settings.value("notes", {}, type=dict)
+        for note_name in saved_notes.keys():
+            notes_list.addItem(note_name)
+
+    
+        button_layout = QHBoxLayout()
+
+    
+        add_note_button = QPushButton("Add Note")
+    
+        add_note_button.clicked.connect(lambda: self.add_note_dialog(notes_list, saved_notes))
+        button_layout.addWidget(add_note_button)
+
+    
+        delete_note_button = QPushButton("Delete Note")
+        delete_note_button.clicked.connect(lambda: self.delete_note(notes_list, saved_notes))
+        button_layout.addWidget(delete_note_button)
+
+        layout.addLayout(button_layout)
+
+    
+        note_viewer = QTextEdit()
+        note_viewer.setReadOnly(False)
+        layout.addWidget(note_viewer)
+
+    
+        upload_image_button = QPushButton("Insert Image")
+        upload_image_button.clicked.connect(lambda: self.insert_image(note_viewer))
+        layout.addWidget(upload_image_button)
+
+    
+        def load_note_content():
+            selected_item = notes_list.currentItem()
+            if selected_item:
+                note_content = saved_notes.get(selected_item.text(), "")
+                note_viewer.setHtml(note_content)
+            else:
+                note_viewer.clear()
+        notes_list.itemSelectionChanged.connect(load_note_content)
+          
+
+    
+        def save_note_content():
+            selected_item = notes_list.currentItem()
+            if selected_item:
+                saved_notes[selected_item.text()] = note_viewer.toHtml()
+                self.settings.setValue("notes", saved_notes)
+
+        note_viewer.textChanged.connect(save_note_content)
+
+        notes_dialog.setLayout(layout)
+        notes_dialog.exec()
+
+    def add_note_dialog(self, notes_list, saved_notes):
+        text, ok = QInputDialog.getText(self, "Add Note", "Enter note name:")
+    
+   
+        if not ok:
+            return
+
+   
+        if text:
+            notes_list.addItem(text)
+        saved_notes[text] = ""
+
+   
+        self.settings.setValue("notes", saved_notes)
+
+   
+        item = notes_list.findItems(text, Qt.MatchFlag.MatchExactly)[0]
+        notes_list.setCurrentItem(item)
+
+   
+        note_viewer = self.findChild(QTextEdit) 
+        note_viewer.setHtml("")
+        note_viewer.setFocus()
+
+
+    def delete_note(self, notes_list, saved_notes):
+        selected_item = notes_list.currentItem()
+        if selected_item:
+            note_name = selected_item.text()
+        confirm = QMessageBox.question(self, "Delete Note", f"Are you sure you want to delete '{note_name}'?", 
+                                       QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, 
+                                       QMessageBox.StandardButton.No)
+        
+        if confirm == QMessageBox.StandardButton.Yes:
+            
+            notes_list.takeItem(notes_list.row(selected_item))
+            
+            
+            saved_notes.pop(note_name, None)
+            
+            
+            self.settings.setValue("notes", saved_notes)
+    def insert_image(self, note_viewer):
+        image_path, _ = QFileDialog.getOpenFileName(self, "Select Image", "", "Images (*.png *.jpg *.jpeg *.bmp *.gif)")
+        if not image_path:
+            return 
+    
+        width, ok = QInputDialog.getInt(self, "Image Width", "Enter image width:", 300, 1, 10000, 1)
+        if not ok:
+            return
+
+        height, ok = QInputDialog.getInt(self, "Image Height", "Enter image height:", 300, 1, 10000, 1)
+        if not ok:
+            return
+
+    
+        file_extension = image_path.split('.')[-1].lower()
+
+        if file_extension == "gif":
+        
+            note_viewer.insertHtml(f'<img src="{image_path}" width="{width}" height="{height}" alt="GIF">')
+        else:
+        
+            note_viewer.insertHtml(f'<img src="{image_path}" width="{width}" height="{height}">')
+
+
+
 
     def bookmark_page(self):
         url = self.current_browser().url().toString()
