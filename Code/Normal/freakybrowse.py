@@ -8,7 +8,6 @@ from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QAction
 from PyQt6.QtCore import QUrl, QSettings
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QListWidget, QTextEdit, QInputDialog, QMessageBox
-from PyQt6.QtGui import QImage, QPixmap
 from PyQt6.QtWidgets import QApplication, QTextEdit, QInputDialog
 from PyQt6.QtCore import Qt
 import sys
