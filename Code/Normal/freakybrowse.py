@@ -10,6 +10,7 @@ from PyQt6.QtCore import QUrl, QSettings
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QListWidget, QTextEdit, QInputDialog, QMessageBox
 from PyQt6.QtWidgets import QApplication, QTextEdit, QInputDialog
 from PyQt6.QtCore import Qt
+QPixmap
 import sys
 import os
 def resource_path(relative_path):
@@ -137,7 +138,297 @@ class MainWindow(QMainWindow):
         background-color: #ff8ad1;
     }
     """
-
+    BLUE_MODE_STYLE = """
+    QMainWindow {
+        background-color: #3a4e8f;
+        color: white;
+    }
+    QToolBar, QLineEdit, QStatusBar {
+        background-color: #2a3f7a;
+        color: white;
+    }
+    QLineEdit {
+        border: 1px solid #6a7d99;
+        border-radius: 5px;
+        padding: 5px;
+    }
+    QToolButton {
+        background-color: #2a3f7a;
+        color: white;
+        border-radius: 5px;
+        padding: 5px;
+    }
+    QToolButton:hover {
+        background-color: #4a5f8b;
+    }
+    QTabWidget::pane {
+        border-top: 1px solid #3a4e8f;
+        background-color: #2a3f7a;
+    }
+    QTabBar::tab {
+        background-color: #1e2a56;
+        color: white;
+        padding: 10px;
+        border-top-left-radius: 0px;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+        border-bottom-left-radius: 0px;
+    }
+    QTabBar::tab:selected {
+        background-color: #4a5f8b;
+        color: white;
+    }
+    QTabBar::tab:hover {
+        background-color: #3a4e8f;
+        color: white;
+    }
+    QStatusBar {
+        border-top: 2px solid #2a3f7a;
+    }
+    QMenuBar {
+        background-color: #2a3f7a;
+        color: white;
+    }
+    QMenuBar::item:selected {
+        background-color: #4a5f8b;
+    }
+    QDockWidget {
+        background-color: #2a3f7a;
+    }
+    """
+    GREEN_MODE_STYLE = """
+    QMainWindow {
+        background-color: #2e8b57;
+        color: white;
+    }
+    QToolBar, QLineEdit, QStatusBar {
+        background-color: #227a4b;
+        color: white;
+    }
+    QLineEdit {
+        border: 1px solid #4caf50;
+        border-radius: 5px;
+        padding: 5px;
+    }
+    QToolButton {
+        background-color: #227a4b;
+        color: white;
+        border-radius: 5px;
+        padding: 5px;
+    }
+    QToolButton:hover {
+        background-color: #4caf50;
+    }
+    QTabWidget::pane {
+        border-top: 1px solid #2e8b57;
+        background-color: #227a4b;
+    }
+    QTabBar::tab {
+        background-color: #1d6f3c;
+        color: white;
+        padding: 10px;
+        border-top-left-radius: 0px;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+        border-bottom-left-radius: 0px;
+    }
+    QTabBar::tab:selected {
+        background-color: #4caf50;
+        color: white;
+    }
+    QTabBar::tab:hover {
+        background-color: #388e3c;
+        color: white;
+    }
+    QStatusBar {
+        border-top: 2px solid #227a4b;
+    }
+    QMenuBar {
+        background-color: #227a4b;
+        color: white;
+    }
+    QMenuBar::item:selected {
+        background-color: #4caf50;
+    }
+    QDockWidget {
+        background-color: #227a4b;
+    }
+    """
+    RED_MODE_STYLE = """
+    QMainWindow {
+        background-color: #F44336;
+        color: white;
+    }
+    QToolBar, QLineEdit, QStatusBar {
+        background-color: #D32F2F;
+        color: white;
+    }
+    QLineEdit {
+        border: 1px solid #E57373;
+        border-radius: 5px;
+        padding: 5px;
+    }
+    QToolButton {
+        background-color: #D32F2F;
+        color: white;
+        border-radius: 5px;
+        padding: 5px;
+    }
+    QToolButton:hover {
+        background-color: #E57373;
+    }
+    QTabWidget::pane {
+        border-top: 1px solid #F44336;
+        background-color: #D32F2F;
+    }
+    QTabBar::tab {
+        background-color: #C62828;
+        color: white;
+        padding: 10px;
+        border-top-left-radius: 0px;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+        border-bottom-left-radius: 0px;
+    }
+    QTabBar::tab:selected {
+        background-color: #E57373;
+        color: white;
+    }
+    QTabBar::tab:hover {
+        background-color: #D32F2F;
+        color: white;
+    }
+    QStatusBar {
+        border-top: 2px solid #D32F2F;
+    }
+    QMenuBar {
+        background-color: #D32F2F;
+        color: white;
+    }
+    QMenuBar::item:selected {
+        background-color: #E57373;
+    }
+    QDockWidget {
+        background-color: #D32F2F;
+    }
+    """
+    PURPLE_MODE_STYLE = """
+    QMainWindow {
+        background-color: #9C27B0;
+        color: white;
+    }
+    QToolBar, QLineEdit, QStatusBar {
+        background-color: #8E24AA;
+        color: white;
+    }
+    QLineEdit {
+        border: 1px solid #BA68C8;
+        border-radius: 5px;
+        padding: 5px;
+    }
+    QToolButton {
+        background-color: #8E24AA;
+        color: white;
+        border-radius: 5px;
+        padding: 5px;
+    }
+    QToolButton:hover {
+        background-color: #BA68C8;
+    }
+    QTabWidget::pane {
+        border-top: 1px solid #9C27B0;
+        background-color: #8E24AA;
+    }
+    QTabBar::tab {
+        background-color: #7B1FA2;
+        color: white;
+        padding: 10px;
+        border-top-left-radius: 0px;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+        border-bottom-left-radius: 0px;
+    }
+    QTabBar::tab:selected {
+        background-color: #BA68C8;
+        color: white;
+    }
+    QTabBar::tab:hover {
+        background-color: #9C27B0;
+        color: white;
+    }
+    QStatusBar {
+        border-top: 2px solid #8E24AA;
+    }
+    QMenuBar {
+        background-color: #8E24AA;
+        color: white;
+    }
+    QMenuBar::item:selected {
+        background-color: #BA68C8;
+    }
+    QDockWidget {
+        background-color: #8E24AA;
+    }
+    """
+    ORANGE_MODE_STYLE = """
+    QMainWindow {
+        background-color: #FF9800;
+        color: white;
+    }
+    QToolBar, QLineEdit, QStatusBar {
+        background-color: #FB8C00;
+        color: white;
+    }
+    QLineEdit {
+        border: 1px solid #FFB74D;
+        border-radius: 5px;
+        padding: 5px;
+    }
+    QToolButton {
+        background-color: #FB8C00;
+        color: white;
+        border-radius: 5px;
+        padding: 5px;
+    }
+    QToolButton:hover {
+        background-color: #FFB74D;
+    }
+    QTabWidget::pane {
+        border-top: 1px solid #FF9800;
+        background-color: #FB8C00;
+    }
+    QTabBar::tab {
+        background-color: #F57C00;
+        color: white;
+        padding: 10px;
+        border-top-left-radius: 0px;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+        border-bottom-left-radius: 0px;
+    }
+    QTabBar::tab:selected {
+        background-color: #FFB74D;
+        color: white;
+    }
+    QTabBar::tab:hover {
+        background-color: #F57C00;
+        color: white;
+    }
+    QStatusBar {
+        border-top: 2px solid #FB8C00;
+    }
+    QMenuBar {
+        background-color: #FB8C00;
+        color: white;
+    }
+    QMenuBar::item:selected {
+        background-color: #FFB74D;
+    }
+    QDockWidget {
+        background-color: #FB8C00;
+    }
+    """
+    # That's a lot of css :sob:
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
@@ -147,14 +438,14 @@ class MainWindow(QMainWindow):
         except Exception as e:
             print(f"Error loading icon: {e}")
 
-         
+        
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
         self.tabs.setTabsClosable(True)
         self.tabs.tabCloseRequested.connect(self.close_current_tab)
         self.tabs.currentChanged.connect(self.update_title)
         self.tabs.tabBarDoubleClicked.connect(self.tab_open_doubleclick)
-
+        self.home_url = MainWindow.HOME_URL
         self.setCentralWidget(self.tabs)
 
         self.status = QStatusBar()
@@ -186,14 +477,19 @@ class MainWindow(QMainWindow):
 
         self.navtb.addSeparator()
 
+
         self.urlbar = QLineEdit()
         self.urlbar.returnPressed.connect(self.navigate_to_url)
         self.navtb.addWidget(self.urlbar)
+        self.urlbar.setPlaceholderText("Enter URL...")
+        logo_action = QAction(QIcon(resource_path("logo.ico")), "Logo", self.urlbar)
+        self.urlbar.addAction(logo_action, QLineEdit.ActionPosition.LeadingPosition)
+        self.urlbar.setClearButtonEnabled(True)
 
-        stop_btn = QAction(QIcon(resource_path("icons/stop.png")), "Stop", self)
-        stop_btn.setStatusTip("Stop loading the page")
-        stop_btn.triggered.connect(lambda: self.current_browser().stop())
-        self.navtb.addAction(stop_btn)
+        notes_button = QAction(QIcon(resource_path("icons/notes1.png")), "Manage Notes", self)
+        notes_button.setStatusTip("Manage your notes")
+        notes_button.triggered.connect(self.manage_notes)
+        self.navtb.addAction(notes_button)
 
         settings_btn = QAction(QIcon(resource_path("icons/settings.png")), "Settings", self)
         settings_btn.setStatusTip("Open Settings")
@@ -220,12 +516,16 @@ class MainWindow(QMainWindow):
         save_page_btn.triggered.connect(self.save_page)
         self.navtb.addAction(save_page_btn)
 
-        self.settings = QSettings("FreakyBrowse", "UserPreferences")
-        self.dark_mode_enabled = self.settings.value("dark_mode", False, type=bool)
+        self.settings = QSettings("FreakyBrowse", "UserSettings")
         self.pink_mode_enabled = self.settings.value("pink_mode", False, type=bool)
-        self.bookmarks = self.settings.value("bookmarks", [], type=list)
+        self.blue_mode_enabled = self.settings.value("blue_mode", False, type=bool)
+        self.green_mode_enabled = self.settings.value("green_mode", False, type=bool)
+        self.orange_mode_enabled = self.settings.value("orange_mode", False, type=bool)
+        self.red_mode_enabled = self.settings.value("red_mode", False, type=bool)
+        self.purple_mode_enabled = self.settings.value("purple_mode", False, type=bool)
 
        
+
         self.toggle_mode()
 
         
@@ -240,14 +540,13 @@ class MainWindow(QMainWindow):
     def add_new_tab(self, qurl=None, label="New Tab"):
         if qurl is None:
             qurl = QUrl(self.HOME_URL)
-
         browser = QWebEngineView()
         browser.setUrl(qurl)
         i = self.tabs.addTab(browser, label)
         self.tabs.setCurrentIndex(i)
-
         browser.urlChanged.connect(lambda qurl, browser=browser: self.update_urlbar(qurl, browser))
         browser.loadFinished.connect(lambda _, i=i, browser=browser: self.tabs.setTabText(i, browser.page().title()))
+
 
     def tab_open_doubleclick(self, i):
         if i == -1:
@@ -285,59 +584,225 @@ class MainWindow(QMainWindow):
         self.tabs.removeTab(i)
 
     def toggle_mode(self):
-        if self.dark_mode_enabled:
-            self.setStyleSheet(self.DARK_MODE_STYLE)
-        elif self.pink_mode_enabled:
+        if self.pink_mode_enabled:
             self.setStyleSheet(self.PINK_MODE_STYLE)
+        elif self.blue_mode_enabled:
+            self.setStyleSheet(self.BLUE_MODE_STYLE)
+        elif self.green_mode_enabled:
+            self.setStyleSheet(self.GREEN_MODE_STYLE)
+        elif self.red_mode_enabled:
+            self.setStyleSheet(self.RED_MODE_STYLE)
+        elif self.purple_mode_enabled:
+            self.setStyleSheet(self.PURPLE_MODE_STYLE)
+        elif self.orange_mode_enabled:
+            self.setStyleSheet(self.ORANGE_MODE_STYLE)
         else:
-            self.setStyleSheet("")
+            self.setStyleSheet(self.DARK_MODE_STYLE)
 
-    def toggle_dark_mode(self, enabled):
-        if enabled:
-            self.pink_mode_enabled = False
-        self.dark_mode_enabled = enabled
-        self.settings.setValue("dark_mode", enabled)
-        self.settings.setValue("pink_mode", self.pink_mode_enabled)
-        self.toggle_mode()
+
 
     def toggle_pink_mode(self, enabled):
         if enabled:
+            self.orange_mode_enabled = False
+            self.purple_mode_enabled = False
+            self.red_mode_enabled = False
             self.dark_mode_enabled = False
-        self.pink_mode_enabled = enabled
+            self.blue_mode_enabled = False
+            self.green_mode_enabled = False
+            self.pink_mode_enabled = enabled
         self.settings.setValue("pink_mode", enabled)
-        self.settings.setValue("dark_mode", self.dark_mode_enabled)
+        self.settings.setValue("orange_mode", self.orange_mode_enabled)
+        self.settings.setValue("purple_mode", self.purple_mode_enabled)
+        self.settings.setValue("red_mode", self.red_mode_enabled)
+        self.settings.setValue("blue_mode", self.blue_mode_enabled)
+        self.settings.setValue("green_mode", self.green_mode_enabled)
+        self.toggle_mode()
+
+    def toggle_blue_mode(self, enabled):
+        if enabled:
+            self.orange_mode_enabled = False
+            self.purple_mode_enabled = False
+            self.red_mode_enabled = False
+            self.dark_mode_enabled = False
+            self.pink_mode_enabled = False
+            self.green_mode_enabled = False
+        self.blue_mode_enabled = enabled
+        self.settings.setValue("pink_mode", self.pink_mode_enabled)
+        self.settings.setValue("orange_mode", self.orange_mode_enabled)
+        self.settings.setValue("purple_mode", self.purple_mode_enabled)
+        self.settings.setValue("red_mode", self.red_mode_enabled)
+        self.settings.setValue("blue_mode", enabled)
+        self.settings.setValue("green_mode", self.green_mode_enabled)
+        self.toggle_mode()
+        
+
+    def toggle_green_mode(self, enabled):
+        if enabled:
+            self.orange_mode_enabled = False
+            self.purple_mode_enabled = False
+            self.red_mode_enabled = False
+            self.dark_mode_enabled = False
+            self.pink_mode_enabled = False
+            self.blue_mode_enabled = False
+        self.green_mode_enabled = enabled
+        self.settings.setValue("pink_mode", self.pink_mode_enabled)
+        self.settings.setValue("orange_mode", self.orange_mode_enabled)
+        self.settings.setValue("purple_mode", self.purple_mode_enabled)
+        self.settings.setValue("red_mode", self.red_mode_enabled)
+        self.settings.setValue("blue_mode", self.blue_mode_enabled)
+        self.settings.setValue("green_mode", enabled)
+        self.toggle_mode()
+    def toggle_orange_mode(self, enabled):
+        if enabled:
+            self.purple_mode_enabled = False
+            self.red_mode_enabled = False
+            self.dark_mode_enabled = False
+            self.pink_mode_enabled = False
+            self.blue_mode_enabled = False
+            self.green_mode_enabled = False
+        self.orange_mode_enabled = enabled
+        self.settings.setValue("pink_mode", self.pink_mode_enabled)
+        self.settings.setValue("orange_mode", enabled)
+        self.settings.setValue("purple_mode", self.purple_mode_enabled)
+        self.settings.setValue("red_mode", self.red_mode_enabled)
+        self.settings.setValue("blue_mode", self.blue_mode_enabled)
+        self.settings.setValue("green_mode", self.green_mode_enabled)
+        self.toggle_mode()
+    def toggle_purple_mode(self, enabled):
+        if enabled:
+            self.red_mode_enabled = False
+            self.dark_mode_enabled = False
+            self.pink_mode_enabled = False
+            self.blue_mode_enabled = False
+            self.green_mode_enabled = False
+            self.orange_mode_enabled = False
+        self.purple_mode_enabled = enabled
+        self.settings.setValue("pink_mode", self.pink_mode_enabled)
+        self.settings.setValue("orange_mode", self.orange_mode_enabled)
+        self.settings.setValue("purple_mode", enabled)
+        self.settings.setValue("red_mode", self.red_mode_enabled)
+        self.settings.setValue("orange_mode", self.orange_mode_enabled)
+    def toggle_red_mode(self, enabled):
+        if enabled:
+            self.dark_mode_enabled = False
+            self.pink_mode_enabled = False
+            self.blue_mode_enabled = False
+            self.green_mode_enabled = False
+            self.orange_mode_enabled = False
+            self.purple_mode_enabled = False
+        self.red_mode_enabled = enabled
+        self.settings.setValue("pink_mode", self.pink_mode_enabled)
+        self.settings.setValue("orange_mode", self.orange_mode_enabled)
+        self.settings.setValue("purple_mode", self.purple_mode_enabled)
+        self.settings.setValue("red_mode", enabled)
+        self.settings.setValue("blue_mode", self.blue_mode_enabled)
+        self.settings.setValue("green_mode", self.green_mode_enabled)
         self.toggle_mode()
 
     def open_settings(self):
         settings_dialog = QDialog(self)
         settings_dialog.setWindowTitle("Settings")
+        
+       
+        settings_dialog.resize(100, 100)  
 
+        
         layout = QVBoxLayout()
 
-        dark_mode_checkbox = QCheckBox("Enable Dark Mode")
-        dark_mode_checkbox.setChecked(self.dark_mode_enabled)
-        dark_mode_checkbox.stateChanged.connect(lambda: self.toggle_dark_mode(dark_mode_checkbox.isChecked()))
-        layout.addWidget(dark_mode_checkbox)
+        style_button = QPushButton("Style Settings")
+        style_button.clicked.connect(self.open_style_settings)
+        layout.addWidget(style_button)
+
+        browser_stg_button = QPushButton("Browser Settings")
+        browser_stg_button.clicked.connect(self.open_browser_settings)
+        layout.addWidget(browser_stg_button)
+
+        close_button = QPushButton("Close")
+        close_button.clicked.connect(settings_dialog.accept)
+
+        layout.addWidget(close_button)
+
+        settings_dialog.setLayout(layout)
+        settings_dialog.exec() 
+
+    def open_browser_settings(self):
+        
+        browser_dialog = QDialog(self)
+        browser_dialog.setWindowTitle("Browser Settings")
+        layout = QVBoxLayout()
+
+        
+        use_google_checkbox = QCheckBox("Use Google's main page?")
+        use_google_checkbox.setChecked(self.home_url == "https://google.com")
+        use_google_checkbox.stateChanged.connect(lambda state: self.toggle_homepage_url(state, home_url_label))
+        layout.addWidget(use_google_checkbox)
+
+        
+        home_url_label = QLabel(f"Current Home URL: {self.home_url}")
+        layout.addWidget(home_url_label)
+
+        close_button = QPushButton("Close")
+        close_button.clicked.connect(browser_dialog.accept)
+        layout.addWidget(close_button)
+
+        browser_dialog.setLayout(layout)
+        browser_dialog.exec()
+
+    def toggle_homepage_url(self, state, home_url_label):
+        if state == 2:
+            
+            MainWindow.HOME_URL = "https://google.com"
+            self.home_url = MainWindow.HOME_URL
+        else:
+           
+            MainWindow.HOME_URL = "https://search.freakybob.site/"
+            self.home_url = MainWindow.HOME_URL
+
+        home_url_label.setText(f"Current Home URL: {self.home_url}")
+        print(f"Home URL set to: {self.home_url}")
+
+    def open_style_settings(self):
+        style_dialog = QDialog(self)
+        style_dialog.setWindowTitle("Style Settings")
+        layout = QVBoxLayout()
 
         pink_mode_checkbox = QCheckBox("Enable Pink Mode")
         pink_mode_checkbox.setChecked(self.pink_mode_enabled)
         pink_mode_checkbox.stateChanged.connect(lambda: self.toggle_pink_mode(pink_mode_checkbox.isChecked()))
         layout.addWidget(pink_mode_checkbox)
 
+        blue_mode_checkbox = QCheckBox("Enable Blue Mode")
+        blue_mode_checkbox.setChecked(self.blue_mode_enabled)
+        blue_mode_checkbox.stateChanged.connect(lambda: self.toggle_blue_mode(blue_mode_checkbox.isChecked()))
+        layout.addWidget(blue_mode_checkbox)
 
-        
-        notes_button = QPushButton("Manage Notes")
-        notes_button.clicked.connect(self.manage_notes)
-        layout.addWidget(notes_button)
+        green_mode_checkbox = QCheckBox("Enable Green Mode")
+        green_mode_checkbox.setChecked(self.green_mode_enabled)
+        green_mode_checkbox.stateChanged.connect(lambda: self.toggle_green_mode(green_mode_checkbox.isChecked()))
+        layout.addWidget(green_mode_checkbox)
 
-        
+        red_mode_checkbox = QCheckBox("Enable Red Mode")
+        red_mode_checkbox.setChecked(self.red_mode_enabled)
+        red_mode_checkbox.stateChanged.connect(lambda: self.toggle_red_mode(red_mode_checkbox.isChecked()))
+        layout.addWidget(red_mode_checkbox)
+
+        orange_mode_checkbox = QCheckBox("Enable Orange Mode")
+        orange_mode_checkbox.setChecked(self.orange_mode_enabled)
+        orange_mode_checkbox.stateChanged.connect(lambda: self.toggle_orange_mode(orange_mode_checkbox.isChecked()))
+        layout.addWidget(orange_mode_checkbox)
+
+        purple_mode_checkbox = QCheckBox("Enable Purple Mode")
+        purple_mode_checkbox.setChecked(self.purple_mode_enabled)
+        purple_mode_checkbox.stateChanged.connect(lambda: self.toggle_purple_mode(purple_mode_checkbox.isChecked()))
+        layout.addWidget(purple_mode_checkbox)
+
         close_button = QPushButton("Close")
-        close_button.clicked.connect(settings_dialog.accept)
+        close_button.clicked.connect(style_dialog.accept)
         layout.addWidget(close_button)
 
-        settings_dialog.setLayout(layout)
-        settings_dialog.exec()
-
+        style_dialog.setLayout(layout)
+        style_dialog.exec()
+        
     def manage_notes(self):
         notes_dialog = QDialog(self)
         notes_dialog.setWindowTitle("Notes Manager")
