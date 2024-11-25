@@ -13,100 +13,16 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #181818;
+            background-image: url("images/bg.png");
+            background-repeat: no-repeat;
+            background-size: cover;
             color: white; 
             transition: background-color 0.3s, color 0.3s;
         }
     h1 {
         color: #3cbed8;
+        text-align: center;
     }
-        #navbar {
-            background-color: #1e1e1e;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 16px;
-        }
-    
-        #navbar button {
-            background-color: #3c3c3c;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            padding: 10px;
-            margin-left: 10px;
-        }
-    
-        #navbar button:hover {
-            background-color: #5c5c5c;
-        }
-    
-        #tabs {
-            display: flex;
-            background-color: #222;
-            padding: 5px 0;
-            margin: 0;
-            overflow-x: auto;
-        }
-    
-        .tab {
-            padding: 8px 12px;
-            cursor: pointer;
-            color: white;
-            background-color: #333;
-            border-radius: 5px 5px 0 0;
-            margin-right: 10px;
-            transition: background-color 0.3s;
-        }
-    
-        .tab.active {
-            background-color: #555;
-            border-bottom: 2px solid #1e1e1e;
-        }
-    
-        iframe {
-            width: 100%;
-            height: 84.4vh;
-            border: none;
-            margin: 0;
-        }
-
-        #settings-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-        }
-    
-        #settings-dialog {
-            background-color: #710c3a;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
-            width: 300px;
-            text-align: center;
-        }
-    
-        .close-btn {
-            background-color: #f44336;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 15px;
-        }
-    
-        .close-btn:hover {
-            background-color: #d32f2f;
-        }
         h2 {
             color: yellow;
         }
@@ -117,19 +33,50 @@
         .h {
             display: inline;
         }
+        #main {
+            max-width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 7px;
+            height: 40px;
+            width: 240px;
+            background-color: rgba(176, 45, 143, 0.579);
+        }
+        #main > #small {
+            text-align: center;
+            color:bisque;
+            margin-top: -20px;
+        }
+        #broswer_slogan {
+            margin-top: 38px;
+            max-width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #info {
+            margin-top: 140px;
+            max-width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
     </style>
 </head>
 <body>
 
-    <div id="tabs"></div>
 
     <div id="content">
-        <h1>FreakyBrowse.</h1>
+        <div id="main">
+            <h1>FreakyBrowse.</h1>
+         <p id="small">A Browser made by the Freakybob-team</p>
+        </div>
+        <div id="broswer_slogan">
         <h2 class="h">A browser built for</h2> <h2 class="color"> you.</h2>
         <br>
         <h2 class="h">A browser for</h2> <h2 class=color>them.</h2>
         <br>
         <h2 class="h">A browser for</h2> <h2 class=color>everyone.</h2>
+        </div>
+        <div id="info">
         <p>FreakyBrowse was built using Python and PyQt6 (originally PyQt5) by the Freakybob Team. It's what we want, and need, in a browser.</p>
         <h1>Features</h1>
         <p>- Notes (images & text!)</p>
@@ -139,54 +86,8 @@
         <p>- Bookmarks</p>
         <p>- Save page</p>
         <p>- View page source</p>
+    </div>
         <a href="https://github.com/Freakybob-Team/freakybrowse/releases/latest"><h1>Get it now!</h1></a>
     </div>
-    <script>
-        let tabs = [];
-        let currentTab = 0;
-
-        const iframe = document.getElementById("browser");
-        const urlbar = document.getElementById("urlbar");
-        const tabsContainer = document.getElementById("tabs");
-
-        function createTab(url = "https://search.freakybob.site/") {
-            const tabIndex = tabs.length;
-            tabs.push(url);
-
-            const tab = document.createElement("div");
-            tab.className = "tab";
-            tab.innerHTML = `FreakyBrowse`;
-            tab.onclick = () => setActiveTab(tabIndex);
-            tabsContainer.appendChild(tab);
-
-            if (tabs.length === 1) {
-                setActiveTab(0);
-            }
-        }
-
-        function setActiveTab(index) {
-            currentTab = index;
-            iframe.src = tabs[currentTab];
-            const allTabs = tabsContainer.getElementsByClassName("tab");
-            Array.from(allTabs).forEach(tab => tab.classList.remove("active"));
-            allTabs[currentTab].classList.add("active");
-        }
-
-        function navigateHome() {
-            iframe.src = "https://search.freakybob.site/";
-        }
-
-        function openSettings() {
-            document.getElementById("settings-modal").style.display = "flex";
-        }
-
-        function closeSettings() {
-            document.getElementById("settings-modal").style.display = "none";
-        }
-// searching prob does not work lmao
-            
-
-        createTab();
-    </script>
 </body>
 </html>
