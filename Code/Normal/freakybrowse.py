@@ -9,8 +9,7 @@ from PyQt6.QtGui import QAction
 from PyQt6.QtCore import QUrl, QSettings
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QListWidget, QTextEdit, QInputDialog, QMessageBox
 from PyQt6.QtWidgets import QApplication, QTextEdit, QInputDialog
-from PyQt6.QtCore import Qt
-QPixmap
+from PyQt6.QtCore import Qt, QPixmap
 import sys
 import os
 def resource_path(relative_path):
@@ -716,7 +715,11 @@ class MainWindow(QMainWindow):
         browser_stg_button = QPushButton("Browser Settings")
         browser_stg_button.clicked.connect(self.open_browser_settings)
         layout.addWidget(browser_stg_button)
-
+        
+        info_button = QPushButton("Info")
+        info_button.clicked.connect(self.open_info_button)
+        layout.addWidget(info_button)
+        
         close_button = QPushButton("Close")
         close_button.clicked.connect(settings_dialog.accept)
 
@@ -724,7 +727,11 @@ class MainWindow(QMainWindow):
 
         settings_dialog.setLayout(layout)
         settings_dialog.exec() 
-
+    def open_info_button(self):
+        info_dialog = QDialog(self)
+        indo_dialog.setWindowTitlte("FreakyBrowse info")
+        layout = QVBoxLayout()
+        print("Greg")
     def open_browser_settings(self):
         
         browser_dialog = QDialog(self)
