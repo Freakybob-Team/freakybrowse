@@ -10,8 +10,7 @@ from PyQt6.QtCore import QUrl, QSettings
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QListWidget, QTextEdit, QInputDialog, QMessageBox
 from PyQt6.QtWidgets import QApplication, QTextEdit, QInputDialog
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QPixmap
-from PyQt6.QtGui import QFont
+QPixmap
 import sys
 import os
 def resource_path(relative_path):
@@ -313,64 +312,6 @@ class MainWindow(QMainWindow):
         background-color: #D32F2F;
     }
     """
-    PURPLE_MODE_STYLE = """
-    QMainWindow {
-        background-color: #9C27B0;
-        color: white;
-    }
-    QToolBar, QLineEdit, QStatusBar {
-        background-color: #8E24AA;
-        color: white;
-    }
-    QLineEdit {
-        border: 1px solid #BA68C8;
-        border-radius: 5px;
-        padding: 5px;
-    }
-    QToolButton {
-        background-color: #8E24AA;
-        color: white;
-        border-radius: 5px;
-        padding: 5px;
-    }
-    QToolButton:hover {
-        background-color: #BA68C8;
-    }
-    QTabWidget::pane {
-        border-top: 1px solid #9C27B0;
-        background-color: #8E24AA;
-    }
-    QTabBar::tab {
-        background-color: #7B1FA2;
-        color: white;
-        padding: 10px;
-        border-top-left-radius: 0px;
-        border-top-right-radius: 5px;
-        border-bottom-right-radius: 5px;
-        border-bottom-left-radius: 0px;
-    }
-    QTabBar::tab:selected {
-        background-color: #BA68C8;
-        color: white;
-    }
-    QTabBar::tab:hover {
-        background-color: #9C27B0;
-        color: white;
-    }
-    QStatusBar {
-        border-top: 2px solid #8E24AA;
-    }
-    QMenuBar {
-        background-color: #8E24AA;
-        color: white;
-    }
-    QMenuBar::item:selected {
-        background-color: #BA68C8;
-    }
-    QDockWidget {
-        background-color: #8E24AA;
-    }
-    """
     ORANGE_MODE_STYLE = """
     QMainWindow {
         background-color: #FF9800;
@@ -476,6 +417,11 @@ class MainWindow(QMainWindow):
         home_btn.triggered.connect(self.navigate_home)
         self.navtb.addAction(home_btn)
 
+        pikidiary_btn = QAction(QIcon(resource_path("icons/piki.png")), "Pikidiary", self)
+        pikidiary_btn.setStatusTip("Go to Pikidiary!")
+        pikidiary_btn.triggered.connect(self.pikidiary)
+        self.navtb.addAction(pikidiary_btn)
+
         self.navtb.addSeparator()
 
 
@@ -523,7 +469,6 @@ class MainWindow(QMainWindow):
         self.green_mode_enabled = self.settings.value("green_mode", False, type=bool)
         self.orange_mode_enabled = self.settings.value("orange_mode", False, type=bool)
         self.red_mode_enabled = self.settings.value("red_mode", False, type=bool)
-        self.purple_mode_enabled = self.settings.value("purple_mode", False, type=bool)
 
        
 
@@ -536,19 +481,20 @@ class MainWindow(QMainWindow):
         
         self.bookmarks = self.settings.value("bookmarks", [], type=list)
 
-        self.settings = QSettings("Freakybob", "FreakyBrowse")
-        self.home_url = self.settings.value("home_url", MainWindow.HOME_URL)
+        
 
     def add_new_tab(self, qurl=None, label="New Tab"):
         if qurl is None:
-        
-            qurl = QUrl(self.home_url)
+            qurl = QUrl(self.HOME_URL)
         browser = QWebEngineView()
         browser.setUrl(qurl)
         i = self.tabs.addTab(browser, label)
         self.tabs.setCurrentIndex(i)
         browser.urlChanged.connect(lambda qurl, browser=browser: self.update_urlbar(qurl, browser))
         browser.loadFinished.connect(lambda _, i=i, browser=browser: self.tabs.setTabText(i, browser.page().title()))
+    def pikidiary(self):
+        url = QUrl("https://pikidiary.lol")
+        self.add_new_tab(url, "Pikidiary")
 
 
     def tab_open_doubleclick(self, i):
@@ -561,7 +507,7 @@ class MainWindow(QMainWindow):
         self.update_urlbar(self.current_browser().url())
 
     def navigate_home(self):
-        self.current_browser().setUrl(QUrl(self.home_url))
+        self.current_browser().setUrl(QUrl(self.HOME_URL))
 
     def navigate_to_url(self):
         q = QUrl(self.urlbar.text())
@@ -595,8 +541,6 @@ class MainWindow(QMainWindow):
             self.setStyleSheet(self.GREEN_MODE_STYLE)
         elif self.red_mode_enabled:
             self.setStyleSheet(self.RED_MODE_STYLE)
-        elif self.purple_mode_enabled:
-            self.setStyleSheet(self.PURPLE_MODE_STYLE)
         elif self.orange_mode_enabled:
             self.setStyleSheet(self.ORANGE_MODE_STYLE)
         else:
@@ -607,7 +551,6 @@ class MainWindow(QMainWindow):
     def toggle_pink_mode(self, enabled):
         if enabled:
             self.orange_mode_enabled = False
-            self.purple_mode_enabled = False
             self.red_mode_enabled = False
             self.dark_mode_enabled = False
             self.blue_mode_enabled = False
@@ -615,7 +558,6 @@ class MainWindow(QMainWindow):
             self.pink_mode_enabled = enabled
         self.settings.setValue("pink_mode", enabled)
         self.settings.setValue("orange_mode", self.orange_mode_enabled)
-        self.settings.setValue("purple_mode", self.purple_mode_enabled)
         self.settings.setValue("red_mode", self.red_mode_enabled)
         self.settings.setValue("blue_mode", self.blue_mode_enabled)
         self.settings.setValue("green_mode", self.green_mode_enabled)
@@ -624,7 +566,6 @@ class MainWindow(QMainWindow):
     def toggle_blue_mode(self, enabled):
         if enabled:
             self.orange_mode_enabled = False
-            self.purple_mode_enabled = False
             self.red_mode_enabled = False
             self.dark_mode_enabled = False
             self.pink_mode_enabled = False
@@ -632,7 +573,6 @@ class MainWindow(QMainWindow):
         self.blue_mode_enabled = enabled
         self.settings.setValue("pink_mode", self.pink_mode_enabled)
         self.settings.setValue("orange_mode", self.orange_mode_enabled)
-        self.settings.setValue("purple_mode", self.purple_mode_enabled)
         self.settings.setValue("red_mode", self.red_mode_enabled)
         self.settings.setValue("blue_mode", enabled)
         self.settings.setValue("green_mode", self.green_mode_enabled)
@@ -642,7 +582,6 @@ class MainWindow(QMainWindow):
     def toggle_green_mode(self, enabled):
         if enabled:
             self.orange_mode_enabled = False
-            self.purple_mode_enabled = False
             self.red_mode_enabled = False
             self.dark_mode_enabled = False
             self.pink_mode_enabled = False
@@ -650,14 +589,12 @@ class MainWindow(QMainWindow):
         self.green_mode_enabled = enabled
         self.settings.setValue("pink_mode", self.pink_mode_enabled)
         self.settings.setValue("orange_mode", self.orange_mode_enabled)
-        self.settings.setValue("purple_mode", self.purple_mode_enabled)
         self.settings.setValue("red_mode", self.red_mode_enabled)
         self.settings.setValue("blue_mode", self.blue_mode_enabled)
         self.settings.setValue("green_mode", enabled)
         self.toggle_mode()
     def toggle_orange_mode(self, enabled):
         if enabled:
-            self.purple_mode_enabled = False
             self.red_mode_enabled = False
             self.dark_mode_enabled = False
             self.pink_mode_enabled = False
@@ -666,25 +603,10 @@ class MainWindow(QMainWindow):
         self.orange_mode_enabled = enabled
         self.settings.setValue("pink_mode", self.pink_mode_enabled)
         self.settings.setValue("orange_mode", enabled)
-        self.settings.setValue("purple_mode", self.purple_mode_enabled)
         self.settings.setValue("red_mode", self.red_mode_enabled)
         self.settings.setValue("blue_mode", self.blue_mode_enabled)
         self.settings.setValue("green_mode", self.green_mode_enabled)
         self.toggle_mode()
-    def toggle_purple_mode(self, enabled):
-        if enabled:
-            self.red_mode_enabled = False
-            self.dark_mode_enabled = False
-            self.pink_mode_enabled = False
-            self.blue_mode_enabled = False
-            self.green_mode_enabled = False
-            self.orange_mode_enabled = False
-        self.purple_mode_enabled = enabled
-        self.settings.setValue("pink_mode", self.pink_mode_enabled)
-        self.settings.setValue("orange_mode", self.orange_mode_enabled)
-        self.settings.setValue("purple_mode", enabled)
-        self.settings.setValue("red_mode", self.red_mode_enabled)
-        self.settings.setValue("orange_mode", self.orange_mode_enabled)
     def toggle_red_mode(self, enabled):
         if enabled:
             self.dark_mode_enabled = False
@@ -692,11 +614,9 @@ class MainWindow(QMainWindow):
             self.blue_mode_enabled = False
             self.green_mode_enabled = False
             self.orange_mode_enabled = False
-            self.purple_mode_enabled = False
         self.red_mode_enabled = enabled
         self.settings.setValue("pink_mode", self.pink_mode_enabled)
         self.settings.setValue("orange_mode", self.orange_mode_enabled)
-        self.settings.setValue("purple_mode", self.purple_mode_enabled)
         self.settings.setValue("red_mode", enabled)
         self.settings.setValue("blue_mode", self.blue_mode_enabled)
         self.settings.setValue("green_mode", self.green_mode_enabled)
@@ -730,7 +650,29 @@ class MainWindow(QMainWindow):
         layout.addWidget(close_button)
 
         settings_dialog.setLayout(layout)
-        settings_dialog.exec() 
+        settings_dialog.exec()  
+    def open_browser_settings(self):
+        browser_dialog = QDialog(self)
+        browser_dialog.setWindowTitle("Browser Settings")
+        layout = QVBoxLayout()
+
+        
+        use_google_checkbox = QCheckBox("Use Google's main page?")
+        use_google_checkbox.setChecked(self.home_url == "https://google.com")
+        use_google_checkbox.stateChanged.connect(
+            lambda state: self.toggle_homepage_url(state, home_url_label))
+        layout.addWidget(use_google_checkbox)
+        warning_label = QLabel("This does not bring you to https://google.com when you start the app. This just changes the Home button location and new tab location :P (This also doesn't save yet :PPP)")
+        home_url_label = QLabel(f"Current Home URL: {self.home_url}")
+        layout.addWidget(warning_label)
+        layout.addWidget(home_url_label)
+
+        close_button = QPushButton("Close")
+        close_button.clicked.connect(browser_dialog.accept)
+        layout.addWidget(close_button)
+
+        browser_dialog.setLayout(layout)
+        browser_dialog.exec()
     def open_info_button(self):
         info_dialog = QDialog(self)
         info_dialog.setWindowTitle("FreakyBrowse info\n")
@@ -794,39 +736,19 @@ class MainWindow(QMainWindow):
         layout.addWidget(close_button)
         info_dialog.setLayout(layout)
         info_dialog.exec()
-    def open_browser_settings(self):
-        browser_dialog = QDialog(self)
-        browser_dialog.setWindowTitle("Browser Settings")
-        layout = QVBoxLayout()
-
-        
-        use_google_checkbox = QCheckBox("Use Google's main page?")
-        use_google_checkbox.setChecked(self.home_url == "https://google.com")
-        use_google_checkbox.stateChanged.connect(
-            lambda state: self.toggle_homepage_url(state, home_url_label))
-        layout.addWidget(use_google_checkbox)
-        warning_label = QLabel("This does not bring you to https://google.com when you start the app. This just changes the Home button location and new tab location :P")
-        home_url_label = QLabel(f"Current Home URL: {self.home_url}")
-        layout.addWidget(warning_label)
-        layout.addWidget(home_url_label)
-
-        close_button = QPushButton("Close")
-        close_button.clicked.connect(browser_dialog.accept)
-        layout.addWidget(close_button)
-
-        browser_dialog.setLayout(layout)
-        browser_dialog.exec()
 
     def toggle_homepage_url(self, state, home_url_label):
         if state == 2:
-            self.home_url = "https://google.com"
+            
+            MainWindow.HOME_URL = "https://google.com"
+            self.home_url = MainWindow.HOME_URL
         else:
-            self.home_url = "https://search.freakybob.site/"
+           
+            MainWindow.HOME_URL = "https://search.freakybob.site/"
+            self.home_url = MainWindow.HOME_URL
 
-        
-        MainWindow.HOME_URL = self.home_url
         home_url_label.setText(f"Current Home URL: {self.home_url}")
-        self.settings.setValue("home_url", self.home_url)
+        print(f"Home URL set to: {self.home_url}")
 
     def open_style_settings(self):
         style_dialog = QDialog(self)
@@ -858,10 +780,6 @@ class MainWindow(QMainWindow):
         orange_mode_checkbox.stateChanged.connect(lambda: self.toggle_orange_mode(orange_mode_checkbox.isChecked()))
         layout.addWidget(orange_mode_checkbox)
 
-        purple_mode_checkbox = QCheckBox("Enable Purple Mode")
-        purple_mode_checkbox.setChecked(self.purple_mode_enabled)
-        purple_mode_checkbox.stateChanged.connect(lambda: self.toggle_purple_mode(purple_mode_checkbox.isChecked()))
-        layout.addWidget(purple_mode_checkbox)
 
         close_button = QPushButton("Close")
         close_button.clicked.connect(style_dialog.accept)
