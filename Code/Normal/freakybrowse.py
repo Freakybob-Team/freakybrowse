@@ -696,7 +696,7 @@ class MainWindow(QMainWindow):
         title_label2_font = QFont("Comic Sans", 18, QFont.Weight.Bold)
         title_label2.setFont(title_label2_font)
         title_label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        info_label = QLabel("FreakyBrowse was made on Oct 13th 2024. It first started out as code stolen from stackoverflow but was updated to work and look better.\nThe first time we started to try to distibrute FreakyBrowse, it was saying it was a trojan. It was a false positive from what wish13yt used to turn the code into an exe.\nWe now use Pyinstaller so you don't get any false positives when downloading FreakyBrowse!")
+        info_label = QLabel("FreakyBrowse was made on Oct 13th 2024. It first started out as code stolen from StackOverflow & GeeksForGeeks but was updated to work and look better.\nThe first time we started to try to distibrute FreakyBrowse, it was saying it was a trojan. It was a false positive from what wish13yt used to turn the code into an exe.\nWe now use Pyinstaller so you don't get any false positives when downloading FreakyBrowse!")
         info_label_font = QFont("Comic Sans", 9, QFont.Weight.DemiBold)
         info_label.setFont(info_label_font)
         info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -720,6 +720,16 @@ class MainWindow(QMainWindow):
         info_label2_font = QFont("Comic Sans", 9, QFont.Weight.DemiBold)
         info_label2.setFont(info_label2_font)
         info_label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        cus_style = QLabel("How do I make a custom style?")
+        cus_style_font = QFont("Comic Sans", 13, QFont.Weight.Bold)
+        cus_style.setFont(cus_style_font)
+        cus_style.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        cus_style2 = QLabel("Make a custom.qss in the same directory that contains FreakyBrowse. It uses the same syntax as CSS, fyi. It will automatically apply to FreakyBrowse on start (unless you change the Style in settings.)")
+        cus_style2_font = QFont("Comic Sans", 9, QFont.Weight.DemiBold)
+        cus_style2.setFont(cus_style2_font)
+        cus_style2.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         layout.addWidget(title_label)
         layout.addWidget(below_label1)
@@ -1000,6 +1010,9 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    qss="custom.qss"
+    with open(qss,"r") as fh:
+            app.setStyleSheet(fh.read())
     app.setApplicationName("FreakyBrowse")
     app.setWindowIcon(QIcon("logo.ico")) 
     
