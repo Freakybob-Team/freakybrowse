@@ -696,7 +696,7 @@ class MainWindow(QMainWindow):
         title_label2_font = QFont("Comic Sans", 18, QFont.Weight.Bold)
         title_label2.setFont(title_label2_font)
         title_label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        info_label = QLabel("FreakyBrowse was made on Oct 13th 2024. It first started out as code stolen from stackoverflow but was updated to work and look better.\nThe first time we started to try to distibrute FreakyBrowse, it was saying it was a trojan. It was a false positive from what wish13yt used to turn the code into an exe.\nWe now use Pyinstaller so you don't get any false positives when downloading FreakyBrowse!")
+        info_label = QLabel("FreakyBrowse was made on Oct 13th 2024. It first started out as code from GeeksForGeeks & StackOverflow but was updated to work and look better.\nThe first time we started to try to distibrute FreakyBrowse, it was saying it was a trojan. It was a false positive from what wish13yt used to turn the code into an exe.\nWe now use Pyinstaller so you don't get any false positives when downloading FreakyBrowse!")
         info_label_font = QFont("Comic Sans", 9, QFont.Weight.DemiBold)
         info_label.setFont(info_label_font)
         info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
