@@ -1,0 +1,56 @@
+    QMainWindow {
+        background-color: #FF9800;
+        color: white;
+    }
+    QToolBar, QLineEdit, QStatusBar {
+        background-color: #FB8C00;
+        color: white;
+    }
+    QLineEdit {
+        border: 1px solid #FFB74D;
+        border-radius: 5px;
+        padding: 5px;
+    }
+    QToolButton {
+        background-color: #FB8C00;
+        color: white;
+        border-radius: 5px;
+        padding: 5px;
+    }
+    QToolButton:hover {
+        background-color: #FFB74D;
+    }
+    QTabWidget::pane {
+        border-top: 1px solid #FF9800;
+        background-color: #FB8C00;
+    }
+    QTabBar::tab {
+        background-color: #F57C00;
+        color: white;
+        padding: 10px;
+        border-top-left-radius: 0px;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+        border-bottom-left-radius: 0px;
+    }
+    QTabBar::tab:selected {
+        background-color: #FFB74D;
+        color: white;
+    }
+    QTabBar::tab:hover {
+        background-color: #F57C00;
+        color: white;
+    }
+    QStatusBar {
+        border-top: 2px solid #FB8C00;
+    }
+    QMenuBar {
+        background-color: #FB8C00;
+        color: white;
+    }
+    QMenuBar::item:selected {
+        background-color: #FFB74D;
+    }
+    QDockWidget {
+        background-color: #FB8C00;
+    }

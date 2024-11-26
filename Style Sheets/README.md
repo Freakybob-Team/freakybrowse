@@ -1,0 +1,1 @@
+Styles in this folder are bundled with FreakyBrowse.
