@@ -11,6 +11,7 @@ from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QLis
 from PyQt6.QtWidgets import QApplication, QTextEdit, QInputDialog
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap
+from PyQt6.QtGui import QFont
 import sys
 import os
 def resource_path(relative_path):
@@ -535,11 +536,13 @@ class MainWindow(QMainWindow):
         
         self.bookmarks = self.settings.value("bookmarks", [], type=list)
 
-        
+        self.settings = QSettings("Freakybob", "FreakyBrowse")
+        self.home_url = self.settings.value("home_url", MainWindow.HOME_URL)
 
     def add_new_tab(self, qurl=None, label="New Tab"):
         if qurl is None:
-            qurl = QUrl(self.HOME_URL)
+        
+            qurl = QUrl(self.home_url)
         browser = QWebEngineView()
         browser.setUrl(qurl)
         i = self.tabs.addTab(browser, label)
@@ -558,7 +561,7 @@ class MainWindow(QMainWindow):
         self.update_urlbar(self.current_browser().url())
 
     def navigate_home(self):
-        self.current_browser().setUrl(QUrl(self.HOME_URL))
+        self.current_browser().setUrl(QUrl(self.home_url))
 
     def navigate_to_url(self):
         q = QUrl(self.urlbar.text())
@@ -730,11 +733,33 @@ class MainWindow(QMainWindow):
         settings_dialog.exec() 
     def open_info_button(self):
         info_dialog = QDialog(self)
-        indo_dialog.setWindowTitlte("FreakyBrowse info")
+        info_dialog.setWindowTitle("FreakyBrowse info\n")
         layout = QVBoxLayout()
-        print("Greg")
+        title_label = QLabel("FreakyBrowse Info")
+        title_font = QFont("Arial", 18, QFont.Weight.Bold)
+        title_label.setFont(title_font)
+        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        below_label1 = QLabel("FreakyBrowse, by the Freakybob Team.")
+        below_label1.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        below_label2 = QLabel("Version: 1.9\n")
+        below_label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        info_label = QLabel("FreakyBrowse was made on Oct 13th 2024. It first started out as code stolen from stackoverflow but was updated to work and look better.\nThe first time we started to try to distibrute FreakyBrowse, it was saying it was a trojan. It was a false positive from what wish13yt used to turn the code into an exe.\nWe now use Pyinstaller so you don't get any false positives when downloading FreakyBrowse!")
+        info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        info_label2 = QLabel("Everything is GPL-3")
+        info_label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(title_label)
+        layout.addWidget(below_label1)
+        layout.addWidget(below_label2)
+        layout.addWidget(info_label)
+        layout.addWidget(info_label2)
+        close_button = QPushButton("Close")
+        close_button.clicked.connect(info_dialog.accept)
+        layout.addWidget(close_button)
+        info_dialog.setLayout(layout)
+        info_dialog.exec()
     def open_browser_settings(self):
-        
         browser_dialog = QDialog(self)
         browser_dialog.setWindowTitle("Browser Settings")
         layout = QVBoxLayout()
@@ -742,11 +767,12 @@ class MainWindow(QMainWindow):
         
         use_google_checkbox = QCheckBox("Use Google's main page?")
         use_google_checkbox.setChecked(self.home_url == "https://google.com")
-        use_google_checkbox.stateChanged.connect(lambda state: self.toggle_homepage_url(state, home_url_label))
+        use_google_checkbox.stateChanged.connect(
+            lambda state: self.toggle_homepage_url(state, home_url_label))
         layout.addWidget(use_google_checkbox)
-
-        
+        warning_label = QLabel("This does not bring you to https://google.com when you start the app. This just changes the Home button location and new tab location :P")
         home_url_label = QLabel(f"Current Home URL: {self.home_url}")
+        layout.addWidget(warning_label)
         layout.addWidget(home_url_label)
 
         close_button = QPushButton("Close")
@@ -758,16 +784,14 @@ class MainWindow(QMainWindow):
 
     def toggle_homepage_url(self, state, home_url_label):
         if state == 2:
-            
-            MainWindow.HOME_URL = "https://google.com"
-            self.home_url = MainWindow.HOME_URL
+            self.home_url = "https://google.com"
         else:
-           
-            MainWindow.HOME_URL = "https://search.freakybob.site/"
-            self.home_url = MainWindow.HOME_URL
+            self.home_url = "https://search.freakybob.site/"
 
+        
+        MainWindow.HOME_URL = self.home_url
         home_url_label.setText(f"Current Home URL: {self.home_url}")
-        print(f"Home URL set to: {self.home_url}")
+        self.settings.setValue("home_url", self.home_url)
 
     def open_style_settings(self):
         style_dialog = QDialog(self)
