@@ -666,6 +666,27 @@ class MainWindow(QMainWindow):
         home_url_label = QLabel(f"Current Home URL: {self.home_url}")
         layout.addWidget(warning_label)
         layout.addWidget(home_url_label)
+        # commented out- giving error Traceback (most recent call last):
+        #        File "C:\Users\wishd\Documents\GitHub\FreakyBrowse\Code\Normal\freakybrowse.py", line 679, in open_browser_settings
+        #          use_cus.setChecked(lambda: setCus)
+        #          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+        #      TypeError: setChecked(self, a0: bool): argument 1 has unexpected type 'function'
+        #      Exception ignored on threading shutdown:
+        #      Traceback (most recent call last):
+        #        File "C:\Users\wishd\AppData\Local\Programs\Python\Python313\Lib\threading.py", line 1524, in _shutdown
+        #          if _main_thread._handle.is_done() and _is_main_interpreter():
+        #      SystemError: <method 'is_done' of '_thread._ThreadHandle' objects> returned a result with an exception set
+        # def setCus():
+        #    if (os.path.exists('custom.qss')):
+        #        qss="custom.qss"
+        #        with open(qss, "r") as f:
+        #            app.setStyleSheet(f.read())
+        #        print("Exists")
+        #    else:
+        #        print("Doesn't exist")
+        # use_cus = QCheckBox("Use custom style? (custom.qss)")
+        # use_cus.setChecked(lambda: setCus)
+        # layout.addWidget(use_cus)
 
         close_button = QPushButton("Close")
         close_button.clicked.connect(browser_dialog.accept)
