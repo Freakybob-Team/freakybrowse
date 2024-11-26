@@ -418,7 +418,7 @@ class MainWindow(QMainWindow):
         self.navtb.addAction(home_btn)
 
         pikidiary_btn = QAction(QIcon(resource_path("icons/piki.png")), "Pikidiary", self)
-        pikidiary_btn.setStatusTip("Go to Pikidiary!")
+        pikidiary_btn.setStatusTip("Go to PikiDiary!")
         pikidiary_btn.triggered.connect(self.pikidiary)
         self.navtb.addAction(pikidiary_btn)
 
