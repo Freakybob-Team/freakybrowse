@@ -12,6 +12,7 @@ Latest Version: V.1.9
 Software supported: Windows
 
 For the homepage of FreakyBrowse, we use https://search.freakybob.site!
+
 FreakyBrowse Screenshots! 
 ![image](https://github.com/user-attachments/assets/f00f26fa-1eae-4ae1-9789-cfdddd1002cf)
 
