@@ -1,3 +1,7 @@
+# Hai there! Welcome to the main file of FreakyBrowse!
+# If ya see any issues, plz make an issue on our github!
+# Feel free to add anything or fix anything!
+# - Freakybob-Team <3
 from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
@@ -10,7 +14,6 @@ from PyQt6.QtCore import QUrl, QSettings
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QListWidget, QTextEdit, QInputDialog, QMessageBox
 from PyQt6.QtWidgets import QApplication, QTextEdit, QInputDialog
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QPixmap
 import sys
 import os
 def resource_path(relative_path):
@@ -25,8 +28,9 @@ class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.resize(900, 700)
+        self.setWindowTitle("FreakyBrowse 2.0 - by the Freakybob Team.")
         try:
-            icon_path = resource_path("icons/logo.ico")
+            icon_path = resource_path("icons/logo_new.ico")
             self.setWindowIcon(QIcon(icon_path))
         except Exception as e:
             print(f"Error loading icon: {e}")
@@ -36,7 +40,6 @@ class MainWindow(QMainWindow):
         self.tabs.setDocumentMode(True)
         self.tabs.setTabsClosable(True)
         self.tabs.tabCloseRequested.connect(self.close_current_tab)
-        self.tabs.currentChanged.connect(self.update_title)
         self.tabs.tabBarDoubleClicked.connect(self.tab_open_doubleclick)
         self.home_url = MainWindow.HOME_URL
         self.setCentralWidget(self.tabs)
@@ -80,7 +83,7 @@ class MainWindow(QMainWindow):
         self.urlbar.returnPressed.connect(self.navigate_to_url)
         self.navtb.addWidget(self.urlbar)
         self.urlbar.setPlaceholderText("Enter URL...")
-        logo_action = QAction(QIcon(resource_path("logo.ico")), "Logo", self.urlbar)
+        logo_action = QAction(QIcon(resource_path("icons/logo.png")), "Logo", self.urlbar)
         self.urlbar.addAction(logo_action, QLineEdit.ActionPosition.LeadingPosition)
         self.urlbar.setClearButtonEnabled(True)
 
@@ -151,17 +154,14 @@ class MainWindow(QMainWindow):
         browser.loadFinished.connect(lambda _, i=i, browser=browser: self.tabs.setTabText(i, browser.page().title()))
     def pikidiary(self):
         url = QUrl("https://pikidiary.lol")
-        self.add_new_tab(url, "Peakidiary")
+        self.add_new_tab(url, "PeakiDiary")
 
 
     def tab_open_doubleclick(self, i):
         if i == -1:
             self.add_new_tab()
 
-    def update_title(self):
-        title = self.current_browser().page().title()
-        self.setWindowTitle("FreakyBrowse 2.0 - by the Freakybob Team.")
-        self.update_urlbar(self.current_browser().url())
+    
 
     def navigate_home(self):
         self.current_browser().setUrl(QUrl(self.HOME_URL))
@@ -428,11 +428,18 @@ class MainWindow(QMainWindow):
     def open_style_settings(self):
         style_dialog = QDialog(self)
         style_dialog.setWindowTitle("Style Settings")
+        style_dialog.setFixedSize(400, 400)
+        style_dialog.setStyleSheet("""
+            background-color: #17786d;
+            border-radius: 10px;
+        """)
+    
         layout = QVBoxLayout()
 
         main_label = QLabel("Style Settings")
         main_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        main_label.setFont(QFont("Comic Sans", 18, QFont.Weight.Bold))
+        main_label.setFont(QFont("Arial", 18, QFont.Weight.Bold))
+        main_label.setStyleSheet("color: #333333; margin-bottom: 10px;")
         layout.addWidget(main_label)
 
         styles = [
@@ -446,23 +453,36 @@ class MainWindow(QMainWindow):
             ("Retro Green Mode", self.retro_green_mode_enabled, self.toggle_retro_green_mode),
             ("Dark Purple", self.purple_mode_enabled, self.toggle_purple_mode)
         ]
-
+    
         for label, enabled, toggle_func in styles:
             checkbox = QCheckBox(f"Enable {label}")
             checkbox.setChecked(enabled)
+            checkbox.setStyleSheet("font-size: 14px; padding: 5px;")
             checkbox.stateChanged.connect(lambda checked, func=toggle_func: func(checked))
             layout.addWidget(checkbox)
 
+        button_layout = QVBoxLayout()
         close_button = QPushButton("Close")
+        close_button.setStyleSheet("""
+            background-color: #0078d4;
+            color: white;
+            padding: 4px;
+            border-radius: 5px;
+            font-size: 14px;
+        """)
         close_button.clicked.connect(style_dialog.accept)
-        layout.addWidget(close_button)
+        button_layout.addWidget(close_button)
 
+        layout.addLayout(button_layout)
+    
         style_dialog.setLayout(layout)
         style_dialog.exec()
+
 
     def open_settings(self):
         settings_dialog = QDialog(self)
         settings_dialog.setWindowTitle("Settings")
+        settings_dialog.setFixedSize(120, 120)
         
        
         settings_dialog.resize(100, 100)  
@@ -513,67 +533,83 @@ class MainWindow(QMainWindow):
         browser_dialog.exec()
     def open_info_button(self):
         info_dialog = QDialog(self)
-        info_dialog.setWindowTitle("FreakyBrowse info\n")
+        info_dialog.setWindowTitle("FreakyBrowse Info")
+        info_dialog.setFixedSize(940, 510)
+        info_dialog.setStyleSheet("""
+        background-color: #9dadad;
+        """)
+
         layout = QVBoxLayout()
-        
         title_label = QLabel("FreakyBrowse Info")
-        title_font = QFont("Comic Sans", 18, QFont.Weight.Bold)
+        title_font = QFont("Arial", 20, QFont.Weight.Bold)
         title_label.setFont(title_font)
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        title_label.setStyleSheet("color: #333333; margin-bottom: 10px;")
+        layout.addWidget(title_label)
 
         below_label1 = QLabel("FreakyBrowse, by the Freakybob Team.")
         below_label1.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        below_label1.setFont(QFont("Arial", 11, QFont.Weight.Normal))
+        below_label1.setStyleSheet("color: #666666;")
+        layout.addWidget(below_label1)
+
         below_label2 = QLabel("Version: 2.0 (WOW!!!! 2.0??? CRAZY !!!)")
         below_label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        below_label1_font = QFont("Comic Sans", 9, QFont.Weight.DemiBold)
-        below_label1.setFont(below_label1_font)
-        below_label2_font = QFont("Comic Sans", 9, QFont.Weight.DemiBold)
-        below_label2.setFont(below_label2_font)
+        below_label2.setFont(QFont("Arial", 11, QFont.Weight.Normal))
+        below_label2.setStyleSheet("color: white;  margin-bottom: 15px;")
+        layout.addWidget(below_label2)
 
         title_label2 = QLabel("Sorta History")
-        title_label2_font = QFont("Comic Sans", 18, QFont.Weight.Bold)
-        title_label2.setFont(title_label2_font)
         title_label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        info_label = QLabel("FreakyBrowse was made on Oct 13th 2024. It first started out as code from GeeksForGeeks & StackOverflow but was updated to work and look better.\nThe first time we started to try to distibrute FreakyBrowse, it was saying it was a trojan. It was a false positive from what wish13yt used to turn the code into an exe.\nWe now use Pyinstaller so you don't get any false positives when downloading FreakyBrowse!")
-        info_label_font = QFont("Comic Sans", 9, QFont.Weight.DemiBold)
-        info_label.setFont(info_label_font)
+        title_label2.setFont(QFont("Arial", 16, QFont.Weight.Bold))
+        title_label2.setStyleSheet("color: #333333; margin-bottom: 10px;")
+        layout.addWidget(title_label2)
+
+        info_label = QLabel("FreakyBrowse was made on Oct 13th 2024. It first started out as code stolen from stackoverflow but was updated to work and look better.\nThe first time we started to try to distribute FreakyBrowse, it was flagged as a trojan. It was a false positive from what wish13yt used to turn the code into an exe.\nWe now use PyInstaller so you don't get any false positives when downloading FreakyBrowse!")
         info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        info_label.setFont(QFont("Arial", 10, QFont.Weight.Normal))
+        info_label.setStyleSheet("color: white; margin-bottom: 15px;")
+        layout.addWidget(info_label)
 
         your_info_title = QLabel("Your Info")
-        your_info_title_font = QFont("Comic Sans", 13, QFont.Weight.Bold)
-        your_info_title.setFont(your_info_title_font)
-        your_info_title.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+        your_info_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        your_info_title.setFont(QFont("Arial", 14, QFont.Weight.Bold))
+        your_info_title.setStyleSheet("color: #333333; margin-bottom: 10px;")
+        layout.addWidget(your_info_title)
 
-        your_info_label = QLabel("FreakyBrowse does not use your personal info. Every website you go to is your choice of giving THEM your info. You do have to agree to the Privacy Policy that we have for search.freakybob.site. You can find it by pressing 'here' on search.freakybob.site")
-        your_info_label_font = QFont("Comic Sans", 9, QFont.Weight.DemiBold)
-        your_info_label.setFont(your_info_label_font)
-        your_info_label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+        your_info_label = QLabel("FreakyBrowse does not use your personal info. Every website you visit is your choice to give THEM your info.\nYou do have to agree to the Privacy Policy on search.freakybob.site.\nYou can find it by pressing 'here' on search.freakybob.site")
+        your_info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        your_info_label.setFont(QFont("Arial", 10, QFont.Weight.Normal))
+        your_info_label.setStyleSheet("color: white;  margin-bottom: 15px;")
+        layout.addWidget(your_info_label)
 
         gpl_label = QLabel("Rights?")
-        gpl_label_font = QFont("Comic Sans", 13, QFont.Weight.Bold)
-        gpl_label.setFont(gpl_label_font)
         gpl_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        gpl_label.setFont(QFont("Arial", 14, QFont.Weight.Bold))
+        gpl_label.setStyleSheet("color: #333333; margin-bottom: 10px;")
+        layout.addWidget(gpl_label)
 
         info_label2 = QLabel("Everything is GPL-3")
-        info_label2_font = QFont("Comic Sans", 9, QFont.Weight.DemiBold)
-        info_label2.setFont(info_label2_font)
         info_label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        layout.addWidget(title_label)
-        layout.addWidget(below_label1)
-        layout.addWidget(below_label2)
-        layout.addWidget(title_label2)
-        layout.addWidget(info_label)
-        layout.addWidget(your_info_title)
-        layout.addWidget(your_info_label)
-        layout.addWidget(gpl_label)
+        info_label2.setFont(QFont("Arial", 10, QFont.Weight.Normal))
+        info_label2.setStyleSheet("color: white;  margin-bottom: 20px;")
         layout.addWidget(info_label2)
 
         close_button = QPushButton("Close")
+        close_button.setStyleSheet("""
+        background-color: #0078d4;
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 14px;
+        margin-top: 15px;
+        """)
         close_button.clicked.connect(info_dialog.accept)
         layout.addWidget(close_button)
+
         info_dialog.setLayout(layout)
         info_dialog.exec()
+
 
     def toggle_homepage_url(self, state, home_url_label):
         if state == 2:
@@ -803,7 +839,7 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setApplicationName("FreakyBrowse")
-    app.setWindowIcon(QIcon("logo.ico")) 
+    app.setWindowIcon(QIcon("logo2.ico")) 
     
     window = MainWindow()
     app.exec() # app.exec_() is deprecated in PyQt6
