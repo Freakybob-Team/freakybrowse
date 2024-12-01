@@ -196,7 +196,16 @@ class MainWindow(QMainWindow):
             q.setScheme("https")
         if q.isValid():
             self.current_browser().setUrl(q)
-            # RPC.update(state="Looking at " + str(self.urlbar.text()), buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}], large_image="icon.png", large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass.")
+            try:
+                RPC.update(state="Looking at " + str(self.urlbar.text()), buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}], large_image="icon.png", large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass.")
+            except:
+                if ("style" in RPC.state):
+                    RPC.update(
+                        details="Browsing the interwebs!",
+                        buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
+                        large_image="icon.png",
+                        large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
+                    )
             # tried showing the URL but it also showed the style, if we can fix that this would be fire fr
         else:
             QMessageBox.warning(self, "Invalid URL", "Please enter a valid URL.")
