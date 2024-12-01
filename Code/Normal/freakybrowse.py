@@ -67,7 +67,7 @@ class MainWindow(QMainWindow):
         self.tabs.setDocumentMode(True)
         self.tabs.setTabsClosable(True)
         self.tabs.tabCloseRequested.connect(self.close_current_tab)
-        self.tabs.tabBarDoubleClicked.connect(self.tab_open_doubleclick)
+        
         self.home_url = MainWindow.HOME_URL
         self.setCentralWidget(self.tabs)
 
@@ -102,6 +102,11 @@ class MainWindow(QMainWindow):
         settings_btn.setStatusTip("Open Settings")
         settings_btn.triggered.connect(self.open_settings)
         self.navtb.addAction(settings_btn)
+
+        new_tab_btn = QAction(QIcon(resource_path("icons/new_tab.png")), "New Tab", self)
+        new_tab_btn.setStatusTip("Open a new tab")
+        new_tab_btn.triggered.connect(self.add_new_tab)
+        self.navtb.addAction(new_tab_btn)
 
         self.navtb.addSeparator()
 
@@ -156,6 +161,10 @@ class MainWindow(QMainWindow):
         self.lavender_mode_enabled = self.settings.value("lavender_mode", False, type=bool)
         self.retro_green_mode_enabled = self.settings.value("retro_green_mode", False, type=bool)
         self.purple_mode_enabled = self.settings.value("purple_mode", False, type=bool)
+        
+        self.settings = QSettings("FreakyBrowse", "RPCsettings")
+        self.rpc_enabled = self.settings.value("rpc_enabled", True, type=bool)
+        self.update_rpc_state()
 
        
 
@@ -173,13 +182,19 @@ class MainWindow(QMainWindow):
     def add_new_tab(self, qurl=None, label="New Tab"):
         if qurl is None:
             qurl = QUrl(self.HOME_URL)
+    
+        if not isinstance(qurl, QUrl):
+            qurl = QUrl(self.HOME_URL)
+
         browser = QWebEngineView()
         browser.setUrl(qurl)
         i = self.tabs.addTab(browser, label)
         self.tabs.setCurrentIndex(i)
         browser.urlChanged.connect(lambda qurl, browser=browser: self.update_urlbar(qurl, browser))
         browser.loadFinished.connect(lambda _, i=i, browser=browser: self.tabs.setTabText(i, browser.page().title()))
-        if (haveDiscord == "True"):
+    
+    
+        if haveDiscord == "True" and self.rpc_enabled:
             try:
                 RPC.update(
                     state="Looking at " + str(self.HOME_URL),
@@ -188,8 +203,9 @@ class MainWindow(QMainWindow):
                     large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
                 )
                 print("Updated RPC! (New tab)")
-            except:
-                if ("style" in RPC.state):
+            except Exception as e:
+                print(f"Error updating RPC: {e}")
+                if "style" in RPC.state:
                     RPC.update(
                         details="Browsing the interwebs!",
                         buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
@@ -201,9 +217,7 @@ class MainWindow(QMainWindow):
         self.add_new_tab(url, "PeakiDiary")
 
 
-    def tab_open_doubleclick(self, i):
-        if i == -1:
-            self.add_new_tab()
+    
 
     
 
@@ -216,20 +230,28 @@ class MainWindow(QMainWindow):
             q.setScheme("https")
         if q.isValid():
             self.current_browser().setUrl(q)
-            if (haveDiscord == "True"):
+        
+            if haveDiscord == "True" and self.rpc_enabled:
                 try:
-                    RPC.update(state="Looking at " + str(self.urlbar.text()), buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}], large_image="icon.png", large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass.")
+                    RPC.update(
+                        state="Looking at " + str(self.urlbar.text()),
+                        buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
+                        large_image="icon.png",
+                        large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
+                    )
                     print("Updated RPC! (Navigated to URL)")
-                except:
-                    if ("style" in RPC.state):
+                except Exception as e:
+                    print(f"Error updating RPC: {e}")
+                    if "style" in RPC.state:
                         RPC.update(
                             details="Browsing the interwebs!",
                             buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
                             large_image="icon.png",
                             large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
                         )
-                # tried showing the URL but it also showed the style, if we can fix that this would be fire fr
-                # HOLY CRAP I FIXED IT - wish
+                        # tried showing the URL but it also showed the style, if we can fix that this would be fire fr
+                        # HOLY CRAP I FIXED IT - wish
+                        # gg !! - greg
         else:
             QMessageBox.warning(self, "Invalid URL", "Please enter a valid URL.")
 
@@ -264,6 +286,55 @@ class MainWindow(QMainWindow):
                 self.setStyleSheet(style)
         else:
             print(f"Style file '{style_name}.qss' not found at {style_path}!")
+    def open_browser_settings(self):
+        
+        browser_dialog = QDialog(self)
+        browser_dialog.setWindowTitle("Browser Settings")
+        layout = QVBoxLayout()
+
+        
+        use_google_checkbox = QCheckBox("Use Google's main page?")
+        use_google_checkbox.setChecked(self.home_url == "https://google.com")
+        use_google_checkbox.stateChanged.connect(
+            lambda state: self.toggle_homepage_url(state, home_url_label))
+        layout.addWidget(use_google_checkbox)
+        warning_label = QLabel("This does not bring you to https://google.com when you start the app. This just changes the Home button location and new tab location :P (This also doesn't save yet :PPP)")
+        home_url_label = QLabel(f"Current Home URL: {self.home_url}")
+        layout.addWidget(warning_label)
+        layout.addWidget(home_url_label)
+
+        use_rpc_checkbox = QCheckBox("Use FreakyBrowse's RPC?")
+        use_rpc_checkbox.setChecked(self.rpc_enabled)
+        use_rpc_checkbox.stateChanged.connect(self.toggle_rpc)
+        layout.addWidget(use_rpc_checkbox)
+        
+        close_button = QPushButton("Close")
+        close_button.clicked.connect(browser_dialog.accept)
+        layout.addWidget(close_button)
+
+        browser_dialog.setLayout(layout)
+        browser_dialog.exec()
+        # Wish, this onlys turns it off and you can't turn it back on after cause it saves. fix greg
+    def toggle_rpc(self, state):
+        self.rpc_enabled = state == Qt.CheckState.Checked
+        self.settings.setValue("rpc_enabled", self.rpc_enabled)
+        print(f"RPC toggled: {'Enabled' if self.rpc_enabled else 'Disabled'}")
+        self.update_rpc_state()
+    def update_rpc_state(self):
+        if self.rpc_enabled:
+            try:
+                print("RPC is now enabled.")
+            except Exception as e:
+                print(f"Error enabling RPC: {e}")
+        else:
+            try:
+                RPC.clear()
+                print("RPC is now disabled.")
+            except Exception as e:
+                print(f"Error disabling RPC: {e}")
+
+        
+
 
     def toggle_mode(self):
         if self.pink_mode_enabled:
@@ -567,28 +638,7 @@ class MainWindow(QMainWindow):
 
         settings_dialog.setLayout(layout)
         settings_dialog.exec()  
-    def open_browser_settings(self):
-        browser_dialog = QDialog(self)
-        browser_dialog.setWindowTitle("Browser Settings")
-        layout = QVBoxLayout()
-
-        
-        use_google_checkbox = QCheckBox("Use Google's main page?")
-        use_google_checkbox.setChecked(self.home_url == "https://google.com")
-        use_google_checkbox.stateChanged.connect(
-            lambda state: self.toggle_homepage_url(state, home_url_label))
-        layout.addWidget(use_google_checkbox)
-        warning_label = QLabel("This does not bring you to https://google.com when you start the app. This just changes the Home button location and new tab location :P (This also doesn't save yet :PPP)")
-        home_url_label = QLabel(f"Current Home URL: {self.home_url}")
-        layout.addWidget(warning_label)
-        layout.addWidget(home_url_label)
-
-        close_button = QPushButton("Close")
-        close_button.clicked.connect(browser_dialog.accept)
-        layout.addWidget(close_button)
-
-        browser_dialog.setLayout(layout)
-        browser_dialog.exec()
+    
     def open_info_button(self):
         info_dialog = QDialog(self)
         info_dialog.setWindowTitle("FreakyBrowse Info")
@@ -611,7 +661,7 @@ class MainWindow(QMainWindow):
         below_label1.setStyleSheet("color: #666666;")
         layout.addWidget(below_label1)
 
-        below_label2 = QLabel("Version: 2.0 (WOW!!!! 2.0??? CRAZY !!!)")
+        below_label2 = QLabel("Version: 2.1!!!")
         below_label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         below_label2.setFont(QFont("Arial", 11, QFont.Weight.Normal))
         below_label2.setStyleSheet("color: white;  margin-bottom: 15px;")
@@ -641,7 +691,7 @@ class MainWindow(QMainWindow):
         your_info_label.setStyleSheet("color: white;  margin-bottom: 15px;")
         layout.addWidget(your_info_label)
 
-        gpl_label = QLabel("Rights?")
+        gpl_label = QLabel("License?")
         gpl_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         gpl_label.setFont(QFont("Arial", 14, QFont.Weight.Bold))
         gpl_label.setStyleSheet("color: #333333; margin-bottom: 10px;")
