@@ -14,6 +14,7 @@ from PyQt6.QtCore import QUrl, QSettings
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QListWidget, QTextEdit, QInputDialog, QMessageBox
 from PyQt6.QtWidgets import QApplication, QTextEdit, QInputDialog
 from PyQt6.QtCore import Qt
+# from PyQt6.QtWebEngineCore import QWebEngineDownloadRequest, QWebEngineProfile
 import sys
 import os
 from pypresence import Presence
@@ -38,6 +39,9 @@ class MainWindow(QMainWindow):
             self.setWindowIcon(QIcon(icon_path))
         except Exception as e:
             print(f"Error loading icon: {e}")
+        # self.download_manager_widget = DownloadManagerWidget()
+        # self.download_manager_widget.setAttribute(Qt.WidgetAttribute.WA_QuitOnClose, False)
+        # QWebEngineProfile.defaultProfile().downloadRequested.connect(self.download_manager_widget.downloadRequested)
 
         
         self.tabs = QTabWidget()
@@ -841,6 +845,21 @@ class MainWindow(QMainWindow):
         with open(filename, "w", encoding="utf-8") as file:
             file.write(content)
         QMessageBox.information(self, "Page Saved", f"Page has been saved to {filename}.")
+# class DownloadManagerWidget(QWidget):
+#     def downloadRequested(self, download: QWebEngineDownloadRequest):
+#         assert download and download.state() == QWebEngineDownloadRequest.DownloadRequested
+#         # Prompt the user for a file name
+#         path, _ = QFileDialog.getSaveFileName(self, "Save as", QDir(download.downloadDirectory()).filePath(download.downloadFileName()))
+#         if path.isEmpty():
+#             return
+#         # Set download directory and file name
+#         download.setDownloadDirectory(QFileInfo(path).path())
+#         download.setDownloadFileName(QFileInfo(path).fileName())
+#         download.accept()
+#         # Add the download to the download manager
+#         self.add(DownloadManagerWidget)
+#         # Show the download manager
+#         self.show()
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setApplicationName("FreakyBrowse")
