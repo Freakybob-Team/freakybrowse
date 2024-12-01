@@ -162,7 +162,7 @@ class MainWindow(QMainWindow):
         self.retro_green_mode_enabled = self.settings.value("retro_green_mode", False, type=bool)
         self.purple_mode_enabled = self.settings.value("purple_mode", False, type=bool)
         
-        self.settings = QSettings("FreakyBrowse", "RPC")
+        self.settings = QSettings("FreakyBrowse", "SIGMA RPC")
         self.rpc_enabled = self.settings.value("rpc_enabled", True, type=bool)
         self.warned_about_rpc = False
         self.update_rpc_state()
@@ -235,7 +235,7 @@ class MainWindow(QMainWindow):
             if haveDiscord == "True" and self.rpc_enabled:
                 try:
                     RPC.update(
-                        state="Looking at " + str(self.urlbar.text()),
+                        state="Looking at " + str( self.urlbar.text()),
                         buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
                         large_image="icon.png",
                         large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
@@ -255,7 +255,7 @@ class MainWindow(QMainWindow):
                         # gg !! - greg
         else:
             QMessageBox.warning(self, "Invalid URL", "Please enter a valid URL.")
-        if haveDiscord == "True" and self.rpc_enabled and "chrome" or "Chrome" in str(self.urlbar.text()):
+        if haveDiscord == "True" and self.rpc_enabled and "chrome" in str(self.urlbar.text()):
             try:
                 RPC.update(
                     details="Commiting a sin",
@@ -265,7 +265,108 @@ class MainWindow(QMainWindow):
                 )
             except Exception as e:
                 print(f"Error updating RPC: {e}")
+        if haveDiscord == "True" and self.rpc_enabled and "freakybob.site" in str(self.urlbar.text()):
+            try:
+                RPC.update(
+                    details="Browsing peak, freakybob.site",
+                    buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
+                    large_image="icon.png",
+                    large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
+                )
+            except Exception as e:
+                print(f"Error updating RPC: {e}")
+        if haveDiscord == "True" and self.rpc_enabled and "https://rentahitman.com/" in str(self.urlbar.text()):
+            try:
+                RPC.update(
+                    details="Oooohh interesting IP address!",
+                    buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
+                    large_image="icon.png",
+                    large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
+                )
+            except Exception as e:
+                print(f"Error updating RPC: {e}")
+        if haveDiscord == "True" and self.rpc_enabled and "pikidiary.lol" and "PikiDiary.lol" in str(self.urlbar.text()):
+            try:
+                RPC.update(
+                    details="This user is peak! Speaking of peak, check out PikiDiary!",
+                    buttons=[{"label": "PikiDiary", "url": "https://pikidiary.lol"}],
+                    large_image="icon.png",
+                    large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
+                )
+            except Exception as e:
+                print(f"Error updating RPC: {e}")
+        if haveDiscord == "True" and self.rpc_enabled and "x.com" and "X.com" in str(self.urlbar.text()):
+            try:
+                RPC.update(
+                    details="You know there's always a nearby therapist office",
+                    buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
+                    large_image="icon.png",
+                    large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
+                )
+            except Exception as e:
+                print(f"Error updating RPC: {e}")
+        if haveDiscord == "True" and self.rpc_enabled and "reddit.com" and "Reddit" and "reddit" in str(self.urlbar.text()):
+            try:
+                RPC.update(
+                    details="wikihow is always a last resort",
+                    buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
+                    large_image="icon.png",
+                    large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
+                )
+            except Exception as e:
+                print(f"Error updating RPC: {e}")
+        if haveDiscord == "True" and self.rpc_enabled and "classroom.google.com" and "Classroom.Google.com" in str(self.urlbar.text()):
+            try:
+                RPC.update(
+                    details="im sorry for you",
+                    buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
+                    large_image="icon.png",
+                    large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
+                )
+            except Exception as e:
+                print(f"Error updating RPC: {e}")
+        if haveDiscord == "True" and self.rpc_enabled and "archive.org" in str(self.urlbar.text()):
+            try:
+                RPC.update(
+                    details="This user is either a huge nerd or a pirator. Prob both tbh",
+                    buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
+                    large_image="icon.png",
+                    large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
+                )
+            except Exception as e:
+                print(f"Error updating RPC: {e}")
+        if haveDiscord == "True" and self.rpc_enabled and "apple.com" in str(self.urlbar.text()):
+            try:
+                RPC.update(
+                    details="We're more open than them, y'know?",
+                    buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
+                    large_image="icon.png",
+                    large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
+                )
+            except Exception as e:
+                print(f"Error updating RPC: {e}")
+        if haveDiscord == "True" and self.rpc_enabled and "match.com" in str(self.urlbar.text()):
+            try:
+                RPC.update(
+                    details="On FreakyBrowse? Really",
+                    buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
+                    large_image="icon.png",
+                    large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
+                )
+            except Exception as e:
+                print(f"Error updating RPC: {e}")
+        if haveDiscord == "True" and self.rpc_enabled and "redditforcommunity.com" and "www.reddit.com/r/modhelp/" in str(self.urlbar.text()):
+            try:
+                RPC.update(
+                    details="Weight.. being.. gained..",
+                    buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
+                    large_image="icon.png",
+                    large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
+                )
+            except Exception as e:
+                print(f"Error updating RPC: {e}")
     def update_urlbar(self, q, browser=None):
+        
         if browser != self.current_browser():
             return
         self.urlbar.setText(q.toString())
