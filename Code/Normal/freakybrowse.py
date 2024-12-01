@@ -162,8 +162,9 @@ class MainWindow(QMainWindow):
         self.retro_green_mode_enabled = self.settings.value("retro_green_mode", False, type=bool)
         self.purple_mode_enabled = self.settings.value("purple_mode", False, type=bool)
         
-        self.settings = QSettings("FreakyBrowse", "RPCsettings")
+        self.settings = QSettings("FreakyBrowse", "RPC")
         self.rpc_enabled = self.settings.value("rpc_enabled", True, type=bool)
+        self.warned_about_rpc = False
         self.update_rpc_state()
 
        
@@ -318,11 +319,25 @@ class MainWindow(QMainWindow):
         browser_dialog.setLayout(layout)
         browser_dialog.exec()
         # Wish, this onlys turns it off and you can't turn it back on after cause it saves. fix greg
+
+
     def toggle_rpc(self, state):
+        if self.rpc_enabled and not self.warned_about_rpc:
+            reply = QMessageBox.question(self, "Warning", 
+                                     "Are you sure you want to disable Discord RPC? This action cannot be undone unless you reinstall or update.",
+                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, 
+                                     QMessageBox.StandardButton.No)
+            if reply == QMessageBox.StandardButton.No:
+                self.sender().setChecked(self.rpc_enabled)
+                return
+
+            self.warned_about_rpc = True
+
         self.rpc_enabled = state == Qt.CheckState.Checked
         self.settings.setValue("rpc_enabled", self.rpc_enabled)
         print(f"RPC toggled: {'Enabled' if self.rpc_enabled else 'Disabled'}")
         self.update_rpc_state()
+
     def update_rpc_state(self):
         if self.rpc_enabled:
             try:
