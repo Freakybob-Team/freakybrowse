@@ -308,6 +308,9 @@ class MainWindow(QMainWindow):
         use_rpc_checkbox.stateChanged.connect(self.toggle_rpc)
         layout.addWidget(use_rpc_checkbox)
         
+        warn_label = QLabel("Warning! This permanently disables Discord RPC for FreakyBrowse until you reinstall or update.")
+        layout.addWidget(warn_label)
+        
         close_button = QPushButton("Close")
         close_button.clicked.connect(browser_dialog.accept)
         layout.addWidget(close_button)
