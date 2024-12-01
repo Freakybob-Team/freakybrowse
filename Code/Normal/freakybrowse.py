@@ -16,6 +16,10 @@ from PyQt6.QtWidgets import QApplication, QTextEdit, QInputDialog
 from PyQt6.QtCore import Qt
 import sys
 import os
+from pypresence import Presence
+RPC = Presence("1312584606637101156")
+RPC.connect()
+RPC.update(details="Browsing the interwebs!", buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}], large_image="icon.png", large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass.")
 def resource_path(relative_path):
     """ Get the absolute path to a resource, works for dev and bundled apps """
     try:
@@ -87,8 +91,8 @@ class MainWindow(QMainWindow):
         self.urlbar.addAction(logo_action, QLineEdit.ActionPosition.LeadingPosition)
         self.urlbar.setClearButtonEnabled(True)
 
-        pikidiary_btn = QAction(QIcon(resource_path("icons/piki.png")), "Pikidiary", self)
-        pikidiary_btn.setStatusTip("Go to Pikidiary!")
+        pikidiary_btn = QAction(QIcon(resource_path("icons/piki.png")), "PikiDiary", self)
+        pikidiary_btn.setStatusTip("Go to PikiDiary!")
         pikidiary_btn.triggered.connect(self.pikidiary)
         self.navtb.addAction(pikidiary_btn)
 
@@ -172,6 +176,8 @@ class MainWindow(QMainWindow):
             q.setScheme("https")
         if q.isValid():
             self.current_browser().setUrl(q)
+            # RPC.update(state="Looking at " + str(self.urlbar.text()), buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}], large_image="icon.png", large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass.")
+            # tried showing the URL but it also showed the style, if we can fix that this would be fire fr
         else:
             QMessageBox.warning(self, "Invalid URL", "Please enter a valid URL.")
 
@@ -835,7 +841,6 @@ class MainWindow(QMainWindow):
         with open(filename, "w", encoding="utf-8") as file:
             file.write(content)
         QMessageBox.information(self, "Page Saved", f"Page has been saved to {filename}.")
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setApplicationName("FreakyBrowse")
