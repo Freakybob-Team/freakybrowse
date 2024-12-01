@@ -32,13 +32,13 @@ try:
         large_image="icon.png",
         large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
     )
-    haveDiscord = True
+    haveDiscord = "True"
 except InvalidPipe:
     print("")
-    haveDiscord = False
+    haveDiscord = "False"
 except Exception as e:
     print("")
-    haveDiscord = False
+    haveDiscord = "False"
 
 def resource_path(relative_path):
     """ Get the absolute path to a resource, works for dev and bundled apps """
@@ -187,6 +187,7 @@ class MainWindow(QMainWindow):
                     large_image="icon.png",
                     large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
                 )
+                print("Updated RPC! (New tab)")
             except:
                 if ("style" in RPC.state):
                     RPC.update(
@@ -218,6 +219,7 @@ class MainWindow(QMainWindow):
             if (haveDiscord == "True"):
                 try:
                     RPC.update(state="Looking at " + str(self.urlbar.text()), buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}], large_image="icon.png", large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass.")
+                    print("Updated RPC! (Navigated to URL)")
                 except:
                     if ("style" in RPC.state):
                         RPC.update(
