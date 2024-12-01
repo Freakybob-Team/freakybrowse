@@ -255,7 +255,16 @@ class MainWindow(QMainWindow):
                         # gg !! - greg
         else:
             QMessageBox.warning(self, "Invalid URL", "Please enter a valid URL.")
-
+        if haveDiscord == "True" and self.rpc_enabled and "chrome" in str(self.urlbar.text()):
+            try:
+                RPC.update(
+                    details="Commiting a sin",
+                    buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
+                    large_image="icon.png",
+                    large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
+                )
+            except Exception as e:
+                print(f"Error updating RPC: {e}")
     def update_urlbar(self, q, browser=None):
         if browser != self.current_browser():
             return
