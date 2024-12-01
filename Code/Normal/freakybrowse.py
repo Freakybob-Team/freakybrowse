@@ -15,12 +15,28 @@ from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QLis
 from PyQt6.QtWidgets import QApplication, QTextEdit, QInputDialog
 from PyQt6.QtCore import Qt
 # from PyQt6.QtWebEngineCore import QWebEngineDownloadRequest, QWebEngineProfile
+
 import sys
 import os
 from pypresence import Presence
-RPC = Presence("1312584606637101156")
-RPC.connect()
-RPC.update(details="Browsing the interwebs!", buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}], large_image="icon.png", large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass.")
+from pypresence.exceptions import InvalidPipe
+
+RPC = None
+
+try:
+    RPC = Presence("1312584606637101156")
+    RPC.connect()
+    RPC.update(
+        details="Browsing the interwebs!",
+        buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
+        large_image="icon.png",
+        large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
+    )
+except InvalidPipe:
+    print("")
+except Exception as e:
+    print("")
+
 def resource_path(relative_path):
     """ Get the absolute path to a resource, works for dev and bundled apps """
     try:
