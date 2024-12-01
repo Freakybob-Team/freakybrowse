@@ -162,7 +162,7 @@ class MainWindow(QMainWindow):
         self.retro_green_mode_enabled = self.settings.value("retro_green_mode", False, type=bool)
         self.purple_mode_enabled = self.settings.value("purple_mode", False, type=bool)
         
-        self.settings = QSettings("FreakyBrowse", "SIGMA RPC")
+        self.settings = QSettings("FreakyBrowse", "RPC1Settings")
         self.rpc_enabled = self.settings.value("rpc_enabled", True, type=bool)
         self.warned_about_rpc = False
         self.update_rpc_state()
@@ -414,12 +414,12 @@ class MainWindow(QMainWindow):
         layout.addWidget(warning_label)
         layout.addWidget(home_url_label)
 
-        use_rpc_checkbox = QCheckBox("Disable RPC?")
+        use_rpc_checkbox = QCheckBox("Use FreakyBrowese's Discord RPC?")
         use_rpc_checkbox.setChecked(self.rpc_enabled)
         use_rpc_checkbox.stateChanged.connect(self.toggle_rpc)
         layout.addWidget(use_rpc_checkbox)
         
-        warn_label = QLabel("Warning! This permanently disables Discord RPC for FreakyBrowse until you reinstall or update.")
+        warn_label = QLabel("If you disable FreakyBrowse's Discord RPC, it will not be enabled again until you reinstall or update.")
         layout.addWidget(warn_label)
 
         close_button = QPushButton("Close")
@@ -428,8 +428,6 @@ class MainWindow(QMainWindow):
 
         browser_dialog.setLayout(layout)
         browser_dialog.exec()
-        # Wish, this onlys turns it off and you can't turn it back on after cause it saves. fix greg
-
 
     def toggle_rpc(self, state):
         if self.rpc_enabled and not self.warned_about_rpc:
@@ -894,7 +892,10 @@ class MainWindow(QMainWindow):
 
         layout.addLayout(button_layout)
 
-    
+        download_note_button = QPushButton("Download Note")
+        download_note_button.clicked.connect(lambda: self.download_note_as_txt(notes_list, saved_notes))
+        button_layout.addWidget(download_note_button)
+
         note_viewer = QTextEdit()
         note_viewer.setReadOnly(False)
         layout.addWidget(note_viewer)
@@ -926,7 +927,7 @@ class MainWindow(QMainWindow):
 
         notes_dialog.setLayout(layout)
         notes_dialog.exec()
-
+        
     def add_note_dialog(self, notes_list, saved_notes):
         text, ok = QInputDialog.getText(self, "Add Note", "Enter note name:")
     
@@ -991,6 +992,38 @@ class MainWindow(QMainWindow):
         else:
         
             note_viewer.insertHtml(f'<img src="{image_path}" width="{width}" height="{height}">')
+    def download_note_as_txt(self, notes_list, saved_notes):
+        selected_item = notes_list.currentItem()
+        if not selected_item:
+            QMessageBox.warning(self, "No Note Selected", "Please select a note to download.")
+            return
+
+   
+        note_name = selected_item.text()
+        note_content = saved_notes.get(note_name, "")
+
+    
+        temp_editor = QTextEdit()
+        temp_editor.setHtml(note_content)
+        plain_text_content = temp_editor.toPlainText()
+
+    
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save Note As",
+            f"{note_name}.txt",
+            "Text Files (*.txt)"
+        )
+        if not file_path:
+            return
+
+    
+        try:
+            with open(file_path, "w", encoding="utf-8") as file:
+                file.write(plain_text_content)
+            QMessageBox.information(self, "Download Successful", f"'{note_name}' has been downloaded as '{file_path}'.")
+        except Exception as e:
+            QMessageBox.critical(self, "Error Saving File", f"An error occurred: {e}")
 
 
 
