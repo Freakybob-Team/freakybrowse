@@ -8,98 +8,93 @@
     <meta content="FreakyBrowse" property="og:title">
     <meta content="FreakyBrowse Info!!!!!!!!" property="og:description">
     <link rel="icon" href="icons/logo.ico">
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-image: url("images/bg.png");
-            background-repeat: no-repeat;
-            background-size: cover;
-            color: white; 
-            transition: background-color 0.3s, color 0.3s;
-        }
-    h1 {
-        color: #3cbed8;
-        text-align: center;
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+<style>
+    * {
+        margin:0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 40px;
     }
-        h2 {
-            color: yellow;
-        }
-        .color {
-            color: aqua;
-            display: inline;
-        }
-        .h {
-            display: inline;
-        }
-        #main {
-            max-width: fit-content;
-            margin-left: auto;
-            margin-right: auto;
-            border-radius: 7px;
-            height: 40px;
-            width: 240px;
-            background-color: rgba(176, 45, 143, 0.579);
-        }
-        #main > #small {
-            text-align: center;
-            color:yellow;
-            margin-top: -20px;
-        }
-        #broswer_slogan {
-            margin-top: 38px;
-            max-width: fit-content;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        #info {
-            margin-top: 140px;
-            max-width: fit-content;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        #yes {
-            max-width: fit-content;
-            margin-left: auto;
-            margin-right: auto;
-            border-radius: 7px;
-            background-color: rgba(219, 27, 240, 0.642);
-            text-align: center;
-            color:aquamarine;
-        }
-        #pytq6 {
-            margin-top: -104px;
-        }
-    </style>
+
+    .a1 {
+        display: inline-block;
+        margin-left: 100px;
+        height:0px;
+        margin-bottom: -250px;
+    }
+
+    .a2 {
+        margin-top: 400px;
+        display: inline-block;
+        margin-left: 10px;
+        color: blue;
+        height:0px;
+        width: 0px;
+    }
+
+    .download {
+        display: block;
+  width: 250px;
+  padding: 20px 5px;
+  border-radius: 30px;
+  margin-top: 10px;
+  margin-left: 190px;
+  background-color: red;
+  text-align: center;
+  font-family: Helvetica;
+  font-size: 32px;
+  color: mintcream;
+  transition: .8s background-position ease-in-out;
+  text-decoration: none;
+  animation: pop-in .6s ease-out forwards;
+  background-position: left;
+  background: rgb(238,174,202);
+background: radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%);
+  background-size: 300%;
+  background-position: left;
+}
+
+.download:hover {
+ background-position: right;
+}
+
+    img {
+        margin: 0;
+        margin-top: -330px;
+    margin-left:900px;
+ height: 520px;
+ transform:
+      rotate3d(.5,-.866,0,15deg)
+      rotate(1deg);
+    box-shadow:
+      2em 4em 6em -2em rgba(0,0,0,.5),
+      1em 2em 3.5em -2.5em rgba(0,0,0,.5);
+    transition:
+      transform .4s ease,
+      box-shadow .4s ease;
+    border-radius: .5em;
+    border-color:#1b1f3b;
+    border: 2px solid;
+    &:hover {
+      transform:
+        rotate3d(0,0,0,0deg)
+        rotate(0deg);
+    }
+}
+
+
+
+</style>
 </head>
 <body>
-
-
-    <div id="content">
-        <div id="main">
-            <h1>FreakyBrowse.</h1>
-         <p id="small">A Browser made by the Freakybob-team</p>
-        </div>
-        <div id="broswer_slogan">
-        <h2 class="h">A browser built for</h2> <h2 class="color"> you.</h2>
-        <br>
-        <h2 class="h">A browser for</h2> <h2 class=color>them.</h2>
-        <br>
-        <h2 class="h">A browser for</h2> <h2 class=color>everyone.</h2>
-        </div>
-        <div id="info">
-        <p id="pytq6">FreakyBrowse was built using Python and PyQt6 (originally PyQt5) by the Freakybob Team. It's what we want, and need, in a browser.</p>
-        <h1>Features</h1>
-        <p id="yes">- Notes (images & text!)</p>
-        <p id="yes">- Tabs (double-click to add a tab!)</p>
-        <p id="yes">- FreakySearch home page</p>
-        <p id="yes">- Themes (Added by us!)</p>
-        <p id="yes">- Bookmarks</p>
-        <p id="yes">- Save page</p>
-        <p id="yes">- View page source</p>
-    </div>
-        <a href="https://github.com/Freakybob-Team/freakybrowse/releases/latest"><h1>Get it now!</h1></a>
-    </div>
+    <h1 class="a1">A Browser For </h1><h1 class="a2"> Everyone.</h1>
+    <a class="download" href="https://github.com/Freakybob-Team/freakybrowse/releases/download/V.2.0/FreakyBrowse2.exe">Download</a>
+    <img src="Capture d'écran 2024-12-01 191642.png">
 </body>
 </html>
