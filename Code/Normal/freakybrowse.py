@@ -633,7 +633,7 @@ class MainWindow(QMainWindow):
         your_info_title.setStyleSheet("color: #333333; margin-bottom: 10px;")
         layout.addWidget(your_info_title)
 
-        your_info_label = QLabel("FreakyBrowse does not use your personal info. Every website you visit is your choice to give THEM your info.\nYou do have to agree to the Privacy Policy on search.freakybob.site.\nYou can find it by pressing 'here' on search.freakybob.site")
+        your_info_label = QLabel("FreakyBrowse does not use your personal info. Every website you visit is your choice to give THEM your info.\nYou do have to agree to the Privacy Policy on search.freakybob.site.\nYou can find it by pressing 'here' on search.freakybob.site.\n Some dependencies we use may also use your data. We can't do anything about this.")
         your_info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         your_info_label.setFont(QFont("Arial", 10, QFont.Weight.Normal))
         your_info_label.setStyleSheet("color: white;  margin-bottom: 15px;")
