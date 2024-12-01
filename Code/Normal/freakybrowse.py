@@ -22,7 +22,7 @@ from pypresence import Presence
 from pypresence.exceptions import InvalidPipe
 
 RPC = None
-
+haveDiscord = None
 try:
     RPC = Presence("1312584606637101156")
     RPC.connect()
@@ -32,10 +32,13 @@ try:
         large_image="icon.png",
         large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
     )
+    haveDiscord = True
 except InvalidPipe:
     print("")
+    haveDiscord = False
 except Exception as e:
     print("")
+    haveDiscord = False
 
 def resource_path(relative_path):
     """ Get the absolute path to a resource, works for dev and bundled apps """
@@ -176,6 +179,22 @@ class MainWindow(QMainWindow):
         self.tabs.setCurrentIndex(i)
         browser.urlChanged.connect(lambda qurl, browser=browser: self.update_urlbar(qurl, browser))
         browser.loadFinished.connect(lambda _, i=i, browser=browser: self.tabs.setTabText(i, browser.page().title()))
+        if (haveDiscord == "True"):
+            try:
+                RPC.update(
+                    state="Looking at " + str(self.HOME_URL),
+                    buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
+                    large_image="icon.png",
+                    large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
+                )
+            except:
+                if ("style" in RPC.state):
+                    RPC.update(
+                        details="Browsing the interwebs!",
+                        buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
+                        large_image="icon.png",
+                        large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
+                    )
     def pikidiary(self):
         url = QUrl("https://pikidiary.lol")
         self.add_new_tab(url, "PeakiDiary")
@@ -196,17 +215,19 @@ class MainWindow(QMainWindow):
             q.setScheme("https")
         if q.isValid():
             self.current_browser().setUrl(q)
-            try:
-                RPC.update(state="Looking at " + str(self.urlbar.text()), buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}], large_image="icon.png", large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass.")
-            except:
-                if ("style" in RPC.state):
-                    RPC.update(
-                        details="Browsing the interwebs!",
-                        buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
-                        large_image="icon.png",
-                        large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
-                    )
-            # tried showing the URL but it also showed the style, if we can fix that this would be fire fr
+            if (haveDiscord == "True"):
+                try:
+                    RPC.update(state="Looking at " + str(self.urlbar.text()), buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}], large_image="icon.png", large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass.")
+                except:
+                    if ("style" in RPC.state):
+                        RPC.update(
+                            details="Browsing the interwebs!",
+                            buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
+                            large_image="icon.png",
+                            large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
+                        )
+                # tried showing the URL but it also showed the style, if we can fix that this would be fire fr
+                # HOLY CRAP I FIXED IT - wish
         else:
             QMessageBox.warning(self, "Invalid URL", "Please enter a valid URL.")
 
