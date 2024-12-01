@@ -255,7 +255,7 @@ class MainWindow(QMainWindow):
                         # gg !! - greg
         else:
             QMessageBox.warning(self, "Invalid URL", "Please enter a valid URL.")
-        if haveDiscord == "True" and self.rpc_enabled and "chrome" in str(self.urlbar.text()):
+        if haveDiscord == "True" and self.rpc_enabled and "chrome" or "Chrome" in str(self.urlbar.text()):
             try:
                 RPC.update(
                     details="Commiting a sin",
