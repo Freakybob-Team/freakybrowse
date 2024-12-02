@@ -52,7 +52,7 @@ class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.resize(900, 700)
-        self.setWindowTitle("FreakyBrowse 2.0 - by the Freakybob Team.")
+        self.setWindowTitle("FreakyBrowse 2.1 - by the Freakybob Team.")
         try:
             icon_path = resource_path("icons/logo_new.ico")
             self.setWindowIcon(QIcon(icon_path))
