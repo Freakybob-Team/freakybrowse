@@ -8,7 +8,7 @@ This is a browser completly written in Python! We used a lot of guides for the a
 
 This gets updates pretty often so make sure to delete the old FreakyBrowse before installing the new version unless you really want it still!
 
-Latest Version: V.2.0 !!! 🔥
+Latest Version: V.2.1 !!! 🔥
 
 Software supported: Windows
 
