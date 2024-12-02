@@ -11,90 +11,67 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-<style>
-    * {
-        margin:0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: "Poppins", serif;
-  font-weight: 400;
-  font-style: normal;
-  font-size: 40px;
-    }
-
-    .a1 {
-        display: inline-block;
-        margin-left: 100px;
-        height:0px;
-        margin-bottom: -250px;
-    }
-
-    .a2 {
-        margin-top: 400px;
-        display: inline-block;
-        margin-left: 10px;
-        color: blue;
-        height:0px;
-        width: 0px;
-    }
-
-    .download {
-        display: block;
-  width: 250px;
-  padding: 20px 5px;
-  border-radius: 30px;
-  margin-top: 10px;
-  margin-left: 190px;
-  background-color: red;
-  text-align: center;
-  font-family: Helvetica;
-  font-size: 32px;
-  color: mintcream;
-  transition: .8s background-position ease-in-out;
-  text-decoration: none;
-  animation: pop-in .6s ease-out forwards;
-  background-position: left;
-  background: rgb(238,174,202);
-background: radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%);
-  background-size: 300%;
-  background-position: left;
-}
-
-.download:hover {
- background-position: right;
-}
-
-    img {
-        margin: 0;
-        margin-top: -330px;
-    margin-left:900px;
- height: 520px;
- transform:
-      rotate3d(.5,-.866,0,15deg)
-      rotate(1deg);
-    box-shadow:
-      2em 4em 6em -2em rgba(0,0,0,.5),
-      1em 2em 3.5em -2.5em rgba(0,0,0,.5);
-    transition:
-      transform .4s ease,
-      box-shadow .4s ease;
-    border-radius: .5em;
-    border-color:#1b1f3b;
-    border: 2px solid;
-    &:hover {
-      transform:
-        rotate3d(0,0,0,0deg)
-        rotate(0deg);
-    }
-}
-
-
-
-</style>
+<link rel="stylesheet" href="css/index.css">
 </head>
 <body>
-    <h1 class="a1">A Browser For </h1><h1 class="a2"> Everyone.</h1>
-    <a class="download" href="https://github.com/Freakybob-Team/freakybrowse/releases/download/V.2.0/FreakyBrowse2.exe">Download</a>
-    <img src="Capture d'écran 2024-12-01 191642.png">
+    <div class="footer">
+        <a href="https://freakybrowse.freakybob.site">Home</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+        <a href="#download">Download</a>
+    </div>
+    <div class="main">
+        <h1 class="best-browser-thing">The most freakiest browser<span class="dot">.</span></h1>
+    <img src="Images/Screenshot 2024-12-01 182001.png" class="image-main">
+    <h1 class="a2">FreakyBrowse</h1>
+    <h1 class="made-by">A Browser made by the Freakybob Team.</h1>
+</div>
+<h2 class="what">About FreakyBrowse</h2>
+
+<div class="container">
+    <div id="about"></div>
+<div id="info">
+    <h1 id="info-title">Lorem ipsum</h1>
+    <div style="height: 4px; border-bottom: 1px #CCC solid;"></div>
+    <p id="info-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tempus efficitur arcu, sed luctus urna dictum id. Ut sagittis metus vel erat laoreet, in gravida erat tristique. Etiam ut dui elementum, aliquet eros finibus, fringilla arcu. Donec eget massa vestibulum, interdum turpis a, vestibulum ex. Fusce pellentesque ultricies eros et gravida.</p>
+</div>
+<div id="info2">
+    <h1 class="info-title2">Lorem ipsum</h1>
+    <div style="height: 4px; border-bottom: 1px #CCC solid;"></div>
+    <p id="info-text2">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tempus efficitur arcu, sed luctus urna dictum id. Ut sagittis metus vel erat laoreet, in gravida erat tristique. Etiam ut dui elementum, aliquet eros finibus, fringilla arcu. Donec eget massa vestibulum, interdum turpis a, vestibulum ex. Fusce pellentesque ultricies eros et gravida.</p>
+</div>
+</div>
+
+<h1 class="devs">Dev and Contributors</h1>
+<div id="devs" class="dev-grid">
+    <div class="dev-card">
+        <img src="https://github.com/5quirre1.png" alt="squirrel" class="dev-pfp">
+        <h3>5quirre1</h3>
+        <p>Lorem ipsum dolor sit amet</p>
+        <a href="https://github.com/5quirre1" class="github-icon" target="_blank" aria-label="Github Profile">
+            <img src="icons/github.svg" alt="GitHub">
+        </a>
+    </div>
+    <div class="dev-card">
+        <img src="https://github.com/wish13yt.png" alt="wish" class="dev-pfp">
+        <h3>Wish13yt</h3>
+        <p>Lorem ipsum dolor sit amet</p>
+        <a href="https://github.com/wish13yt" class="github-icon" target="_blank" aria-label="Github Profile">
+            <img src="icons/github.svg" alt="GitHub">
+        </a>
+    </div>
+    <div class="dev-card">
+        <img src="https://github.com/Nomaakip.png" alt="noma" class="dev-pfp">
+        <h3>Nomaakip</h3>
+        <p>Lorem ipsum dolor sit amet</p>
+        <a href="https://github.com/Nomaakip" class="github-icon" target="_blank" aria-label="Github Profile">
+            <img src="icons/github.svg" alt="GitHub">
+        </a>
+    </div>
+</div>
+
+
+
+    <!--<a class="download" href="https://github.com/Freakybob-Team/freakybrowse/releases/download/V.2.0/FreakyBrowse2.exe">Download</a>-->
 </body>
 </html>
