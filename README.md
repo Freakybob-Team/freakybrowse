@@ -2,7 +2,7 @@
 We have switched to PyQt6! Before running 1.6+, run these commands in your terminal:
 > pip install PyQt6
 > pip install PyQt6-WebEngine
-
+ 
 # FreakyBrowse!
 This is a browser completly written in Python! We used a lot of guides for the app so keep in mind that we are not THAT smart.
 
