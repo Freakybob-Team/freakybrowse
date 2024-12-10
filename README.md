@@ -1,3 +1,5 @@
+# Notice
+We have ended .exe support for versions past 2.0. Please remember to just.. be smart..
 # WARNING!
 We have switched to PyQt6! Before running 1.6+, run these commands in your terminal:
 > pip install PyQt6
