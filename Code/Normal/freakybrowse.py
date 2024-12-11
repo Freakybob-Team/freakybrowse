@@ -8,13 +8,15 @@ from PyQt6.QtGui import *
 from PyQt6.QtWebEngineWidgets import *
 from PyQt6.QtWidgets import QToolBar, QPushButton
 from PyQt6.QtGui import QIcon
-from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QAction
 from PyQt6.QtCore import QUrl, QSettings
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QListWidget, QTextEdit, QInputDialog, QMessageBox
 from PyQt6.QtWidgets import QApplication, QTextEdit, QInputDialog
 from PyQt6.QtCore import Qt
-# from PyQt6.QtWebEngineCore import QWebEngineDownloadRequest, QWebEngineProfile
+from PyQt6.QtNetwork import QNetworkReply
+from PyQt6.QtCore import QObject, pyqtSignal, QThread
+import requests
+import mimetypes
 
 import sys
 import os
@@ -47,20 +49,156 @@ def resource_path(relative_path):
     except Exception:
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
+class DownloadManagerWindow(QDialog):
+    def __init__(self, parent=None):
+        super(DownloadManagerWindow, self).__init__(parent)
+        self.setWindowTitle("Download Manager")
+        self.download_manager = DownloadManager(self)
+        self.download_manager.download_progress.connect(self.update_progress)
+        self.download_manager.download_complete.connect(self.download_complete)
+        self.download_manager.download_error.connect(self.download_error)
+
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+
+        self.url_label = QLabel("URL:")
+        layout.addWidget(self.url_label)
+        self.url_input = QLineEdit()
+        layout.addWidget(self.url_input)
+
+        self.file_name_label = QLabel("File Name (optional):")
+        layout.addWidget(self.file_name_label)
+        self.file_name_input = QLineEdit()
+        layout.addWidget(self.file_name_input)
+
+        self.download_button = QPushButton("Download")
+        self.download_button.clicked.connect(self.start_download)
+        layout.addWidget(self.download_button)
+
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setValue(0)
+        layout.addWidget(self.progress_bar)
+
+        self.status_label = QLabel("Status:")
+        layout.addWidget(self.status_label)
+
+    def update_progress(self, progress):
+        self.progress_bar.setValue(progress)
+
+    def download_complete(self, file_name):
+        self.status_label.setText(f"Download complete: {file_name}")
+        self.progress_bar.setValue(100)
+
+    def download_error(self, error_message):
+        self.status_label.setText(f"Error: {error_message}")
+
+    def start_download(self):
+        url = self.url_input.text()
+        file_name = self.file_name_input.text().strip()
+
+        if not url:
+            self.status_label.setText("Error: URL is required.")
+            return
+
+        if not file_name:
+            file_name = self.download_manager.get_file_name(url)
+
+        self.progress_bar.setValue(0)
+        self.status_label.setText("Downloading...")
+        self.download_manager.get(url, file_name)
+
+
+class DownloadManager(QObject):
+    download_progress = pyqtSignal(int)
+    download_complete = pyqtSignal(str)
+    download_error = pyqtSignal(str)
+
+    def __init__(self, parent=None):
+        super(DownloadManager, self).__init__(parent)
+        self.parent = parent
+
+    def get(self, url, file_name):
+        self.thread = QThread(self)
+        self.worker = DownloadWorker(url, file_name)
+        self.worker.moveToThread(self.thread)
+
+        self.thread.started.connect(self.worker.start)
+        self.worker.download_progress.connect(self.download_progress.emit)
+        self.worker.download_complete.connect(self.download_complete.emit)
+        self.worker.download_error.connect(self.download_error.emit)
+        self.worker.download_complete.connect(self.thread.quit)
+        self.worker.download_complete.connect(self.worker.deleteLater)
+        self.thread.finished.connect(self.thread.deleteLater)
+
+        self.thread.start()
+
+    def get_file_name(self, url):
+        file_name = os.path.basename(url.split("?")[0])
+        if not file_name:
+            return "downloaded_file"
+
+        mime_type, _ = mimetypes.guess_type(file_name)
+        if mime_type:
+            file_extension = mimetypes.guess_extension(mime_type)
+            if file_extension and not file_name.endswith(file_extension):
+                file_name += file_extension
+        return file_name
+
+
+class DownloadWorker(QObject):
+    download_progress = pyqtSignal(int)
+    download_complete = pyqtSignal(str)
+    download_error = pyqtSignal(str)
+
+    def __init__(self, url, file_name):
+        super(DownloadWorker, self).__init__()
+        self.url = url if url.startswith("http") else "http://" + url
+        self.file_name = file_name
+
+    def start(self):
+        try:
+            with requests.get(self.url, stream=True) as r:
+                r.raise_for_status()
+                total_length = int(r.headers.get('content-length', 0))
+                if total_length == 0:
+                    self.download_error.emit("Unable to determine file size.")
+                    return
+
+
+                mime_type = r.headers.get('content-type', '')
+                if mime_type == 'application/zip' or self.file_name.endswith('.pyz'):
+                    self.file_name = self.ensure_zip_extension(self.file_name)
+
+                with open(self.file_name, 'wb') as f:
+                    downloaded = 0
+                    for chunk in r.iter_content(chunk_size=4096):
+                        if chunk:
+                            f.write(chunk)
+                            downloaded += len(chunk)
+                            progress = int((downloaded / total_length) * 100)
+                            self.download_progress.emit(progress)
+
+            self.download_complete.emit(self.file_name)
+        except Exception as e:
+            self.download_error.emit(str(e))
+
+    def ensure_zip_extension(self, file_name):
+        if not file_name.endswith('.zip'):
+            base_name, _ = os.path.splitext(file_name)
+            return base_name + '.zip'
+        return file_name
 class MainWindow(QMainWindow):
     HOME_URL = "https://search.freakybob.site/"
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.resize(900, 700)
-        self.setWindowTitle("FreakyBrowse 2.1 - by the Freakybob Team.")
+        self.setWindowTitle("FreakyBrowse 2.2 - by the Freakybob Team.")
         try:
             icon_path = resource_path("icons/logo_new.ico")
             self.setWindowIcon(QIcon(icon_path))
         except Exception as e:
             print(f"Error loading icon: {e}")
-        # self.download_manager_widget = DownloadManagerWidget()
-        # self.download_manager_widget.setAttribute(Qt.WidgetAttribute.WA_QuitOnClose, False)
-        # QWebEngineProfile.defaultProfile().downloadRequested.connect(self.download_manager_widget.downloadRequested)
+        self.download_manager = DownloadManager(self)
 
         
         self.tabs = QTabWidget()
@@ -146,10 +284,10 @@ class MainWindow(QMainWindow):
         view_source_btn.triggered.connect(self.view_page_source)
         self.navtb.addAction(view_source_btn)
 
-        save_page_btn = QAction(QIcon(resource_path("icons/download.png")), "Save Page", self)
-        save_page_btn.setStatusTip("Save the current page as HTML")
-        save_page_btn.triggered.connect(self.save_page)
-        self.navtb.addAction(save_page_btn)
+        download_btn = QAction(QIcon(resource_path("icons/download.png")), "Download Manager", self)
+        download_btn.setStatusTip("Open Download Manager")
+        download_btn.triggered.connect(self.open_download_manager)
+        self.navtb.addAction(download_btn)
         
         self.settings = QSettings("FreakyBrowse", "UserSettings")
         self.pink_mode_enabled = self.settings.value("pink_mode", False, type=bool)
@@ -161,8 +299,9 @@ class MainWindow(QMainWindow):
         self.lavender_mode_enabled = self.settings.value("lavender_mode", False, type=bool)
         self.retro_green_mode_enabled = self.settings.value("retro_green_mode", False, type=bool)
         self.purple_mode_enabled = self.settings.value("purple_mode", False, type=bool)
+
         
-        self.settings = QSettings("FreakyBrowse", "RPC1Settings")
+        self.settings = QSettings("FreakyBrowse", "RPC2Settings")
         self.rpc_enabled = self.settings.value("rpc_enabled", True, type=bool)
         self.warned_about_rpc = False
         self.update_rpc_state()
@@ -183,7 +322,7 @@ class MainWindow(QMainWindow):
     def add_new_tab(self, qurl=None, label="New Tab"):
         if qurl is None:
             qurl = QUrl(self.HOME_URL)
-    
+
         if not isinstance(qurl, QUrl):
             qurl = QUrl(self.HOME_URL)
 
@@ -192,7 +331,14 @@ class MainWindow(QMainWindow):
         i = self.tabs.addTab(browser, label)
         self.tabs.setCurrentIndex(i)
         browser.urlChanged.connect(lambda qurl, browser=browser: self.update_urlbar(qurl, browser))
-        browser.loadFinished.connect(lambda _, i=i, browser=browser: self.tabs.setTabText(i, browser.page().title()))
+        browser.titleChanged.connect(lambda title, browser=browser: self.update_tab_title(title, browser))
+
+        self.tabs.setStyleSheet("""
+        QTabBar::tab:selected {
+            font-weight: bold
+        }
+    """)
+        
     
     
         if haveDiscord == "True" and self.rpc_enabled:
@@ -213,15 +359,18 @@ class MainWindow(QMainWindow):
                         large_image="icon.png",
                         large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
                     )
+    def update_tab_title(self, title, browser):
+        index = self.tabs.indexOf(browser)
+        self.tabs.setTabText(index, title)
     def pikidiary(self):
         url = QUrl("https://pikidiary.lol")
-        self.add_new_tab(url, "PeakiDiary")
+        self.add_new_tab(url, "FUCKING PEAK YAYAY")
         if haveDiscord == "True" and self.rpc_enabled:
             try:
                 RPC.update(
                     state="Looking at " + str( self.urlbar.text()),
                     buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
-                    large_image="icon.png",
+                    large_image="icons/piki.png",
                     large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
                 )
                 print("Updated RPC! (Navigated to URL)")
@@ -236,10 +385,6 @@ class MainWindow(QMainWindow):
                     )
 
 
-    
-
-    
-
     def navigate_home(self):
         self.current_browser().setUrl(QUrl(self.HOME_URL))
 
@@ -248,8 +393,16 @@ class MainWindow(QMainWindow):
         if q.scheme() == "":
             q.setScheme("https")
         if q.isValid():
-            self.current_browser().setUrl(q)
+            if q.scheme() == "freak":
+                freak_path = q.path().lstrip('/')
+                if freak_path == "changelog":
+                    self.current_browser().load(QUrl("https://freakybrowse.freakybob.site/freak/changelog"))
+                else:
+                    QMessageBox.warning(self, "Invalid URL", "Unknown freak:/ URL")
         
+            else:
+                self.current_browser().setUrl(q)
+            
             if haveDiscord == "True" and self.rpc_enabled:
                 try:
                     RPC.update(
@@ -303,7 +456,7 @@ class MainWindow(QMainWindow):
                 )
             except Exception as e:
                 print(f"Error updating RPC: {e}")
-        if haveDiscord == "True" and self.rpc_enabled and "pikidiary.lol" in str(self.urlbar.text()):
+        if haveDiscord == "True" and self.rpc_enabled and "pikidiary.lol" and "PikiDiary.lol" in str(self.urlbar.text()):
             try:
                 RPC.update(
                     details="This user is peak! Speaking of peak, check out PikiDiary!",
@@ -313,7 +466,7 @@ class MainWindow(QMainWindow):
                 )
             except Exception as e:
                 print(f"Error updating RPC: {e}")
-        if haveDiscord == "True" and self.rpc_enabled and "x.com" in str(self.urlbar.text()):
+        if haveDiscord == "True" and self.rpc_enabled and "x.com" and "X.com" in str(self.urlbar.text()):
             try:
                 RPC.update(
                     details="You know there's always a nearby therapist office",
@@ -333,7 +486,7 @@ class MainWindow(QMainWindow):
                 )
             except Exception as e:
                 print(f"Error updating RPC: {e}")
-        if haveDiscord == "True" and self.rpc_enabled and "classroom.google.com" in str(self.urlbar.text()):
+        if haveDiscord == "True" and self.rpc_enabled and "classroom.google.com" and "Classroom.Google.com" in str(self.urlbar.text()):
             try:
                 RPC.update(
                     details="im sorry for you",
@@ -373,7 +526,7 @@ class MainWindow(QMainWindow):
                 )
             except Exception as e:
                 print(f"Error updating RPC: {e}")
-        if haveDiscord == "True" and self.rpc_enabled and "reddit.com/r/modhelp/" in str(self.urlbar.text()):
+        if haveDiscord == "True" and self.rpc_enabled and "redditforcommunity.com" and "www.reddit.com/r/modhelp/" in str(self.urlbar.text()):
             try:
                 RPC.update(
                     details="Weight.. being.. gained..",
@@ -383,18 +536,7 @@ class MainWindow(QMainWindow):
                 )
             except Exception as e:
                 print(f"Error updating RPC: {e}")
-        if haveDiscord == "True" and self.rpc_enabled and "stackoverflow.com" in str(self.urlbar.text()):
-            try:
-                RPC.update(
-                    details="Good luck...",
-                    buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
-                    large_image="icon.png",
-                    large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
-                )
-            except Exception as e:
-                print(f"Error updating RPC: {e}")
     def update_urlbar(self, q, browser=None):
-        
         if browser != self.current_browser():
             return
         self.urlbar.setText(q.toString())
@@ -534,7 +676,6 @@ class MainWindow(QMainWindow):
         self.settings.setValue("Lavender_mode", self.lavender_mode_enabled)
         self.settings.setValue("retro_green_mode", enabled)
         self.settings.setValue("purple_mode", self.purple_mode_enabled)
-        
         self.toggle_mode()
     def toggle_pink_mode(self, enabled):
         if enabled:
@@ -546,8 +687,10 @@ class MainWindow(QMainWindow):
             self.oceanic_blue_enabled = False
             self.retro_green_mode_enabled = False
             self.purple_mode_enabled = False
+        self.lavender_mode_enabled = False
         self.pink_mode_enabled = enabled
         self.settings.setValue("pink_mode", enabled)
+        self.settings.setValue("lavender_mode", self.lavender_mode_enabled)
         self.settings.setValue("orange_mode", self.orange_mode_enabled)
         self.settings.setValue("oceanic_blue_mode", self.oceanic_blue_enabled)
         self.settings.setValue("red_mode", self.red_mode_enabled)
@@ -675,6 +818,7 @@ class MainWindow(QMainWindow):
             self.oceanic_blue_enabled = False
             self.retro_green_mode_enabled = False
             self.purple_mode_enabled = False
+
         self.lavender_mode_enabled = enabled
         self.settings.setValue("pink_mode", self.pink_mode_enabled)
         self.settings.setValue("orange_mode", self.orange_mode_enabled)
@@ -761,11 +905,9 @@ class MainWindow(QMainWindow):
         style_dialog.setLayout(layout)
         style_dialog.exec()
 
-
     def open_settings(self):
         settings_dialog = QDialog(self)
         settings_dialog.setWindowTitle("Settings")
-        settings_dialog.setFixedSize(120, 120)
         
        
         settings_dialog.resize(100, 100)  
@@ -792,69 +934,79 @@ class MainWindow(QMainWindow):
 
         settings_dialog.setLayout(layout)
         settings_dialog.exec()  
+
+
+    
     
     def open_info_button(self):
         info_dialog = QDialog(self)
         info_dialog.setWindowTitle("FreakyBrowse Info")
         info_dialog.setFixedSize(940, 510)
         info_dialog.setStyleSheet("""
-        background-color: #9dadad;
+        background-color: #477168;
         """)
 
         layout = QVBoxLayout()
-        title_label = QLabel("FreakyBrowse Info")
-        title_font = QFont("Arial", 20, QFont.Weight.Bold)
-        title_label.setFont(title_font)
+
+        title_label = QLabel("𝓯𝓻𝓮𝓪𝓴𝔂Browse Info")
+        title_label.setFont(QFont("Arial", 20, QFont.Weight.Bold))
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title_label.setStyleSheet("color: #333333; margin-bottom: 10px;")
+        title_label.setStyleSheet("color: #333333;")
         layout.addWidget(title_label)
 
         below_label1 = QLabel("FreakyBrowse, by the Freakybob Team.")
         below_label1.setAlignment(Qt.AlignmentFlag.AlignCenter)
         below_label1.setFont(QFont("Arial", 11, QFont.Weight.Normal))
-        below_label1.setStyleSheet("color: #666666;")
+        below_label1.setStyleSheet("color:#333333;")
         layout.addWidget(below_label1)
 
-        below_label2 = QLabel("Version: 2.1!!!")
-        below_label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        below_label2.setFont(QFont("Arial", 11, QFont.Weight.Normal))
-        below_label2.setStyleSheet("color: white;  margin-bottom: 15px;")
-        layout.addWidget(below_label2)
+        version_layout = QHBoxLayout()
+        version_label = QLabel("Version: 2.2!!!!")
+        version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        version_label.setFont(QFont("Arial", 11, QFont.Weight.Normal))
+        version_label.setStyleSheet("color: white;")
+        version_layout.addWidget(version_label)
+
+        image_label = QLabel()
+        image_label.setPixmap(QPixmap("images/Cube004.png"))
+        image_label.setScaledContents(True)
+        version_layout.addWidget(image_label)
+        layout.addLayout(version_layout)
 
         title_label2 = QLabel("Sorta History")
         title_label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title_label2.setFont(QFont("Arial", 16, QFont.Weight.Bold))
-        title_label2.setStyleSheet("color: #333333; margin-bottom: 10px;")
+        title_label2.setStyleSheet("color: #333333;")
         layout.addWidget(title_label2)
 
-        info_label = QLabel("FreakyBrowse was made on Oct 13th 2024. It first started out as code stolen from stackoverflow but was updated to work and look better.\nThe first time we started to try to distribute FreakyBrowse, it was flagged as a trojan. It was a false positive from what wish13yt used to turn the code into an exe.\nWe now use PyInstaller so you don't get any false positives when downloading FreakyBrowse!")
+        info_label = QLabel("FreakyBrowse was made on Oct 13th 2024. It first started out as code stolen from stackoverflow but was updated to work and look better.\nThe first time we started to try to distribute FreakyBrowse, it was flagged as a trojan. It was a false positive from what wish13yt used to turn the code into an exe.\nSince Pyinstaller sucks and gave false positives, we are starting to use the direct python file!!")
         info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         info_label.setFont(QFont("Arial", 10, QFont.Weight.Normal))
-        info_label.setStyleSheet("color: white; margin-bottom: 15px;")
+        info_label.setStyleSheet("color: white;")
         layout.addWidget(info_label)
 
         your_info_title = QLabel("Your Info")
         your_info_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         your_info_title.setFont(QFont("Arial", 14, QFont.Weight.Bold))
-        your_info_title.setStyleSheet("color: #333333; margin-bottom: 10px;")
+        your_info_title.setStyleSheet("color: #333333;")
         layout.addWidget(your_info_title)
 
         your_info_label = QLabel("FreakyBrowse does not use your personal info. Every website you visit is your choice to give THEM your info.\nYou do have to agree to the Privacy Policy on search.freakybob.site.\nYou can find it by pressing 'here' on search.freakybob.site.\n Some dependencies we use may also use your data. We can't do anything about this.")
         your_info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         your_info_label.setFont(QFont("Arial", 10, QFont.Weight.Normal))
-        your_info_label.setStyleSheet("color: white;  margin-bottom: 15px;")
+        your_info_label.setStyleSheet("color: white;")
         layout.addWidget(your_info_label)
 
         gpl_label = QLabel("License?")
         gpl_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         gpl_label.setFont(QFont("Arial", 14, QFont.Weight.Bold))
-        gpl_label.setStyleSheet("color: #333333; margin-bottom: 10px;")
+        gpl_label.setStyleSheet("color: #333333;")
         layout.addWidget(gpl_label)
 
         info_label2 = QLabel("Everything is GPL-3")
         info_label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         info_label2.setFont(QFont("Arial", 10, QFont.Weight.Normal))
-        info_label2.setStyleSheet("color: white;  margin-bottom: 20px;")
+        info_label2.setStyleSheet("color: white;  ")
         layout.addWidget(info_label2)
 
         close_button = QPushButton("Close")
@@ -871,7 +1023,6 @@ class MainWindow(QMainWindow):
 
         info_dialog.setLayout(layout)
         info_dialog.exec()
-
 
     def toggle_homepage_url(self, state, home_url_label):
         if state == 2:
@@ -903,7 +1054,6 @@ class MainWindow(QMainWindow):
         saved_notes = self.settings.value("notes", {}, type=dict)
         for note_name in saved_notes.keys():
             notes_list.addItem(note_name)
-
     
         button_layout = QHBoxLayout()
 
@@ -982,6 +1132,11 @@ class MainWindow(QMainWindow):
 
 
     def delete_note(self, notes_list, saved_notes):
+        if notes_list.count() == 0:
+            QMessageBox.warning(self, "No Notes to Delete", "Vro, there are no notes to delete.")
+            return
+
+        selected_item = notes_list.currentItem()
         selected_item = notes_list.currentItem()
         if selected_item:
             note_name = selected_item.text()
@@ -1055,7 +1210,6 @@ class MainWindow(QMainWindow):
 
 
 
-
     def bookmark_page(self):
         url = self.current_browser().url().toString()
         if url not in self.bookmarks:
@@ -1122,35 +1276,23 @@ class MainWindow(QMainWindow):
         html_viewer.setLayout(layout)
         html_viewer.exec() # html_viewer.exec_() is deprecated in PyQt6
 
-    def save_page(self):
-        filename, _ = QFileDialog.getSaveFileName(self, "Save Page", "", "HTML Files (*.html)")
-        if filename:
-            page = self.current_browser().page()
-            page.toHtml(lambda html: self.write_to_file(filename, html))
+    def open_download_manager(self):
+        self.download_manager_window = DownloadManagerWindow(self)
+        self.download_manager_window.show()
 
-    def write_to_file(self, filename, content):
-        with open(filename, "w", encoding="utf-8") as file:
-            file.write(content)
-        QMessageBox.information(self, "Page Saved", f"Page has been saved to {filename}.")
-# class DownloadManagerWidget(QWidget):
-#     def downloadRequested(self, download: QWebEngineDownloadRequest):
-#         assert download and download.state() == QWebEngineDownloadRequest.DownloadRequested
-#         # Prompt the user for a file name
-#         path, _ = QFileDialog.getSaveFileName(self, "Save as", QDir(download.downloadDirectory()).filePath(download.downloadFileName()))
-#         if path.isEmpty():
-#             return
-#         # Set download directory and file name
-#         download.setDownloadDirectory(QFileInfo(path).path())
-#         download.setDownloadFileName(QFileInfo(path).fileName())
-#         download.accept()
-#         # Add the download to the download manager
-#         self.add(DownloadManagerWidget)
-#         # Show the download manager
-#         self.show()
+    def on_download_finished(self, reply: QNetworkReply):
+        if reply.error() == QNetworkReply.NetworkError.NoError:
+            content = reply.readAll()
+            file_name = reply.url().fileName()
+            with open(file_name, "wb") as file:
+                file.write(content)
+            self.status.showMessage(f"Downloaded {file_name}")
+        else:
+            self.status.showMessage(f"Download failed: {reply.errorString()}")
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setApplicationName("FreakyBrowse")
-    app.setWindowIcon(QIcon("logo2.ico")) 
+    app.setApplicationName("FreakyBrowse.2.2")
+    app.setWindowIcon(QIcon("logo_new.ico")) 
     
     window = MainWindow()
     app.exec() # app.exec_() is deprecated in PyQt6
