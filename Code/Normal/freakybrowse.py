@@ -216,6 +216,24 @@ class MainWindow(QMainWindow):
     def pikidiary(self):
         url = QUrl("https://pikidiary.lol")
         self.add_new_tab(url, "PeakiDiary")
+        if haveDiscord == "True" and self.rpc_enabled:
+            try:
+                RPC.update(
+                    state="Looking at " + str( self.urlbar.text()),
+                    buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
+                    large_image="icon.png",
+                    large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
+                )
+                print("Updated RPC! (Navigated to URL)")
+            except Exception as e:
+                print(f"Error updating RPC: {e}")
+                if "style" in RPC.state:
+                    RPC.update(
+                        details="Browsing the interwebs!",
+                        buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
+                        large_image="icon.png",
+                        large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
+                    )
 
 
     
