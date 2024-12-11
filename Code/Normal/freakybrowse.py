@@ -285,7 +285,7 @@ class MainWindow(QMainWindow):
                 )
             except Exception as e:
                 print(f"Error updating RPC: {e}")
-        if haveDiscord == "True" and self.rpc_enabled and "pikidiary.lol" and "PikiDiary.lol" in str(self.urlbar.text()):
+        if haveDiscord == "True" and self.rpc_enabled and "pikidiary.lol" in str(self.urlbar.text()):
             try:
                 RPC.update(
                     details="This user is peak! Speaking of peak, check out PikiDiary!",
@@ -295,7 +295,7 @@ class MainWindow(QMainWindow):
                 )
             except Exception as e:
                 print(f"Error updating RPC: {e}")
-        if haveDiscord == "True" and self.rpc_enabled and "x.com" and "X.com" in str(self.urlbar.text()):
+        if haveDiscord == "True" and self.rpc_enabled and "x.com" in str(self.urlbar.text()):
             try:
                 RPC.update(
                     details="You know there's always a nearby therapist office",
@@ -315,7 +315,7 @@ class MainWindow(QMainWindow):
                 )
             except Exception as e:
                 print(f"Error updating RPC: {e}")
-        if haveDiscord == "True" and self.rpc_enabled and "classroom.google.com" and "Classroom.Google.com" in str(self.urlbar.text()):
+        if haveDiscord == "True" and self.rpc_enabled and "classroom.google.com" in str(self.urlbar.text()):
             try:
                 RPC.update(
                     details="im sorry for you",
@@ -355,10 +355,20 @@ class MainWindow(QMainWindow):
                 )
             except Exception as e:
                 print(f"Error updating RPC: {e}")
-        if haveDiscord == "True" and self.rpc_enabled and "redditforcommunity.com" and "www.reddit.com/r/modhelp/" in str(self.urlbar.text()):
+        if haveDiscord == "True" and self.rpc_enabled and "reddit.com/r/modhelp/" in str(self.urlbar.text()):
             try:
                 RPC.update(
                     details="Weight.. being.. gained..",
+                    buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
+                    large_image="icon.png",
+                    large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
+                )
+            except Exception as e:
+                print(f"Error updating RPC: {e}")
+        if haveDiscord == "True" and self.rpc_enabled and "stackoverflow.com" in str(self.urlbar.text()):
+            try:
+                RPC.update(
+                    details="Good luck...",
                     buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
                     large_image="icon.png",
                     large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
