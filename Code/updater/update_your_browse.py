@@ -1,8 +1,9 @@
 import requests
 from urllib.request import urlretrieve
 current_url = "https://github.com/Freakybob-Team/freakybrowse/releases/download/v2.2/2.2.zip"
-url = "https://github.com/Freakybob-Team/freakybrowse/newest_release.txt?raw=true"
+url = "https://github.com/Freakybob-Team/freakybrowse/blob/main/newest_release.txt?raw=true"
 res = requests.get(url)
+print(res.text)
 if (res.text == current_url):
     print("No new version has been found!")
 else:
