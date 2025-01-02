@@ -6,7 +6,11 @@ We have switched to PyQt6! Before running 1.6+, run these commands in your termi
 > pip install PyQt6-WebEngine
  
 # FreakyBrowse!
-This is a browser completly written in Python! It has many features like notes, download manager, a PikiDiary button and more!
+This is a browser completly written in Python! It has many features, such as:
+- Notes
+- Downloads
+- PikiDiary button
+- More!
 
 This gets updates pretty often so make sure to delete the old FreakyBrowse before installing the new version unless you really want it still!
 
