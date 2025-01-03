@@ -2,6 +2,11 @@
 # If ya see any issues, plz make an issue on our github!
 # Feel free to add anything or fix anything!
 # - Freakybob-Team <3
+
+# Known bugs:
+# - Closing the tab before a new one will cause an about:blank page
+# - oceanic_blue_mode does not work
+
 from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
@@ -15,9 +20,9 @@ from PyQt6.QtWidgets import QApplication, QTextEdit, QInputDialog
 from PyQt6.QtCore import Qt
 from PyQt6.QtNetwork import QNetworkReply
 from PyQt6.QtCore import QObject, pyqtSignal, QThread
+from PyQt6.QtWebEngineCore import QWebEnginePage
 import requests
 import mimetypes
-
 import sys
 import os
 from pypresence import Presence
@@ -43,12 +48,14 @@ except Exception as e:
     haveDiscord = "False"
 
 def resource_path(relative_path):
-    """ Get the absolute path to a resource, works for dev and bundled apps """
+    """No use really since no exe but too lazy to fix everything"""
     try:
         base_path = sys._MEIPASS
     except Exception:
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
+
+
 class DownloadManagerWindow(QDialog):
     def __init__(self, parent=None):
         super(DownloadManagerWindow, self).__init__(parent)
@@ -66,7 +73,7 @@ class DownloadManagerWindow(QDialog):
         self.url_input = QLineEdit()
         layout.addWidget(self.url_input)
 
-        self.file_name_label = QLabel("File Name (optional):")
+        self.file_name_label = QLabel("File name and extension (optional):")
         layout.addWidget(self.file_name_label)
         self.file_name_input = QLineEdit()
         layout.addWidget(self.file_name_input)
@@ -181,20 +188,16 @@ class DownloadWorker(QObject):
             self.download_complete.emit(self.file_name)
         except Exception as e:
             self.download_error.emit(str(e))
-
-    def ensure_zip_extension(self, file_name):
-        if not file_name.endswith('.zip'):
-            base_name, _ = os.path.splitext(file_name)
-            return base_name + '.zip'
-        return file_name
+    
 class MainWindow(QMainWindow):
     HOME_URL = "https://search.freakybob.site/"
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.resize(900, 700)
-        self.setWindowTitle("FreakyBrowse 2.2 - by the Freakybob Team.")
+        self.setWindowTitle("FreakyBrowse 2.3")
+        
         try:
-            icon_path = resource_path("icons/logo_new.ico")
+            icon_path = resource_path("logo_new.ico")
             self.setWindowIcon(QIcon(icon_path))
         except Exception as e:
             print(f"Error loading icon: {e}")
@@ -205,7 +208,7 @@ class MainWindow(QMainWindow):
         self.tabs.setDocumentMode(True)
         self.tabs.setTabsClosable(True)
         self.tabs.tabCloseRequested.connect(self.close_current_tab)
-        
+        self.tabs.currentChanged.connect(self.on_current_tab_changed)
         self.home_url = MainWindow.HOME_URL
         self.setCentralWidget(self.tabs)
 
@@ -250,6 +253,7 @@ class MainWindow(QMainWindow):
 
 
         self.urlbar = QLineEdit()
+        
         self.urlbar.returnPressed.connect(self.navigate_to_url)
         self.navtb.addWidget(self.urlbar)
         self.urlbar.setPlaceholderText("Enter URL...")
@@ -289,7 +293,7 @@ class MainWindow(QMainWindow):
         download_btn.triggered.connect(self.open_download_manager)
         self.navtb.addAction(download_btn)
         
-        self.settings = QSettings("FreakyBrowse", "UserSettings")
+        self.settings = QSettings("FreakyBrowse", "UserSettings1")
         self.pink_mode_enabled = self.settings.value("pink_mode", False, type=bool)
         self.blue_mode_enabled = self.settings.value("blue_mode", False, type=bool)
         self.green_mode_enabled = self.settings.value("green_mode", False, type=bool)
@@ -301,7 +305,7 @@ class MainWindow(QMainWindow):
         self.purple_mode_enabled = self.settings.value("purple_mode", False, type=bool)
 
         
-        self.settings = QSettings("FreakyBrowse", "RPC2Settings")
+        self.settings = QSettings("FreakyBrowse", "RPC4Settings")
         self.rpc_enabled = self.settings.value("rpc_enabled", True, type=bool)
         self.warned_about_rpc = False
         self.update_rpc_state()
@@ -332,36 +336,53 @@ class MainWindow(QMainWindow):
         self.tabs.setCurrentIndex(i)
         browser.urlChanged.connect(lambda qurl, browser=browser: self.update_urlbar(qurl, browser))
         browser.titleChanged.connect(lambda title, browser=browser: self.update_tab_title(title, browser))
+        browser.iconChanged.connect(lambda icon, browser=browser: self.update_tab_icon(icon, browser))
 
         self.tabs.setStyleSheet("""
-        QTabBar::tab:selected {
-            font-weight: bold
-        }
-    """)
-        
-    
-    
+    QTabBar::tab:selected {
+        font-weight: bold
+    }
+        """)
+
         if haveDiscord == "True" and self.rpc_enabled:
-            try:
-                RPC.update(
-                    state="Looking at " + str(self.HOME_URL),
+                try:
+                    RPC.update(
+                state="Looking at " + str(qurl.toString()),
+                buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
+                large_image="icon.png",
+                large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
+                )
+                    print("Updated RPC! (New tab)")
+                except Exception as e:
+                    print(f"Error updating RPC: {e}")
+                try:
+                    RPC.update(
+                    details="Browsing the interwebs!",
                     buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
                     large_image="icon.png",
                     large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
                 )
-                print("Updated RPC! (New tab)")
-            except Exception as e:
-                print(f"Error updating RPC: {e}")
-                if "style" in RPC.state:
-                    RPC.update(
-                        details="Browsing the interwebs!",
-                        buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
-                        large_image="icon.png",
-                        large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
-                    )
+                    print("Fallback RPC update!")
+                except Exception as fallback_error:
+                    print(f"Error with fallback RPC: {fallback_error}")
+
     def update_tab_title(self, title, browser):
         index = self.tabs.indexOf(browser)
-        self.tabs.setTabText(index, title)
+        tab_bar = self.tabs.tabBar()
+    
+        max_length = 35
+        if len(title) > max_length:
+            shortened_title = title[:max_length] + "..."
+        else:
+            shortened_title = title
+    
+        self.tabs.setTabText(index, shortened_title)
+
+
+    def update_tab_icon(self, icon, browser):
+        index = self.tabs.indexOf(browser)
+        self.tabs.setTabIcon(index, icon)
+
     def pikidiary(self):
         url = QUrl("https://pikidiary.lol")
         self.add_new_tab(url, "FUCKING PEAK YAYAY")
@@ -536,11 +557,16 @@ class MainWindow(QMainWindow):
                 )
             except Exception as e:
                 print(f"Error updating RPC: {e}")
+
     def update_urlbar(self, q, browser=None):
         if browser != self.current_browser():
             return
         self.urlbar.setText(q.toString())
         self.urlbar.setCursorPosition(0)
+
+        index = self.tabs.indexOf(browser)
+        icon = self.tabs.tabIcon(index)
+        self.tabs.setTabIcon(index, icon)
 
     def current_browser(self):
         return self.tabs.currentWidget()
@@ -548,9 +574,24 @@ class MainWindow(QMainWindow):
     def close_current_tab(self, i):
         if self.tabs.count() < 2:
             return
+        current_browser = self.current_browser()
+        if current_browser:
+            current_browser.stop()
+            current_browser.setUrl(QUrl())
         self.tabs.removeTab(i)
+        if current_browser:
+            self.update_urlbar(current_browser.url(), current_browser)
+        else:
+            self.urlbar.clear()
 
 
+    def on_current_tab_changed(self, index):
+        browser = self.current_browser()
+        if browser:
+            self.update_urlbar(browser.url(), browser)
+        else:
+            self.urlbar.clear()
+    
 
     def load_style_from_file(self, style_name):
         if hasattr(sys, '_MEIPASS'):
@@ -558,298 +599,46 @@ class MainWindow(QMainWindow):
         else:
             styles_folder = os.path.join(os.path.dirname(__file__), 'styles')
 
-   
         style_path = os.path.join(styles_folder, f"{style_name}.qss")
-    
+
         if os.path.exists(style_path):
             with open(style_path, "r") as style_file:
                 style = style_file.read()
                 self.setStyleSheet(style)
         else:
             print(f"Style file '{style_name}.qss' not found at {style_path}!")
-    def open_browser_settings(self):
-        
-        browser_dialog = QDialog(self)
-        browser_dialog.setWindowTitle("Browser Settings")
-        layout = QVBoxLayout()
 
-        
-        use_google_checkbox = QCheckBox("Use Google's main page?")
-        use_google_checkbox.setChecked(self.home_url == "https://google.com")
-        use_google_checkbox.stateChanged.connect(
-            lambda state: self.toggle_homepage_url(state, home_url_label))
-        layout.addWidget(use_google_checkbox)
-        warning_label = QLabel("This does not bring you to https://google.com when you start the app. This just changes the Home button location and new tab location :P (This also doesn't save yet :PPP)")
-        home_url_label = QLabel(f"Current Home URL: {self.home_url}")
-        layout.addWidget(warning_label)
-        layout.addWidget(home_url_label)
-
-        use_rpc_checkbox = QCheckBox("Use FreakyBrowese's Discord RPC?")
-        use_rpc_checkbox.setChecked(self.rpc_enabled)
-        use_rpc_checkbox.stateChanged.connect(self.toggle_rpc)
-        layout.addWidget(use_rpc_checkbox)
-        
-        warn_label = QLabel("If you disable FreakyBrowse's Discord RPC, it will not be enabled again until you reinstall or update.")
-        layout.addWidget(warn_label)
-
-        close_button = QPushButton("Close")
-        close_button.clicked.connect(browser_dialog.accept)
-        layout.addWidget(close_button)
-
-        browser_dialog.setLayout(layout)
-        browser_dialog.exec()
-
-    def toggle_rpc(self, state):
-        if self.rpc_enabled and not self.warned_about_rpc:
-            reply = QMessageBox.question(self, "Warning", 
-                                     "Are you sure you want to disable Discord RPC? This action cannot be undone unless you reinstall or update.",
-                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, 
-                                     QMessageBox.StandardButton.No)
-            if reply == QMessageBox.StandardButton.No:
-                self.sender().setChecked(self.rpc_enabled)
-                return
-
-            self.warned_about_rpc = True
-
-        self.rpc_enabled = state == Qt.CheckState.Checked
-        self.settings.setValue("rpc_enabled", self.rpc_enabled)
-        print(f"RPC toggled: {'Enabled' if self.rpc_enabled else 'Disabled'}")
-        self.update_rpc_state()
-
-    def update_rpc_state(self):
-        if self.rpc_enabled:
-            try:
-                print("RPC is now enabled.")
-            except Exception as e:
-                print(f"Error enabling RPC: {e}")
-        else:
-            try:
-                RPC.clear()
-                print("RPC is now disabled.")
-            except Exception as e:
-                print(f"Error disabling RPC: {e}")
-
-        
-
-
+    
     def toggle_mode(self):
-        if self.pink_mode_enabled:
-            self.load_style_from_file("pink_mode")
-        elif self.blue_mode_enabled:
-            self.load_style_from_file("blue_mode")
-        elif self.green_mode_enabled:
-            self.load_style_from_file("green_mode")
-        elif self.red_mode_enabled:
-            self.load_style_from_file("red_mode")
-        elif self.orange_mode_enabled:
-            self.load_style_from_file("orange_mode")
-        elif self.oceanic_blue_enabled:
-            self.load_style_from_file("oceanic_blue_mode")
-        elif self.lavender_mode_enabled:
-            self.load_style_from_file("lavender_mode")
-        elif self.retro_green_mode_enabled:
-            self.load_style_from_file("retro_green_mode")
-        elif self.purple_mode_enabled:
-            self.load_style_from_file("purple_mode")
+        modes = {
+            "pink_mode": self.pink_mode_enabled,
+            "blue_mode": self.blue_mode_enabled,
+            "green_mode": self.green_mode_enabled,
+            "red_mode": self.red_mode_enabled,
+            "orange_mode": self.orange_mode_enabled,
+            "oceanic_blue_mode": self.oceanic_blue_enabled,
+            "lavender_mode": self.lavender_mode_enabled,
+            "retro_green_mode": self.retro_green_mode_enabled,
+            "purple_mode": self.purple_mode_enabled,
+        }
+        for mode, enabled in modes.items():
+            if enabled:
+                self.load_style_from_file(mode)
+                break
         else:
-            self.load_style_from_file("dark_mode")
+            self.load_style_from_file("default_mode")
 
-
-    
-    def toggle_retro_green_mode(self, enabled):
-        if enabled:
-            self.orange_mode_enabled = False
-            self.red_mode_enabled = False
-            self.dark_mode_enabled = False
-            self.blue_mode_enabled = False
-            self.green_mode_enabled = False
-            self.pink_mode_enabled = False
-            self.oceanic_blue_enabled = False
-            self.lavender_mode_enabled = False
-        self.retro_green_mode_enabled = enabled
-        self.settings.setValue("pink_mode", self.pink_mode_enabled)
-        self.settings.setValue("orange_mode", self.orange_mode_enabled)
-        self.settings.setValue("oceanic_blue_mode", self.oceanic_blue_enabled)
-        self.settings.setValue("red_mode", self.red_mode_enabled)
-        self.settings.setValue("blue_mode", self.blue_mode_enabled)
-        self.settings.setValue("green_mode", self.green_mode_enabled)
-        self.settings.setValue("Lavender_mode", self.lavender_mode_enabled)
-        self.settings.setValue("retro_green_mode", enabled)
-        self.settings.setValue("purple_mode", self.purple_mode_enabled)
-        self.toggle_mode()
-    def toggle_pink_mode(self, enabled):
-        if enabled:
-            self.orange_mode_enabled = False
-            self.red_mode_enabled = False
-            self.dark_mode_enabled = False
-            self.blue_mode_enabled = False
-            self.green_mode_enabled = False
-            self.oceanic_blue_enabled = False
-            self.retro_green_mode_enabled = False
-            self.purple_mode_enabled = False
-        self.lavender_mode_enabled = False
-        self.pink_mode_enabled = enabled
-        self.settings.setValue("pink_mode", enabled)
-        self.settings.setValue("lavender_mode", self.lavender_mode_enabled)
-        self.settings.setValue("orange_mode", self.orange_mode_enabled)
-        self.settings.setValue("oceanic_blue_mode", self.oceanic_blue_enabled)
-        self.settings.setValue("red_mode", self.red_mode_enabled)
-        self.settings.setValue("blue_mode", self.blue_mode_enabled)
-        self.settings.setValue("green_mode", self.green_mode_enabled)
-        self.settings.setValue("retro_green_mode", self.retro_green_mode_enabled)
-        self.settings.setValue("purple_mode", self.purple_mode_enabled)
-        self.toggle_mode()
-    def toggle_orange_mode(self, enabled):
-        if enabled:
-            self.red_mode_enabled = False
-            self.dark_mode_enabled = False
-            self.pink_mode_enabled = False
-            self.blue_mode_enabled = False
-            self.green_mode_enabled = False
-            self.oceanic_blue_enabled = False
-            self.retro_green_mode_enabled = False
-            self.purple_mode_enabled = False
-        self.orange_mode_enabled = enabled
-        self.settings.setValue("pink_mode", self.pink_mode_enabled)
-        self.settings.setValue("orange_mode", enabled)
-        self.settings.setValue("red_mode", self.red_mode_enabled)
-        self.settings.setValue("oceanic_blue_mode", self.oceanic_blue_enabled)
-        self.settings.setValue("blue_mode", self.blue_mode_enabled)
-        self.settings.setValue("green_mode", self.green_mode_enabled)
-        self.settings.setValue("Lavender_mode", self.lavender_mode_enabled)
-        self.settings.setValue("retro_green_mode", self.retro_green_mode_enabled)
-        self.settings.setValue("purple_mode", self.purple_mode_enabled)
-        self.toggle_mode()
-    
-    def toggle_blue_mode(self, enabled):
-        if enabled:
-            self.orange_mode_enabled = False
-            self.red_mode_enabled = False
-            self.dark_mode_enabled = False
-            self.pink_mode_enabled = False
-            self.green_mode_enabled = False
-            self.oceanic_blue_enabled = False
-            self.retro_green_mode_enabled = False
-            self.purple_mode_enabled = False
-        self.blue_mode_enabled = enabled
-        self.settings.setValue("pink_mode", self.pink_mode_enabled)
-        self.settings.setValue("orange_mode", self.orange_mode_enabled)
-        self.settings.setValue("red_mode", self.red_mode_enabled)
-        self.settings.setValue("oceanic_blue_mode", self.oceanic_blue_enabled)
-        self.settings.setValue("blue_mode", enabled)
-        self.settings.setValue("green_mode", self.green_mode_enabled)
-        self.settings.setValue("Lavender_mode", self.lavender_mode_enabled)
-        self.settings.setValue("retro_green_mode", self.retro_green_mode_enabled)
-        self.settings.setValue("purple_mode", self.purple_mode_enabled)
-        self.toggle_mode()
-        
-
-    def toggle_green_mode(self, enabled):
-        if enabled:
-            self.orange_mode_enabled = False
-            self.red_mode_enabled = False
-            self.dark_mode_enabled = False
-            self.pink_mode_enabled = False
-            self.blue_mode_enabled = False
-            self.oceanic_blue_enabled = False
-            self.retro_green_mode_enabled = False
-            self.purple_mode_enabled = False
-        self.green_mode_enabled = enabled
-        self.settings.setValue("pink_mode", self.pink_mode_enabled)
-        self.settings.setValue("orange_mode", self.orange_mode_enabled)
-        self.settings.setValue("oceanic_blue_mode", self.oceanic_blue_enabled)
-        self.settings.setValue("red_mode", self.red_mode_enabled)
-        self.settings.setValue("blue_mode", self.blue_mode_enabled)
-        self.settings.setValue("green_mode", enabled)
-        self.settings.setValue("Lavender_mode", self.lavender_mode_enabled)
-        self.settings.setValue("retro_green_mode", self.retro_green_mode_enabled)
-        self.settings.setValue("purple_mode", self.purple_mode_enabled)
-        self.toggle_mode()
-    def toggle_red_mode(self, enabled):
-        if enabled:
-            self.dark_mode_enabled = False
-            self.pink_mode_enabled = False
-            self.blue_mode_enabled = False
-            self.green_mode_enabled = False
-            self.orange_mode_enabled = False
-            self.oceanic_blue_enabled = False
-            self.retro_green_mode_enabled = False
-            self.purple_mode_enabled = False
-        self.red_mode_enabled = enabled
-        self.settings.setValue("pink_mode", self.pink_mode_enabled)
-        self.settings.setValue("oceanic_blue_mode", self.oceanic_blue_enabled)
-        self.settings.setValue("orange_mode", self.orange_mode_enabled)
-        self.settings.setValue("red_mode", enabled)
-        self.settings.setValue("blue_mode", self.blue_mode_enabled)
-        self.settings.setValue("green_mode", self.green_mode_enabled)
-        self.settings.setValue("Lavender_mode", self.lavender_mode_enabled)
-        self.settings.setValue("retro_green_mode", self.retro_green_mode_enabled)
-        self.settings.setValue("purple_mode", self.purple_mode_enabled)
-        self.toggle_mode()
-    def toggle_oceanic_blue_mode(self, enabled):
-        if enabled:
-            self.pink_mode_enabled = False
-            self.orange_mode_enabled = False
-            self.red_mode_enabled = False
-            self.dark_mode_enabled = False
-            self.blue_mode_enabled = False
-            self.green_mode_enabled = False
-            self.retro_green_mode_enabled = False
-            self.purple_mode_enabled = False
-        self.oceanic_blue_enabled = enabled
-        self.settings.setValue("pink_mode", self.pink_mode_enabled)
-        self.settings.setValue("orange_mode", self.orange_mode_enabled)
-        self.settings.setValue("oceanic_blue_mode", enabled)
-        self.settings.setValue("red_mode", self.red_mode_enabled)
-        self.settings.setValue("blue_mode", self.blue_mode_enabled)
-        self.settings.setValue("green_mode", self.green_mode_enabled)
-        self.settings.setValue("Lavender_mode", self.lavender_mode_enabled)
-        self.settings.setValue("retro_green_mode", self.retro_green_mode_enabled)
-        self.settings.setValue("purple_mode", self.purple_mode_enabled)
-        self.toggle_mode()
-    def toggle_lavender_mode(self, enabled):
-        if enabled:
-            self.pink_mode_enabled = False
-            self.orange_mode_enabled = False
-            self.red_mode_enabled = False
-            self.dark_mode_enabled = False
-            self.blue_mode_enabled = False
-            self.green_mode_enabled = False
-            self.oceanic_blue_enabled = False
-            self.retro_green_mode_enabled = False
-            self.purple_mode_enabled = False
-
-        self.lavender_mode_enabled = enabled
-        self.settings.setValue("pink_mode", self.pink_mode_enabled)
-        self.settings.setValue("orange_mode", self.orange_mode_enabled)
-        self.settings.setValue("oceanic_blue_mode", self.oceanic_blue_enabled)
-        self.settings.setValue("Lavender_mode", enabled)
-        self.settings.setValue("red_mode", self.red_mode_enabled)
-        self.settings.setValue("blue_mode", self.blue_mode_enabled)
-        self.settings.setValue("green_mode", self.green_mode_enabled)
-        self.settings.setValue("retro_green_mode", self.retro_green_mode_enabled)
-        self.settings.setValue("purple_mode", self.purple_mode_enabled)
-        self.toggle_mode()
-    def toggle_purple_mode(self, enabled):
-        if enabled:
-            self.pink_mode_enabled = False
-            self.blue_mode_enabled = False
-            self.green_mode_enabled = False
-            self.red_mode_enabled = False
-            self.orange_mode_enabled = False
-            self.oceanic_blue_enabled = False
-            self.retro_green_mode_enabled = False
-            self.lavender_mode_enabled = False
-        self.purple_mode_enabled = enabled
-        self.settings.setValue("pink_mode", self.pink_mode_enabled)
-        self.settings.setValue("orange_mode", self.orange_mode_enabled)
-        self.settings.setValue("oceanic_blue_mode", self.oceanic_blue_enabled)
-        self.settings.setValue("red_mode", self.red_mode_enabled)
-        self.settings.setValue("blue_mode", self.blue_mode_enabled)
-        self.settings.setValue("green_mode", self.green_mode_enabled)
-        self.settings.setValue("Lavender_mode", self.lavender_mode_enabled)
-        self.settings.setValue("retro_green_mode", self.retro_green_mode_enabled)
-        self.settings.setValue("purple_mode", enabled)  
+    def toggle_mode_enabled(self, mode_name, enabled):
+        modes = [
+            "pink_mode", "blue_mode", "green_mode", "red_mode", "orange_mode", 
+            "oceanic_blue_mode", "lavender_mode", "retro_green_mode", "purple_mode"
+        ]
+        for mode in modes:
+            setattr(self, f"{mode}_enabled", False)
+        setattr(self, f"{mode_name}_enabled", enabled)
+        self.settings.setValue(f"{mode_name}", enabled)
+        for mode in modes:
+            self.settings.setValue(f"{mode}", getattr(self, f"{mode}_enabled"))
         self.toggle_mode()
 
     def open_style_settings(self):
@@ -860,7 +649,7 @@ class MainWindow(QMainWindow):
             background-color: #17786d;
             border-radius: 10px;
         """)
-    
+
         layout = QVBoxLayout()
 
         main_label = QLabel("Style Settings")
@@ -870,17 +659,17 @@ class MainWindow(QMainWindow):
         layout.addWidget(main_label)
 
         styles = [
-            ("Pink Mode", self.pink_mode_enabled, self.toggle_pink_mode),
-            ("Blue Mode", self.blue_mode_enabled, self.toggle_blue_mode),
-            ("Green Mode", self.green_mode_enabled, self.toggle_green_mode),
-            ("Red Mode", self.red_mode_enabled, self.toggle_red_mode),
-            ("Orange Mode", self.orange_mode_enabled, self.toggle_orange_mode),
-            ("Oceanic Blue Mode", self.oceanic_blue_enabled, self.toggle_oceanic_blue_mode),
-            ("Lavender Mode", self.lavender_mode_enabled, self.toggle_lavender_mode),
-            ("Retro Green Mode", self.retro_green_mode_enabled, self.toggle_retro_green_mode),
-            ("Dark Purple", self.purple_mode_enabled, self.toggle_purple_mode)
+            ("Pink Mode", self.pink_mode_enabled, lambda enabled: self.toggle_mode_enabled("pink_mode", enabled)),
+            ("Blue Mode", self.blue_mode_enabled, lambda enabled: self.toggle_mode_enabled("blue_mode", enabled)),
+            ("Green Mode", self.green_mode_enabled, lambda enabled: self.toggle_mode_enabled("green_mode", enabled)),
+            ("Red Mode", self.red_mode_enabled, lambda enabled: self.toggle_mode_enabled("red_mode", enabled)),
+            ("Orange Mode", self.orange_mode_enabled, lambda enabled: self.toggle_mode_enabled("orange_mode", enabled)),
+            ("Oceanic Blue Mode", self.oceanic_blue_enabled, lambda enabled: self.toggle_mode_enabled("oceanic_blue_mode", enabled)),
+            ("Lavender Mode", self.lavender_mode_enabled, lambda enabled: self.toggle_mode_enabled("lavender_mode", enabled)),
+            ("Retro Green Mode", self.retro_green_mode_enabled, lambda enabled: self.toggle_mode_enabled("retro_green_mode", enabled)),
+            ("Dark Purple", self.purple_mode_enabled, lambda enabled: self.toggle_mode_enabled("purple_mode", enabled)),
         ]
-    
+
         for label, enabled, toggle_func in styles:
             checkbox = QCheckBox(f"Enable {label}")
             checkbox.setChecked(enabled)
@@ -888,7 +677,6 @@ class MainWindow(QMainWindow):
             checkbox.stateChanged.connect(lambda checked, func=toggle_func: func(checked))
             layout.addWidget(checkbox)
 
-        button_layout = QVBoxLayout()
         close_button = QPushButton("Close")
         close_button.setStyleSheet("""
             background-color: #0078d4;
@@ -898,46 +686,59 @@ class MainWindow(QMainWindow):
             font-size: 14px;
         """)
         close_button.clicked.connect(style_dialog.accept)
-        button_layout.addWidget(close_button)
+        layout.addWidget(close_button)
 
-        layout.addLayout(button_layout)
-    
         style_dialog.setLayout(layout)
         style_dialog.exec()
 
-    def open_settings(self):
-        settings_dialog = QDialog(self)
-        settings_dialog.setWindowTitle("Settings")
-        
-       
-        settings_dialog.resize(100, 100)  
+    def open_browser_settings(self):
+        browser_dialog = QDialog(self)
+        browser_dialog.setWindowTitle("Browser Settings")
+        browser_dialog.setFixedSize(400, 300)
+        browser_dialog.setStyleSheet("""
+            background-color: #61a6a0;
+            border-radius: 10px;
+        """)
 
-        
         layout = QVBoxLayout()
+        layout.setSpacing(15)
+        layout.setContentsMargins(20, 20, 20, 20)
 
-        style_button = QPushButton("Style Settings")
-        style_button.clicked.connect(self.open_style_settings)
-        layout.addWidget(style_button)
+        use_google_checkbox = QCheckBox("Use Google's main page?")
+        use_google_checkbox.setChecked(self.home_url == "https://google.com")
+        use_google_checkbox.stateChanged.connect(
+            lambda state: self.toggle_homepage_url(state, home_url_label)
+        )
+        layout.addWidget(use_google_checkbox)
 
-        browser_stg_button = QPushButton("Browser Settings")
-        browser_stg_button.clicked.connect(self.open_browser_settings)
-        layout.addWidget(browser_stg_button)
-        
-        info_button = QPushButton("Info")
-        info_button.clicked.connect(self.open_info_button)
-        layout.addWidget(info_button)
-        
+        warning_label = QLabel("This only changes the Home button and new tab location.")
+        home_url_label = QLabel(f"Current Home URL: {self.home_url}")
+        layout.addWidget(warning_label)
+        layout.addWidget(home_url_label)
+
+        use_rpc_checkbox = QCheckBox("Use FreakyBrowse's Discord RPC?")
+        use_rpc_checkbox.setChecked(self.rpc_enabled)
+        use_rpc_checkbox.stateChanged.connect(self.toggle_rpc)
+        layout.addWidget(use_rpc_checkbox)
+
+        rpc_warning_label = QLabel("Disabling Discord RPC will require a reinstall or update to re-enable.")
+        layout.addWidget(rpc_warning_label)
+
         close_button = QPushButton("Close")
-        close_button.clicked.connect(settings_dialog.accept)
-
+        close_button.setStyleSheet("""
+            background-color: #3498db;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-top: 20px;
+        """)
+        close_button.clicked.connect(browser_dialog.accept)
         layout.addWidget(close_button)
 
-        settings_dialog.setLayout(layout)
-        settings_dialog.exec()  
+        browser_dialog.setLayout(layout)
+        browser_dialog.exec()
 
-
-    
-    
     def open_info_button(self):
         info_dialog = QDialog(self)
         info_dialog.setWindowTitle("FreakyBrowse Info")
@@ -961,16 +762,11 @@ class MainWindow(QMainWindow):
         layout.addWidget(below_label1)
 
         version_layout = QHBoxLayout()
-        version_label = QLabel("Version: 2.2!!!!")
+        version_label = QLabel("Version: 2.3!!!!")
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         version_label.setFont(QFont("Arial", 11, QFont.Weight.Normal))
         version_label.setStyleSheet("color: white;")
         version_layout.addWidget(version_label)
-
-        image_label = QLabel()
-        image_label.setPixmap(QPixmap("images/Cube004.png"))
-        image_label.setScaledContents(True)
-        version_layout.addWidget(image_label)
         layout.addLayout(version_layout)
 
         title_label2 = QLabel("Sorta History")
@@ -1023,6 +819,86 @@ class MainWindow(QMainWindow):
 
         info_dialog.setLayout(layout)
         info_dialog.exec()
+    def toggle_rpc(self, state):
+        if self.rpc_enabled and not self.warned_about_rpc:
+            reply = QMessageBox.question(self, "Warning", 
+                                     "Are you sure you want to disable Discord RPC? This action cannot be undone unless you reinstall or update.",
+                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, 
+                                     QMessageBox.StandardButton.No)
+            if reply == QMessageBox.StandardButton.No:
+                self.sender().setChecked(self.rpc_enabled)
+                return
+
+            self.warned_about_rpc = True
+
+        self.rpc_enabled = state == Qt.CheckState.Checked
+        self.settings.setValue("rpc_enabled", self.rpc_enabled)
+        print(f"RPC toggled: {'Enabled' if self.rpc_enabled else 'Disabled'}")
+        self.update_rpc_state()
+
+    def update_rpc_state(self):
+        if self.rpc_enabled:
+            try:
+                print("RPC is now enabled.")
+            except Exception as e:
+                print(f"Error enabling RPC: {e}")
+        else:
+            try:
+                RPC.clear()
+                print("RPC is now disabled.")
+            except Exception as e:
+                print(f"Error disabling RPC: {e}")
+
+    def open_settings(self):
+        settings_dialog = QDialog(self)
+        settings_dialog.setWindowTitle("Settings")
+        settings_dialog.setFixedSize(400, 300)
+        settings_dialog.setStyleSheet("""
+            background-color: #a3d8f4;
+            border-radius: 10px;
+        """)
+
+        layout = QVBoxLayout()
+        layout.setSpacing(10)
+        layout.setContentsMargins(20, 20, 20, 20)
+
+        main_label = QLabel("Settings")
+        main_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        main_label.setFont(QFont("Arial", 16, QFont.Weight.Bold))
+        main_label.setStyleSheet("color: #2c3e50; margin-bottom: 20px;")
+        layout.addWidget(main_label)
+
+        buttons = [
+            ("Style Settings", self.open_style_settings),
+            ("Browser Settings", self.open_browser_settings),
+            ("Info", self.open_info_button)
+        ]
+
+        for label, func in buttons:
+            button = QPushButton(label)
+            button.setStyleSheet("""
+                background-color: #3498db;
+                color: white;
+                padding: 10px;
+                border-radius: 5px;
+                font-size: 14px;
+            """)
+            button.clicked.connect(func)
+            layout.addWidget(button)
+
+        close_button = QPushButton("Close")
+        close_button.setStyleSheet("""
+            background-color: #1abc9c;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        """)
+        close_button.clicked.connect(settings_dialog.accept)
+        layout.addWidget(close_button)
+
+        settings_dialog.setLayout(layout)
+        settings_dialog.exec()
 
     def toggle_homepage_url(self, state, home_url_label):
         if state == 2:
@@ -1046,44 +922,37 @@ class MainWindow(QMainWindow):
 
         layout = QVBoxLayout()
 
-    
         notes_list = QListWidget()
         layout.addWidget(notes_list)
 
-    
         saved_notes = self.settings.value("notes", {}, type=dict)
         for note_name in saved_notes.keys():
             notes_list.addItem(note_name)
-    
+
         button_layout = QHBoxLayout()
 
-    
         add_note_button = QPushButton("Add Note")
-    
         add_note_button.clicked.connect(lambda: self.add_note_dialog(notes_list, saved_notes))
         button_layout.addWidget(add_note_button)
 
-    
         delete_note_button = QPushButton("Delete Note")
         delete_note_button.clicked.connect(lambda: self.delete_note(notes_list, saved_notes))
         button_layout.addWidget(delete_note_button)
-
-        layout.addLayout(button_layout)
 
         download_note_button = QPushButton("Download Note")
         download_note_button.clicked.connect(lambda: self.download_note_as_txt(notes_list, saved_notes))
         button_layout.addWidget(download_note_button)
 
+        layout.addLayout(button_layout)
+
         note_viewer = QTextEdit()
         note_viewer.setReadOnly(False)
         layout.addWidget(note_viewer)
 
-    
         upload_image_button = QPushButton("Insert Image")
         upload_image_button.clicked.connect(lambda: self.insert_image(note_viewer))
         layout.addWidget(upload_image_button)
 
-    
         def load_note_content():
             selected_item = notes_list.currentItem()
             if selected_item:
@@ -1092,9 +961,7 @@ class MainWindow(QMainWindow):
             else:
                 note_viewer.clear()
         notes_list.itemSelectionChanged.connect(load_note_content)
-          
 
-    
         def save_note_content():
             selected_item = notes_list.currentItem()
             if selected_item:
@@ -1105,31 +972,23 @@ class MainWindow(QMainWindow):
 
         notes_dialog.setLayout(layout)
         notes_dialog.exec()
-        
+
     def add_note_dialog(self, notes_list, saved_notes):
         text, ok = QInputDialog.getText(self, "Add Note", "Enter note name:")
-    
-   
-        if not ok:
+        if not ok or not text:
             return
 
-   
-        if text:
-            notes_list.addItem(text)
+        notes_list.addItem(text)
         saved_notes[text] = ""
 
-   
         self.settings.setValue("notes", saved_notes)
 
-   
         item = notes_list.findItems(text, Qt.MatchFlag.MatchExactly)[0]
         notes_list.setCurrentItem(item)
 
-   
         note_viewer = self.findChild(QTextEdit) 
         note_viewer.setHtml("")
         note_viewer.setFocus()
-
 
     def delete_note(self, notes_list, saved_notes):
         if notes_list.count() == 0:
@@ -1137,27 +996,22 @@ class MainWindow(QMainWindow):
             return
 
         selected_item = notes_list.currentItem()
-        selected_item = notes_list.currentItem()
         if selected_item:
             note_name = selected_item.text()
-        confirm = QMessageBox.question(self, "Delete Note", f"Are you sure you want to delete '{note_name}'?", 
-                                       QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, 
-                                       QMessageBox.StandardButton.No)
-        
-        if confirm == QMessageBox.StandardButton.Yes:
-            
-            notes_list.takeItem(notes_list.row(selected_item))
-            
-            
-            saved_notes.pop(note_name, None)
-            
-            
-            self.settings.setValue("notes", saved_notes)
+            confirm = QMessageBox.question(self, "Delete Note", f"Are you sure you want to delete '{note_name}'?", 
+                                           QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, 
+                                           QMessageBox.StandardButton.No)
+
+            if confirm == QMessageBox.StandardButton.Yes:
+                notes_list.takeItem(notes_list.row(selected_item))
+                saved_notes.pop(note_name, None)
+                self.settings.setValue("notes", saved_notes)
+
     def insert_image(self, note_viewer):
         image_path, _ = QFileDialog.getOpenFileName(self, "Select Image", "", "Images (*.png *.jpg *.jpeg *.bmp *.gif)")
         if not image_path:
             return 
-    
+
         width, ok = QInputDialog.getInt(self, "Image Width", "Enter image width:", 300, 1, 10000, 1)
         if not ok:
             return
@@ -1166,31 +1020,27 @@ class MainWindow(QMainWindow):
         if not ok:
             return
 
-    
         file_extension = image_path.split('.')[-1].lower()
-
+        img_tag = f'<img src="{image_path}" width="{width}" height="{height}" alt="Image">'
+        
         if file_extension == "gif":
-        
-            note_viewer.insertHtml(f'<img src="{image_path}" width="{width}" height="{height}" alt="GIF">')
-        else:
-        
-            note_viewer.insertHtml(f'<img src="{image_path}" width="{width}" height="{height}">')
+            img_tag = f'<img src="{image_path}" width="{width}" height="{height}" alt="GIF">'
+
+        note_viewer.insertHtml(img_tag)
+
     def download_note_as_txt(self, notes_list, saved_notes):
         selected_item = notes_list.currentItem()
         if not selected_item:
             QMessageBox.warning(self, "No Note Selected", "Please select a note to download.")
             return
 
-   
         note_name = selected_item.text()
         note_content = saved_notes.get(note_name, "")
 
-    
         temp_editor = QTextEdit()
         temp_editor.setHtml(note_content)
         plain_text_content = temp_editor.toPlainText()
 
-    
         file_path, _ = QFileDialog.getSaveFileName(
             self,
             "Save Note As",
@@ -1200,13 +1050,13 @@ class MainWindow(QMainWindow):
         if not file_path:
             return
 
-    
         try:
             with open(file_path, "w", encoding="utf-8") as file:
                 file.write(plain_text_content)
             QMessageBox.information(self, "Download Successful", f"'{note_name}' has been downloaded as '{file_path}'.")
         except Exception as e:
             QMessageBox.critical(self, "Error Saving File", f"An error occurred: {e}")
+
 
 
 
@@ -1254,7 +1104,7 @@ class MainWindow(QMainWindow):
             self.settings.setValue("bookmarks", self.bookmarks)
             dialog.accept()
             self.show_bookmarks()
-
+# we'll make this a inspect element soon grge
     def view_page_source(self):
      
         current_browser = self.current_browser()
@@ -1289,11 +1139,15 @@ class MainWindow(QMainWindow):
             self.status.showMessage(f"Downloaded {file_name}")
         else:
             self.status.showMessage(f"Download failed: {reply.errorString()}")
+    
+    
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setApplicationName("FreakyBrowse.2.2")
+    app.setApplicationName("FreakyBrowse.2.3")
     app.setWindowIcon(QIcon("logo_new.ico")) 
     
     window = MainWindow()
     app.exec() # app.exec_() is deprecated in PyQt6
 #I am steve :33333 GREG GREG GREG I HATE YOU !!!!VFYUGEIHLJ:K:D<MNFKGILEHQODJLK:A?<
+# freakbob
