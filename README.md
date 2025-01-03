@@ -8,7 +8,7 @@ This is a browser completly written in Python! It has many features, such as:
 This gets updates pretty often so make sure to delete the old FreakyBrowse before installing the new version unless you really want it still!
 
 # How to run it 
-To run it, just run the command `python freakybrowse.py` inside the directory where `freakybrowse.py` is located.
+To run it, just run the command `python (it may also be called py) freakybrowse.py` inside the directory where `freakybrowse.py` is located.
 # Software info
 Latest Version: V.2.3!
 
