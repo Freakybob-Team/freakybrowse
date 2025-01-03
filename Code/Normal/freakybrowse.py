@@ -3,6 +3,8 @@
 # Feel free to add anything or fix anything!
 # - Freakybob-Team <3
 
+# Comments were done by @5quirre1, you're very welcome gusy
+
 # Known bugs:
 # - Closing the tab before a new one will cause an about:blank page
 # - oceanic_blue_mode does not work
@@ -28,6 +30,7 @@ import os
 from pypresence import Presence
 from pypresence.exceptions import InvalidPipe
 
+#rpc 
 RPC = None
 haveDiscord = None
 try:
@@ -47,6 +50,7 @@ except Exception as e:
     print("")
     haveDiscord = "False"
 
+#gteg
 def resource_path(relative_path):
     """No use really since no exe but too lazy to fix everything"""
     try:
@@ -59,91 +63,115 @@ def resource_path(relative_path):
 class DownloadManagerWindow(QDialog):
     def __init__(self, parent=None):
         super(DownloadManagerWindow, self).__init__(parent)
+        # the normal stuff for the window
         self.setWindowTitle("Download Manager")
         self.download_manager = DownloadManager(self)
+
+        # connect signals from the download manager to right place
         self.download_manager.download_progress.connect(self.update_progress)
         self.download_manager.download_complete.connect(self.download_complete)
         self.download_manager.download_error.connect(self.download_error)
 
+        # set up the window layout
         layout = QVBoxLayout()
         self.setLayout(layout)
 
+        # the label and input field for the url
         self.url_label = QLabel("URL:")
         layout.addWidget(self.url_label)
         self.url_input = QLineEdit()
         layout.addWidget(self.url_input)
 
+        # the label and input field for the file name
         self.file_name_label = QLabel("File name and extension (optional):")
         layout.addWidget(self.file_name_label)
         self.file_name_input = QLineEdit()
         layout.addWidget(self.file_name_input)
 
+        # the download button
         self.download_button = QPushButton("Download")
         self.download_button.clicked.connect(self.start_download)
         layout.addWidget(self.download_button)
 
+        # a progress bar to show the progress
         self.progress_bar = QProgressBar()
         self.progress_bar.setValue(0)
         layout.addWidget(self.progress_bar)
 
+        # a label to show the status
         self.status_label = QLabel("Status:")
         layout.addWidget(self.status_label)
 
     def update_progress(self, progress):
+        # updaye the progress bar
         self.progress_bar.setValue(progress)
 
     def download_complete(self, file_name):
+        # show the download complete message gregd
         self.status_label.setText(f"Download complete: {file_name}")
         self.progress_bar.setValue(100)
 
     def download_error(self, error_message):
+        # error error error error erorr eorro eir
         self.status_label.setText(f"Error: {error_message}")
 
     def start_download(self):
+        # get the url and file name
         url = self.url_input.text()
         file_name = self.file_name_input.text().strip()
 
+        # if no url is provided show an errorgrefgdaa
         if not url:
             self.status_label.setText("Error: URL is required.")
             return
 
+        # if no file name is give it gives a default one
         if not file_name:
             file_name = self.download_manager.get_file_name(url)
 
+        # start the download and restart the progress bar
         self.progress_bar.setValue(0)
         self.status_label.setText("Downloading...")
         self.download_manager.get(url, file_name)
 
 
 class DownloadManager(QObject):
+    # the error, progress, and complete signals
     download_progress = pyqtSignal(int)
     download_complete = pyqtSignal(str)
     download_error = pyqtSignal(str)
-
+    
     def __init__(self, parent=None):
         super(DownloadManager, self).__init__(parent)
         self.parent = parent
 
     def get(self, url, file_name):
+        # create a worker and thread for the download
         self.thread = QThread(self)
         self.worker = DownloadWorker(url, file_name)
         self.worker.moveToThread(self.thread)
 
+        # connect the signals from the worker to the slots in the thread
         self.thread.started.connect(self.worker.start)
         self.worker.download_progress.connect(self.download_progress.emit)
         self.worker.download_complete.connect(self.download_complete.emit)
         self.worker.download_error.connect(self.download_error.emit)
+
+        # connect the signals from the thread to the worker
         self.worker.download_complete.connect(self.thread.quit)
         self.worker.download_complete.connect(self.worker.deleteLater)
         self.thread.finished.connect(self.thread.deleteLater)
 
+        # start start start start start start start start start start start start start start start start start start 
         self.thread.start()
 
     def get_file_name(self, url):
+        # if no file name, it say downloaded_file
         file_name = os.path.basename(url.split("?")[0])
         if not file_name:
             return "downloaded_file"
 
+        # this fucking sucks
         mime_type, _ = mimetypes.guess_type(file_name)
         if mime_type:
             file_extension = mimetypes.guess_extension(mime_type)
@@ -153,29 +181,35 @@ class DownloadManager(QObject):
 
 
 class DownloadWorker(QObject):
+    # the error, progress, and complete signals again
     download_progress = pyqtSignal(int)
     download_complete = pyqtSignal(str)
     download_error = pyqtSignal(str)
 
     def __init__(self, url, file_name):
         super(DownloadWorker, self).__init__()
+        # ensure that the url is good
         self.url = url if url.startswith("http") else "http://" + url
         self.file_name = file_name
 
     def start(self):
         try:
+            # make the request and download the fileg
             with requests.get(self.url, stream=True) as r:
-                r.raise_for_status()
+                r.raise_for_status()  # raise an error if fail
+
+                # get the file size
                 total_length = int(r.headers.get('content-length', 0))
                 if total_length == 0:
                     self.download_error.emit("Unable to determine file size.")
                     return
 
-
+                # idk why this is still here, i think it was cause I downloaded a zip and it turned into .pyz and I got mad
                 mime_type = r.headers.get('content-type', '')
                 if mime_type == 'application/zip' or self.file_name.endswith('.pyz'):
                     self.file_name = self.ensure_zip_extension(self.file_name)
 
+                # download the file
                 with open(self.file_name, 'wb') as f:
                     downloaded = 0
                     for chunk in r.iter_content(chunk_size=4096):
@@ -185,25 +219,33 @@ class DownloadWorker(QObject):
                             progress = int((downloaded / total_length) * 100)
                             self.download_progress.emit(progress)
 
+            # singal that the download is complete
             self.download_complete.emit(self.file_name)
         except Exception as e:
+            # signal gthat ERROR ERORRERORRERORRERORRERORRERORRERORRERORRERORRERORRERORRERORRERORRERORRERORRERORRERORRERORRERORRERORR
             self.download_error.emit(str(e))
+
     
 class MainWindow(QMainWindow):
+    #home url
     HOME_URL = "https://search.freakybob.site/"
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
+        
         self.resize(900, 700)
+        # the title
         self.setWindowTitle("FreakyBrowse 2.3")
         
+        # icon
         try:
             icon_path = resource_path("logo_new.ico")
             self.setWindowIcon(QIcon(icon_path))
         except Exception as e:
             print(f"Error loading icon: {e}")
+            #download manager thing
         self.download_manager = DownloadManager(self)
 
-        
+        # the tabs stuff 
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
         self.tabs.setTabsClosable(True)
@@ -212,48 +254,57 @@ class MainWindow(QMainWindow):
         self.home_url = MainWindow.HOME_URL
         self.setCentralWidget(self.tabs)
 
+        # the status bar???
         self.status = QStatusBar()
         self.setStatusBar(self.status)
 
+        # the toolbar tggreh
         self.navtb = QToolBar("Navigation")
         self.addToolBar(self.navtb)
         
-        
+        # back button
         back_btn = QAction(QIcon(resource_path("icons/back.png")), "Back", self)
         back_btn.setStatusTip("Go back")
         back_btn.triggered.connect(lambda: self.current_browser().back())
         self.navtb.addAction(back_btn)
 
+        # forward button
         next_btn = QAction(QIcon(resource_path("icons/forward.png")), "Forward", self)
         next_btn.setStatusTip("Go forward")
         next_btn.triggered.connect(lambda: self.current_browser().forward())
         self.navtb.addAction(next_btn)
 
+        # refresh button
         reload_btn = QAction(QIcon(resource_path("icons/refresh.png")), "Reload", self)
         reload_btn.setStatusTip("Reload the page")
         reload_btn.triggered.connect(lambda: self.current_browser().reload())
         self.navtb.addAction(reload_btn)
 
+        # home button
         home_btn = QAction(QIcon(resource_path("icons/home.png")), "Home", self)
         home_btn.setStatusTip("Go back to home")
         home_btn.triggered.connect(self.navigate_home)
         self.navtb.addAction(home_btn)
-
+        
+        # settings button
         settings_btn = QAction(QIcon(resource_path("icons/settings.png")), "Settings", self)
         settings_btn.setStatusTip("Open Settings")
         settings_btn.triggered.connect(self.open_settings)
         self.navtb.addAction(settings_btn)
 
+        # new tab button
         new_tab_btn = QAction(QIcon(resource_path("icons/new_tab.png")), "New Tab", self)
         new_tab_btn.setStatusTip("Open a new tab")
         new_tab_btn.triggered.connect(self.add_new_tab)
         self.navtb.addAction(new_tab_btn)
 
+        # separator
         self.navtb.addSeparator()
 
-
+        # so you can tpe greg
         self.urlbar = QLineEdit()
-        
+
+        # url stuff
         self.urlbar.returnPressed.connect(self.navigate_to_url)
         self.navtb.addWidget(self.urlbar)
         self.urlbar.setPlaceholderText("Enter URL...")
@@ -261,38 +312,43 @@ class MainWindow(QMainWindow):
         self.urlbar.addAction(logo_action, QLineEdit.ActionPosition.LeadingPosition)
         self.urlbar.setClearButtonEnabled(True)
 
+        # pikidiary button
         pikidiary_btn = QAction(QIcon(resource_path("icons/piki.png")), "PikiDiary", self)
         pikidiary_btn.setStatusTip("Go to PikiDiary!")
         pikidiary_btn.triggered.connect(self.pikidiary)
         self.navtb.addAction(pikidiary_btn)
 
+        # opens the notes stuff
         notes_button = QAction(QIcon(resource_path("icons/notes1.png")), "Manage Notes", self)
         notes_button.setStatusTip("Manage your notes")
         notes_button.triggered.connect(self.manage_notes)
         self.navtb.addAction(notes_button)
 
-        
-
+        # vro
         bookmark_btn = QAction(QIcon(resource_path("icons/bookmark.png")), "Bookmark", self)
         bookmark_btn.setStatusTip("Bookmark this page!")
         bookmark_btn.triggered.connect(self.bookmark_page)
         self.navtb.addAction(bookmark_btn)
 
+        # the fuck you think, retard
         view_bookmarks_btn = QAction(QIcon(resource_path("icons/bookmarks.png")), "Bookmarks", self)
         view_bookmarks_btn.setStatusTip("View all bookmarks")
         view_bookmarks_btn.triggered.connect(self.show_bookmarks)
         self.navtb.addAction(view_bookmarks_btn)
 
+        # source button
         view_source_btn = QAction(QIcon(resource_path("icons/source.png")), "View Source", self)
         view_source_btn.setStatusTip("View the source of the current page")
         view_source_btn.triggered.connect(self.view_page_source)
         self.navtb.addAction(view_source_btn)
 
+        # download button
         download_btn = QAction(QIcon(resource_path("icons/download.png")), "Download Manager", self)
         download_btn.setStatusTip("Open Download Manager")
         download_btn.triggered.connect(self.open_download_manager)
         self.navtb.addAction(download_btn)
-        
+
+        # supposed to be for the styles, doesn't fucking work
         self.settings = QSettings("FreakyBrowse", "UserSettings1")
         self.pink_mode_enabled = self.settings.value("pink_mode", False, type=bool)
         self.blue_mode_enabled = self.settings.value("blue_mode", False, type=bool)
@@ -304,25 +360,24 @@ class MainWindow(QMainWindow):
         self.retro_green_mode_enabled = self.settings.value("retro_green_mode", False, type=bool)
         self.purple_mode_enabled = self.settings.value("purple_mode", False, type=bool)
 
-        
+        # rpc stuff greg
         self.settings = QSettings("FreakyBrowse", "RPC4Settings")
         self.rpc_enabled = self.settings.value("rpc_enabled", True, type=bool)
         self.warned_about_rpc = False
         self.update_rpc_state()
 
        
-
         self.toggle_mode()
 
-        
+        #tab stuff
         self.add_new_tab(QUrl(self.HOME_URL), "New Tab")
         self.show()
 
-        
+        # bookmarks
         self.bookmarks = self.settings.value("bookmarks", [], type=list)
 
         
-
+    # adds a new tab 
     def add_new_tab(self, qurl=None, label="New Tab"):
         if qurl is None:
             qurl = QUrl(self.HOME_URL)
@@ -366,6 +421,7 @@ class MainWindow(QMainWindow):
                 except Exception as fallback_error:
                     print(f"Error with fallback RPC: {fallback_error}")
 
+    # updates the tab titles greg
     def update_tab_title(self, title, browser):
         index = self.tabs.indexOf(browser)
         tab_bar = self.tabs.tabBar()
@@ -378,11 +434,12 @@ class MainWindow(QMainWindow):
     
         self.tabs.setTabText(index, shortened_title)
 
-
+    # updates the tab icon for the tabs
     def update_tab_icon(self, icon, browser):
         index = self.tabs.indexOf(browser)
         self.tabs.setTabIcon(index, icon)
 
+    # pikidiary...
     def pikidiary(self):
         url = QUrl("https://pikidiary.lol")
         self.add_new_tab(url, "FUCKING PEAK YAYAY")
@@ -405,10 +462,11 @@ class MainWindow(QMainWindow):
                         large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
                     )
 
-
+    # changes the tab to home greg
     def navigate_home(self):
         self.current_browser().setUrl(QUrl(self.HOME_URL))
 
+    # navigating to urls greg
     def navigate_to_url(self):
         q = QUrl(self.urlbar.text())
         if q.scheme() == "":
@@ -447,6 +505,7 @@ class MainWindow(QMainWindow):
                         # gg !! - greg
         else:
             QMessageBox.warning(self, "Invalid URL", "Please enter a valid URL.")
+            # holy fuck, this is all the random ass rpc
         if haveDiscord == "True" and self.rpc_enabled and "chrome" in str(self.urlbar.text()):
             try:
                 RPC.update(
@@ -558,6 +617,7 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 print(f"Error updating RPC: {e}")
 
+    # updates the urlbar
     def update_urlbar(self, q, browser=None):
         if browser != self.current_browser():
             return
@@ -568,9 +628,11 @@ class MainWindow(QMainWindow):
         icon = self.tabs.tabIcon(index)
         self.tabs.setTabIcon(index, icon)
 
+    # returns the current browser
     def current_browser(self):
         return self.tabs.currentWidget()
 
+    # closes the current tab
     def close_current_tab(self, i):
         if self.tabs.count() < 2:
             return
@@ -584,7 +646,7 @@ class MainWindow(QMainWindow):
         else:
             self.urlbar.clear()
 
-
+    # updates the URL bar when the tab changes
     def on_current_tab_changed(self, index):
         browser = self.current_browser()
         if browser:
@@ -592,7 +654,7 @@ class MainWindow(QMainWindow):
         else:
             self.urlbar.clear()
     
-
+    # loads the styles from the folder
     def load_style_from_file(self, style_name):
         if hasattr(sys, '_MEIPASS'):
             styles_folder = os.path.join(sys._MEIPASS, 'styles')
@@ -608,7 +670,7 @@ class MainWindow(QMainWindow):
         else:
             print(f"Style file '{style_name}.qss' not found at {style_path}!")
 
-    
+    # more style code greg
     def toggle_mode(self):
         modes = {
             "pink_mode": self.pink_mode_enabled,
@@ -628,6 +690,7 @@ class MainWindow(QMainWindow):
         else:
             self.load_style_from_file("default_mode")
 
+    # a simplified version of the original style code, don't mess with it if you no understand
     def toggle_mode_enabled(self, mode_name, enabled):
         modes = [
             "pink_mode", "blue_mode", "green_mode", "red_mode", "orange_mode", 
@@ -641,6 +704,8 @@ class MainWindow(QMainWindow):
             self.settings.setValue(f"{mode}", getattr(self, f"{mode}_enabled"))
         self.toggle_mode()
 
+
+    # style settings
     def open_style_settings(self):
         style_dialog = QDialog(self)
         style_dialog.setWindowTitle("Style Settings")
@@ -691,6 +756,7 @@ class MainWindow(QMainWindow):
         style_dialog.setLayout(layout)
         style_dialog.exec()
 
+    # browser settings
     def open_browser_settings(self):
         browser_dialog = QDialog(self)
         browser_dialog.setWindowTitle("Browser Settings")
@@ -739,6 +805,7 @@ class MainWindow(QMainWindow):
         browser_dialog.setLayout(layout)
         browser_dialog.exec()
 
+    # giant ass info window
     def open_info_button(self):
         info_dialog = QDialog(self)
         info_dialog.setWindowTitle("FreakyBrowse Info")
@@ -819,6 +886,8 @@ class MainWindow(QMainWindow):
 
         info_dialog.setLayout(layout)
         info_dialog.exec()
+
+        # toggles rpc
     def toggle_rpc(self, state):
         if self.rpc_enabled and not self.warned_about_rpc:
             reply = QMessageBox.question(self, "Warning", 
@@ -836,6 +905,7 @@ class MainWindow(QMainWindow):
         print(f"RPC toggled: {'Enabled' if self.rpc_enabled else 'Disabled'}")
         self.update_rpc_state()
 
+    # basically just says if it was enabled or no
     def update_rpc_state(self):
         if self.rpc_enabled:
             try:
@@ -849,6 +919,7 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 print(f"Error disabling RPC: {e}")
 
+    # the settings window
     def open_settings(self):
         settings_dialog = QDialog(self)
         settings_dialog.setWindowTitle("Settings")
@@ -900,6 +971,7 @@ class MainWindow(QMainWindow):
         settings_dialog.setLayout(layout)
         settings_dialog.exec()
 
+    # toggles the homepage url
     def toggle_homepage_url(self, state, home_url_label):
         if state == 2:
             
@@ -914,7 +986,7 @@ class MainWindow(QMainWindow):
         print(f"Home URL set to: {self.home_url}")
 
     
-        
+    # the main notes window that holds all the buttons and all that
     def manage_notes(self):
         notes_dialog = QDialog(self)
         notes_dialog.setWindowTitle("Notes Manager")
@@ -953,6 +1025,7 @@ class MainWindow(QMainWindow):
         upload_image_button.clicked.connect(lambda: self.insert_image(note_viewer))
         layout.addWidget(upload_image_button)
 
+        # loads note content
         def load_note_content():
             selected_item = notes_list.currentItem()
             if selected_item:
@@ -962,6 +1035,7 @@ class MainWindow(QMainWindow):
                 note_viewer.clear()
         notes_list.itemSelectionChanged.connect(load_note_content)
 
+        # saves note content.
         def save_note_content():
             selected_item = notes_list.currentItem()
             if selected_item:
@@ -973,6 +1047,7 @@ class MainWindow(QMainWindow):
         notes_dialog.setLayout(layout)
         notes_dialog.exec()
 
+    # I don't have to explain this.
     def add_note_dialog(self, notes_list, saved_notes):
         text, ok = QInputDialog.getText(self, "Add Note", "Enter note name:")
         if not ok or not text:
@@ -990,6 +1065,7 @@ class MainWindow(QMainWindow):
         note_viewer.setHtml("")
         note_viewer.setFocus()
 
+    # I can't tell what this does, ask wish
     def delete_note(self, notes_list, saved_notes):
         if notes_list.count() == 0:
             QMessageBox.warning(self, "No Notes to Delete", "Vro, there are no notes to delete.")
@@ -1007,6 +1083,7 @@ class MainWindow(QMainWindow):
                 saved_notes.pop(note_name, None)
                 self.settings.setValue("notes", saved_notes)
 
+    # get's an image from the user prompt and turns that image into html
     def insert_image(self, note_viewer):
         image_path, _ = QFileDialog.getOpenFileName(self, "Select Image", "", "Images (*.png *.jpg *.jpeg *.bmp *.gif)")
         if not image_path:
@@ -1028,6 +1105,7 @@ class MainWindow(QMainWindow):
 
         note_viewer.insertHtml(img_tag)
 
+    # downloads the note as txt
     def download_note_as_txt(self, notes_list, saved_notes):
         selected_item = notes_list.currentItem()
         if not selected_item:
@@ -1059,7 +1137,7 @@ class MainWindow(QMainWindow):
 
 
 
-
+    # it does this thing... it's called bookmarking....
     def bookmark_page(self):
         url = self.current_browser().url().toString()
         if url not in self.bookmarks:
@@ -1069,6 +1147,7 @@ class MainWindow(QMainWindow):
         else:
             QMessageBox.warning(self, "Already Bookmarked", "This page is already in your bookmarks.")
 
+    # shows the bookmarks window
     def show_bookmarks(self):
         bookmarks_dialog = QDialog(self)
         bookmarks_dialog.setWindowTitle("Bookmarks")
@@ -1098,19 +1177,22 @@ class MainWindow(QMainWindow):
         bookmarks_dialog.setLayout(layout)
         bookmarks_dialog.exec() # bookmarks_dialog.exec_() is deprecated in PyQt6
 
+
+    # wouldn't take a genius to figure this out
     def delete_bookmark(self, url, dialog):
         if url in self.bookmarks:
             self.bookmarks.remove(url)
             self.settings.setValue("bookmarks", self.bookmarks)
             dialog.accept()
             self.show_bookmarks()
-# we'll make this a inspect element soon grge
+
+    # retrieves the html of the current page
     def view_page_source(self):
-     
-        current_browser = self.current_browser()
         
-       
+        current_browser = self.current_browser()
         current_browser.page().toHtml(lambda html: self.show_html(html))
+
+    # shows the html dumbass
     def show_html(self, html):
         html_viewer = QDialog(self)
         html_viewer.setWindowTitle("Page Source")
@@ -1126,21 +1208,13 @@ class MainWindow(QMainWindow):
         html_viewer.setLayout(layout)
         html_viewer.exec() # html_viewer.exec_() is deprecated in PyQt6
 
+    # shows the download window
     def open_download_manager(self):
         self.download_manager_window = DownloadManagerWindow(self)
         self.download_manager_window.show()
+    
+    # the code that used to be here was for the status bar, we no use status bar
 
-    def on_download_finished(self, reply: QNetworkReply):
-        if reply.error() == QNetworkReply.NetworkError.NoError:
-            content = reply.readAll()
-            file_name = reply.url().fileName()
-            with open(file_name, "wb") as file:
-                file.write(content)
-            self.status.showMessage(f"Downloaded {file_name}")
-        else:
-            self.status.showMessage(f"Download failed: {reply.errorString()}")
-    
-    
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
