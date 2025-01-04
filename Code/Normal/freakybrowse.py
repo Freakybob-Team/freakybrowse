@@ -1219,10 +1219,12 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     web = QWebEngineView()
-    # set user agent (make this a setting later, prob could change a variable)
+    # set user agent
     
+    # global useragent
+    # useragent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) QtWebEngine/6.7.3 Chrome/118.0.5993.220 Safari/537.36" # this by default, allow to be changed in settings
     # web.page().profile().setHttpUserAgent(
-    #     "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36"
+    #     useragent
     # )
 
     # end set user agent
