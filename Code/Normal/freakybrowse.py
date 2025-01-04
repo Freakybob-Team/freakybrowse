@@ -1218,6 +1218,14 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    web = QWebEngineView()
+    # set user agent (make this a setting later, prob could change a variable)
+    
+    # web.page().profile().setHttpUserAgent(
+    #     "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36"
+    # )
+
+    # end set user agent
     app.setApplicationName("FreakyBrowse.2.3")
     app.setWindowIcon(QIcon("logo_new.ico")) 
     
