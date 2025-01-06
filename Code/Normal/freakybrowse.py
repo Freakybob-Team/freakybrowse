@@ -229,6 +229,15 @@ class DownloadWorker(QObject):
 class MainWindow(QMainWindow):
     #home url
     HOME_URL = "https://search.freakybob.site/"
+    try:
+        print(sys.argv[1])
+        global isArgHome
+        isArgHome = "True"
+    except IndexError:
+        print("HOME_URL config not listed; defaulting to set HOME_URL in FreakyBrowse.")
+        isArgHome = "False"
+    if (isArgHome == "True"):
+        HOME_URL = sys.argv[1]
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         
