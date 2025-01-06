@@ -230,7 +230,7 @@ class MainWindow(QMainWindow):
     #home url
     HOME_URL = "https://search.freakybob.site/"
     try:
-        print(sys.argv[1])
+        print("HOME_URL ARG FOUND;" + sys.argv[1])
         global isArgHome
         isArgHome = "True"
     except IndexError:
