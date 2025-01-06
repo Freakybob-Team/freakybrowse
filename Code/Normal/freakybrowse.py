@@ -31,7 +31,7 @@ from pypresence import Presence
 from pypresence.exceptions import InvalidPipe
 import argparse
 parser = argparse.ArgumentParser(description='Parser for FreakyBrowse')
-parser.add_argument('--home_url', action="store", dest='url', default="https://search.freakybob.site")
+parser.add_argument('--url', action="store", dest='url', default="https://search.freakybob.site")
 try:
     args = parser.parse_args()
 except:
@@ -236,14 +236,14 @@ class MainWindow(QMainWindow):
     #home url
     HOME_URL = "https://search.freakybob.site/"
     try:
-        print("HOME_URL ARG FOUND;" + args.home_url)
+        print("HOME_URL ARG FOUND;" + args.url)
         global isArgHome
         isArgHome = "True"
     except IndexError:
         print("HOME_URL config not listed; defaulting to set HOME_URL in FreakyBrowse.")
         isArgHome = "False"
     if (isArgHome == "True"):
-        HOME_URL = args.home_url
+        HOME_URL = args.url
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         
