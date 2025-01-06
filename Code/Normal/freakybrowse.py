@@ -29,7 +29,13 @@ import sys
 import os
 from pypresence import Presence
 from pypresence.exceptions import InvalidPipe
-
+import argparse
+parser = argparse.ArgumentParser(description='Parser for FreakyBrowse')
+parser.add_argument('--url', action="store", dest='url', default="https://search.freakybob.site")
+try:
+    args = parser.parse_args()
+except:
+    print("No arguments found")
 #rpc 
 RPC = None
 haveDiscord = None
@@ -230,14 +236,14 @@ class MainWindow(QMainWindow):
     #home url
     HOME_URL = "https://search.freakybob.site/"
     try:
-        print("HOME_URL ARG FOUND;" + sys.argv[1])
+        print("HOME_URL ARG FOUND;" + args.url)
         global isArgHome
         isArgHome = "True"
     except IndexError:
         print("HOME_URL config not listed; defaulting to set HOME_URL in FreakyBrowse.")
         isArgHome = "False"
     if (isArgHome == "True"):
-        HOME_URL = sys.argv[1]
+        HOME_URL = args.url
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         
