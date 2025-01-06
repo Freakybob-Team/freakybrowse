@@ -278,7 +278,6 @@ class MainWindow(QMainWindow):
         self.addToolBar(self.navtb)
         
         # back button
-        # back button
         back_btn = QAction(QIcon(resource_path("assets/icons/back.png")), "Back", self)
         back_btn.setStatusTip("Go back")
         back_btn.triggered.connect(lambda: self.current_browser().back())
@@ -935,6 +934,82 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 print(f"Error disabling RPC: {e}")
 
+    # I wonder what /j shortcut stuff
+    def shortcut_settings(self):
+        shortcut_dialog = QDialog(self)
+        shortcut_dialog.setWindowTitle("Shortcut stuff")
+        shortcut_dialog.setFixedSize(400, 230)
+
+        layout = QVBoxLayout()
+        layout.setSpacing(10)
+        layout.setContentsMargins(20, 20, 20, 20)
+
+        url_label = QLabel("Enter URL:")
+        layout.addWidget(url_label)
+
+        url_input = QLineEdit()
+        layout.addWidget(url_input)
+
+        name_label = QLabel("Enter Shortcut Name (optional):")
+        layout.addWidget(name_label)
+
+        name_input = QLineEdit()
+        layout.addWidget(name_input)
+
+        create_button = QPushButton("Create Shortcut")
+        layout.addWidget(create_button)
+        
+        #makes the shortcut
+        def create_shortcut():
+            url = url_input.text().strip()
+            name = name_input.text().strip()
+
+            if not url:
+                QMessageBox.warning(self, "Warning", "Vro. Put the url :sob:")
+                return
+
+            if not (url.startswith("http://") or url.startswith("https://")):
+                QMessageBox.warning(self, "Warning", "URL must start with http:// or https:// !")
+                return
+
+            if '.' not in url:
+                QMessageBox.warning(self, "Warning", "URL must contain a '.' (e.g., .com, .net) !")
+                return
+
+            shortcut_folder = "Shortcuts"
+            if not os.path.exists(shortcut_folder):
+                os.makedirs(shortcut_folder)
+
+            count = 1
+            while True:
+                if not name:
+                    generated_name = f"Shortcut{count}.bat"
+                else:
+                    generated_name = f"{name}.bat"
+
+                file_path = os.path.join(shortcut_folder, generated_name)
+
+                if not os.path.exists(file_path):
+                    break
+
+                count += 1
+
+            try:
+                with open(file_path, "w") as file:
+                    file.write(f"rem make sure to change the name in the bat file if you want to share the batch file!! Don't want your name to get leaked :3\n\n@echo off\ncd /d {os.getcwd()}\npowershell py freakybrowse.py --url {url}")
+                QMessageBox.information(self, "Success", f"Shortcut created: {file_path} !!!")
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Failed to create shortcut: {str(e)}")
+
+        create_button.clicked.connect(create_shortcut)
+
+        close_button = QPushButton("Close")
+        layout.addWidget(close_button)
+        close_button.clicked.connect(shortcut_dialog.accept)
+
+        shortcut_dialog.setLayout(layout)
+        shortcut_dialog.exec()
+
     # the settings window
     def open_settings(self):
         settings_dialog = QDialog(self)
@@ -958,7 +1033,8 @@ class MainWindow(QMainWindow):
         buttons = [
             ("Style Settings", self.open_style_settings),
             ("Browser Settings", self.open_browser_settings),
-            ("Info", self.open_info_button)
+            ("Info", self.open_info_button),
+            ("Shortcut", self.shortcut_settings)
         ]
 
         for label, func in buttons:
@@ -1204,7 +1280,6 @@ class MainWindow(QMainWindow):
 
     # retrieves the html of the current page
     def view_page_source(self):
-        
         current_browser = self.current_browser()
         current_browser.page().toHtml(lambda html: self.show_html(html))
 
@@ -1231,7 +1306,6 @@ class MainWindow(QMainWindow):
     
     # the code that used to be here was for the status bar, we no use status bar
 
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     web = QWebEngineView()
@@ -1251,4 +1325,3 @@ if __name__ == "__main__":
     app.exec() # app.exec_() is deprecated in PyQt6
 #I am steve :33333 GREG GREG GREG I HATE YOU !!!!VFYUGEIHLJ:K:D<MNFKGILEHQODJLK:A?<
 # freakbob
-
