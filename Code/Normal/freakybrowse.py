@@ -278,37 +278,38 @@ class MainWindow(QMainWindow):
         self.addToolBar(self.navtb)
         
         # back button
-        back_btn = QAction(QIcon(resource_path("icons/back.png")), "Back", self)
+        # back button
+        back_btn = QAction(QIcon(resource_path("assets/icons/back.png")), "Back", self)
         back_btn.setStatusTip("Go back")
         back_btn.triggered.connect(lambda: self.current_browser().back())
         self.navtb.addAction(back_btn)
 
         # forward button
-        next_btn = QAction(QIcon(resource_path("icons/forward.png")), "Forward", self)
+        next_btn = QAction(QIcon(resource_path("assets/icons/forward.png")), "Forward", self)
         next_btn.setStatusTip("Go forward")
         next_btn.triggered.connect(lambda: self.current_browser().forward())
         self.navtb.addAction(next_btn)
 
         # refresh button
-        reload_btn = QAction(QIcon(resource_path("icons/refresh.png")), "Reload", self)
+        reload_btn = QAction(QIcon(resource_path("assets/icons/refresh.png")), "Reload", self)
         reload_btn.setStatusTip("Reload the page")
         reload_btn.triggered.connect(lambda: self.current_browser().reload())
         self.navtb.addAction(reload_btn)
 
         # home button
-        home_btn = QAction(QIcon(resource_path("icons/home.png")), "Home", self)
+        home_btn = QAction(QIcon(resource_path("assets/icons/home.png")), "Home", self)
         home_btn.setStatusTip("Go back to home")
         home_btn.triggered.connect(self.navigate_home)
         self.navtb.addAction(home_btn)
         
         # settings button
-        settings_btn = QAction(QIcon(resource_path("icons/settings.png")), "Settings", self)
+        settings_btn = QAction(QIcon(resource_path("assets/icons/settings.png")), "Settings", self)
         settings_btn.setStatusTip("Open Settings")
         settings_btn.triggered.connect(self.open_settings)
         self.navtb.addAction(settings_btn)
 
         # new tab button
-        new_tab_btn = QAction(QIcon(resource_path("icons/new_tab.png")), "New Tab", self)
+        new_tab_btn = QAction(QIcon(resource_path("assets/icons/new_tab.png")), "New Tab", self)
         new_tab_btn.setStatusTip("Open a new tab")
         new_tab_btn.triggered.connect(self.add_new_tab)
         self.navtb.addAction(new_tab_btn)
@@ -323,42 +324,42 @@ class MainWindow(QMainWindow):
         self.urlbar.returnPressed.connect(self.navigate_to_url)
         self.navtb.addWidget(self.urlbar)
         self.urlbar.setPlaceholderText("Enter URL...")
-        logo_action = QAction(QIcon(resource_path("icons/logo.png")), "Logo", self.urlbar)
+        logo_action = QAction(QIcon(resource_path("assets/icons/logo.png")), "Logo", self.urlbar)
         self.urlbar.addAction(logo_action, QLineEdit.ActionPosition.LeadingPosition)
         self.urlbar.setClearButtonEnabled(True)
 
         # pikidiary button
-        pikidiary_btn = QAction(QIcon(resource_path("icons/piki.png")), "PikiDiary", self)
+        pikidiary_btn = QAction(QIcon(resource_path("assets/icons/piki.png")), "PikiDiary", self)
         pikidiary_btn.setStatusTip("Go to PikiDiary!")
         pikidiary_btn.triggered.connect(self.pikidiary)
         self.navtb.addAction(pikidiary_btn)
 
         # opens the notes stuff
-        notes_button = QAction(QIcon(resource_path("icons/notes1.png")), "Manage Notes", self)
+        notes_button = QAction(QIcon(resource_path("assets/icons/notes1.png")), "Manage Notes", self)
         notes_button.setStatusTip("Manage your notes")
         notes_button.triggered.connect(self.manage_notes)
         self.navtb.addAction(notes_button)
 
         # vro
-        bookmark_btn = QAction(QIcon(resource_path("icons/bookmark.png")), "Bookmark", self)
+        bookmark_btn = QAction(QIcon(resource_path("assets/icons/bookmark.png")), "Bookmark", self)
         bookmark_btn.setStatusTip("Bookmark this page!")
         bookmark_btn.triggered.connect(self.bookmark_page)
         self.navtb.addAction(bookmark_btn)
 
         # the fuck you think, retard
-        view_bookmarks_btn = QAction(QIcon(resource_path("icons/bookmarks.png")), "Bookmarks", self)
+        view_bookmarks_btn = QAction(QIcon(resource_path("assets/icons/bookmarks.png")), "Bookmarks", self)
         view_bookmarks_btn.setStatusTip("View all bookmarks")
         view_bookmarks_btn.triggered.connect(self.show_bookmarks)
         self.navtb.addAction(view_bookmarks_btn)
 
         # source button
-        view_source_btn = QAction(QIcon(resource_path("icons/source.png")), "View Source", self)
+        view_source_btn = QAction(QIcon(resource_path("assets/icons/source.png")), "View Source", self)
         view_source_btn.setStatusTip("View the source of the current page")
         view_source_btn.triggered.connect(self.view_page_source)
         self.navtb.addAction(view_source_btn)
 
         # download button
-        download_btn = QAction(QIcon(resource_path("icons/download.png")), "Download Manager", self)
+        download_btn = QAction(QIcon(resource_path("assets/icons/download.png")), "Download Manager", self)
         download_btn.setStatusTip("Open Download Manager")
         download_btn.triggered.connect(self.open_download_manager)
         self.navtb.addAction(download_btn)
@@ -674,7 +675,7 @@ class MainWindow(QMainWindow):
         if hasattr(sys, '_MEIPASS'):
             styles_folder = os.path.join(sys._MEIPASS, 'styles')
         else:
-            styles_folder = os.path.join(os.path.dirname(__file__), 'styles')
+            styles_folder = os.path.join(os.path.dirname(__file__), 'assets/styles')
 
         style_path = os.path.join(styles_folder, f"{style_name}.qss")
 
@@ -1250,3 +1251,4 @@ if __name__ == "__main__":
     app.exec() # app.exec_() is deprecated in PyQt6
 #I am steve :33333 GREG GREG GREG I HATE YOU !!!!VFYUGEIHLJ:K:D<MNFKGILEHQODJLK:A?<
 # freakbob
+
