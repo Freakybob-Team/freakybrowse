@@ -965,7 +965,7 @@ class MainWindow(QMainWindow):
             name = name_input.text().strip()
 
             if not url:
-                QMessageBox.warning(self, "Warning", "Vro. Put the url :sob:")
+                QMessageBox.warning(self, "Warning", "vro. Put the url :sob:")
                 return
 
             if not (url.startswith("http://") or url.startswith("https://")):
@@ -996,7 +996,7 @@ class MainWindow(QMainWindow):
 
             try:
                 with open(file_path, "w") as file:
-                    file.write(f"rem make sure to change the name in the bat file if you want to share the batch file!! Don't want your name to get leaked :3\n\n@echo off\ncd /d {os.getcwd()}\npowershell py freakybrowse.py --url {url}")
+                    file.write(f"@echo off\nrem make sure to change the name in the bat file if you want to share the batch file!! Don't want your name to get leaked :3\n\ncd /d {os.getcwd()}\npowershell py freakybrowse.py --url {url}\nIF %ERRORLEVEL% NEQ 0 (\necho Error: Failed to launch FreakyBrowse\npause\n)")
                 QMessageBox.information(self, "Success", f"Shortcut created: {file_path} !!!")
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"Failed to create shortcut: {str(e)}")
@@ -1279,7 +1279,7 @@ class MainWindow(QMainWindow):
             self.show_bookmarks()
 
     # retrieves the html of the current page
-    def view_page_source(self):
+    def view_page_source(self):        
         current_browser = self.current_browser()
         current_browser.page().toHtml(lambda html: self.show_html(html))
 
@@ -1305,6 +1305,7 @@ class MainWindow(QMainWindow):
         self.download_manager_window.show()
     
     # the code that used to be here was for the status bar, we no use status bar
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
