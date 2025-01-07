@@ -1,5 +1,6 @@
 import os
-
+import winsound
+import time
 def create():
     while True:
         print("------------------------------------------------------")
@@ -33,12 +34,12 @@ def create_shortcut(url, name):
         os.makedirs(shortcut_folder)
 
     if name is None:
-        name = "Shortcut{count}"
+        name = "Shortcut"
     else:
         name = name.replace(".bat", "")
 
     count = 1
-    file_path = os.path.join(shortcut_folder, f"{name}.bat")
+    file_path = os.path.join(shortcut_folder, f"{name}{count}.bat")
 
     while os.path.exists(file_path):
         count += 1
@@ -48,10 +49,14 @@ def create_shortcut(url, name):
         with open(file_path, "w") as file:
             file.write(f"@echo off\nrem make sure to change the name in the bat file if you want to share the batch file!! Don't want your name to get leaked :3\n\ncd /d {os.getcwd()}\npowershell py freakybrowse.py --url {url}\nIF %ERRORLEVEL% NEQ 0 (\necho Error: Failed to launch FreakyBrowse\npause\n)")
         print(f"Shortcut created: {file_path} !")
+        winsound.Beep(523, 200)  
+        winsound.Beep(659, 200)
+        winsound.Beep(784, 400)
     except Exception as e:
         print(f"Failed to create shortcut: {str(e)} :c")
+    time.sleep(2)
     print("------------------------------------------------------")
-
+    
 def main():
     print("Welcome to the Shortcut maker for FreakyBrowse!")
     print("To Create a new shortcut for FreakyBrowse, type 'create' !!")
