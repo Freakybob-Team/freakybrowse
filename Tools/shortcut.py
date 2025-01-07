@@ -46,8 +46,17 @@ def create_shortcut(url, name):
         file_path = os.path.join(shortcut_folder, f"{name}{count}.bat")
 
     try:
+        root_directory = os.path.dirname(os.path.abspath(__file__)).rsplit(os.sep, 1)[0]
         with open(file_path, "w") as file:
-            file.write(f"@echo off\nrem make sure to change the name in the bat file if you want to share the batch file!! Don't want your name to get leaked :3\n\ncd /d {os.getcwd()}\npowershell py freakybrowse.py --url {url}\nIF %ERRORLEVEL% NEQ 0 (\necho Error: Failed to launch FreakyBrowse\npause\n)")
+            file.write(f"""@echo off
+rem make sure to change the name in the bat file if you want to share the batch file!! Don't want your name to get leaked :3
+
+cd /d {root_directory}
+powershell python freakybrowse.py --url {url}
+IF %ERRORLEVEL% NEQ 0 (
+echo Error: Failed to launch FreakyBrowse
+pause
+)""")
         print(f"Shortcut created: {file_path} !")
 
         winsound.Beep(523, 150)
@@ -58,7 +67,7 @@ def create_shortcut(url, name):
 
     except Exception as e:
         print(f"Failed to create shortcut: {str(e)} :c")
-    time.sleep(3.5)
+    time.sleep(3.2)
     print("------------------------------------------------------")
     
 def main():
