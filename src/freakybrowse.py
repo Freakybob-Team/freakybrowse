@@ -775,7 +775,7 @@ class MainWindow(QMainWindow):
     def open_browser_settings(self):
         browser_dialog = QDialog(self)
         browser_dialog.setWindowTitle("Browser Settings")
-        browser_dialog.setFixedSize(500, 400)
+        browser_dialog.setFixedSize(480, 320)
         browser_dialog.setStyleSheet("""
             background-color: #61a6a0;
             border-radius: 10px;
@@ -936,7 +936,7 @@ class MainWindow(QMainWindow):
     # useragent thingy
     def useragent_settings(self):
         useragent_dialog = QDialog(self)
-        useragent_dialog.setWindowTitle("[Guard] User-Agent Settings")
+        useragent_dialog.setWindowTitle("[Guard] UserAgent Settings")
         useragent_dialog.setFixedSize(400, 230)
 
         layout = QVBoxLayout()
