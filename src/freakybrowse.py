@@ -952,19 +952,33 @@ class MainWindow(QMainWindow):
         agent_input = QLineEdit()
         layout.addWidget(agent_input)
 
+        chrome_default_button = QPushButton("Change UserAgent to Chrome 131.0.0.0 (Windows NT 10.0; Win64)")
+        layout.addWidget(chrome_default_button)
+
         submit_button = QPushButton("Change UserAgent")
         layout.addWidget(submit_button)
 
         def useragent_change():
-            global useragent
+            global useragent # makes useragent variable accessable
             useragent = agent_input.text().strip()
             web.page().profile().setHttpUserAgent(
                 useragent
-            )
+            ) # set useragent
+
+        def chrome_default():
+            global useragent # makes useragent variable accessable
+            useragent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+            web.page().profile().setHttpUserAgent(
+                useragent
+            ) # set useragent
+
         submit_button.clicked.connect(useragent_change)
+        chrome_default_button.clicked.connect(chrome_default)
+
         close_button = QPushButton("Close")
         layout.addWidget(close_button)
         close_button.clicked.connect(useragent_dialog.accept)
+
         useragent_dialog.setLayout(layout)
         useragent_dialog.exec()
     # I wonder what /j shortcut stuff
