@@ -775,7 +775,7 @@ class MainWindow(QMainWindow):
     def open_browser_settings(self):
         browser_dialog = QDialog(self)
         browser_dialog.setWindowTitle("Browser Settings")
-        browser_dialog.setFixedSize(400, 300)
+        browser_dialog.setFixedSize(500, 400)
         browser_dialog.setStyleSheet("""
             background-color: #61a6a0;
             border-radius: 10px;
@@ -933,7 +933,40 @@ class MainWindow(QMainWindow):
                 print("RPC is now disabled.")
             except Exception as e:
                 print(f"Error disabling RPC: {e}")
+    # useragent thingy
+    def useragent_settings(self):
+        useragent_dialog = QDialog(self)
+        useragent_dialog.setWindowTitle("[Guard] User-Agent Settings")
+        useragent_dialog.setFixedSize(400, 230)
 
+        layout = QVBoxLayout()
+        layout.setSpacing(10)
+        layout.setContentsMargins(20, 20, 20, 20)
+
+        warning_label = QLabel("WARNING: This may break websites. Use at your own risk.")
+        layout.addWidget(warning_label)
+
+        agent_label = QLabel("Enter custom UserAgent string:")
+        layout.addWidget(agent_label)
+
+        agent_input = QLineEdit()
+        layout.addWidget(agent_input)
+
+        submit_button = QPushButton("Change UserAgent")
+        layout.addWidget(submit_button)
+
+        def useragent_change():
+            global useragent
+            useragent = agent_input.text().strip()
+            web.page().profile().setHttpUserAgent(
+                useragent
+            )
+        submit_button.clicked.connect(useragent_change)
+        close_button = QPushButton("Close")
+        layout.addWidget(close_button)
+        close_button.clicked.connect(useragent_dialog.accept)
+        useragent_dialog.setLayout(layout)
+        useragent_dialog.exec()
     # I wonder what /j shortcut stuff
     def shortcut_settings(self):
         shortcut_dialog = QDialog(self)
@@ -1034,7 +1067,8 @@ class MainWindow(QMainWindow):
             ("Style Settings", self.open_style_settings),
             ("Browser Settings", self.open_browser_settings),
             ("Info", self.open_info_button),
-            ("Shortcut", self.shortcut_settings)
+            ("Shortcut", self.shortcut_settings),
+            ("[Guard] UserAgent", self.useragent_settings)
         ]
 
         for label, func in buttons:
@@ -1309,14 +1343,15 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    global web
     web = QWebEngineView()
     # set user agent
-    
-    # global useragent
-    # useragent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) QtWebEngine/6.7.3 Chrome/118.0.5993.220 Safari/537.36" # this by default, allow to be changed in settings
-    # web.page().profile().setHttpUserAgent(
-    #     useragent
-    # )
+    try:
+        web.page().profile().setHttpUserAgent(
+            useragent
+        )
+    except:
+        print("No custom user-agent found; using default")
 
     # end set user agent
     app.setApplicationName("FreakyBrowse.2.3")
