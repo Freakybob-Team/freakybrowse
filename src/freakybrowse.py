@@ -249,7 +249,7 @@ class MainWindow(QMainWindow):
         
         self.resize(900, 700)
         # the title
-        self.setWindowTitle("FreakyBrowse 2.3")
+        self.setWindowTitle("FreakyBrowse 2.4")
         
         # icon
         try:
@@ -1061,7 +1061,7 @@ class MainWindow(QMainWindow):
     def open_settings(self):
         settings_dialog = QDialog(self)
         settings_dialog.setWindowTitle("Settings")
-        settings_dialog.setFixedSize(400, 300)
+        settings_dialog.setFixedSize(490, 370)
         settings_dialog.setStyleSheet("""
             background-color: #a3d8f4;
             border-radius: 10px;
@@ -1368,7 +1368,7 @@ if __name__ == "__main__":
         print("No custom user-agent found; using default")
 
     # end set user agent
-    app.setApplicationName("FreakyBrowse.2.3")
+    app.setApplicationName("FreakyBrowse.2.4")
     app.setWindowIcon(QIcon("logo_new.ico")) 
     
     window = MainWindow()
