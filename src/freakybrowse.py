@@ -32,10 +32,22 @@ from pypresence.exceptions import InvalidPipe
 import argparse
 parser = argparse.ArgumentParser(description='Parser for FreakyBrowse')
 parser.add_argument('--url', action="store", dest='url', default="https://search.freakybob.site")
+
+# change this when new version release - wish
+appname = "FreakyBrowse 2.4"
+app = QApplication(sys.argv)
+
+parser.add_argument('--name', action="store", dest='name', default="FreakyBrowse 2.4")
 try:
     args = parser.parse_args()
 except:
     print("No arguments found")
+try:
+    appname = args.name
+    app.setApplicationName(appname)
+    print(appname)
+except AttributeError:
+    print("[debug] no arg given via --name; proceeding with default")
 #rpc 
 RPC = None
 haveDiscord = None
@@ -267,7 +279,7 @@ class MainWindow(QMainWindow):
         
         self.resize(900, 700)
         # the title
-        self.setWindowTitle("FreakyBrowse 2.4")
+        self.setWindowTitle(appname)
         
         # icon
         try:
@@ -1374,7 +1386,6 @@ class MainWindow(QMainWindow):
 
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
     global web
     web = QWebEngineView()
     # set user agent
@@ -1385,8 +1396,13 @@ if __name__ == "__main__":
     except:
         print("No custom user-agent found; using default")
     # end set user agent
-
-    app.setApplicationName("FreakyBrowse.2.4")
+    try:
+        if (appname != args.name):
+            app.setApplicationName(appname)
+            print(appname)
+    except:
+        app.setApplicationName(appname)
+        print(appname)
     app.setWindowIcon(QIcon("logo_new.ico")) 
     
     window = MainWindow()
