@@ -30,13 +30,21 @@ import os
 from pypresence import Presence
 from pypresence.exceptions import InvalidPipe
 import argparse
+from pysafebrowsing import SafeBrowsing
+import json
+
 parser = argparse.ArgumentParser(description='Parser for FreakyBrowse')
 parser.add_argument('--url', action="store", dest='url', default="https://search.freakybob.site")
+
+sb_key = "no key"
 
 # change this when new version release - wish
 appname = "FreakyBrowse 2.4"
 app = QApplication(sys.argv)
-
+try:
+    sBrowsing = SafeBrowsing(sb_key) # type: ignore
+except:
+    print("debug start sbrowsing 404")
 parser.add_argument('--name', action="store", dest='name', default="FreakyBrowse 2.4")
 try:
     args = parser.parse_args()
@@ -514,6 +522,21 @@ class MainWindow(QMainWindow):
     # navigating to urls greg
     def navigate_to_url(self):
         q = QUrl(self.urlbar.text())
+        print(self.urlbar.text().strip("PyQt6.QtCore.QUrl()"))
+        # if (sb_key != "no key"):
+        #     if ("search.freakybob.site" in self.urlbar.text().strip("PyQt6.QtCore.QUrl()")):
+        #         self.urlbar.text().strip("#gsc.tab=0")
+        #     if (self.urlbar.text().strip("PyQt6.QtCore.QUrl()").endswith("/")):
+        #         safeResult = sBrowsing.lookup_urls(self.urlbar.text().strip("PyQt6.QtCore.QUrl()"))
+        #         print(safeResult)
+        #         data = json.load(safeResult)
+        #         print(data)
+        #     else:
+        #         print(self.urlbar.text().strip("PyQt6.QtCore.QUrl()") + "/")
+        #         safeResult = sBrowsing.lookup_urls(self.urlbar.text().strip("PyQt6.QtCore.QUrl()") + "/")
+        #         print(safeResult)
+        #         data = json.load(safeResult)
+        #         print(data)
         if q.scheme() == "":
             q.setScheme("https")
         if q.isValid():
@@ -525,6 +548,12 @@ class MainWindow(QMainWindow):
                     QMessageBox.warning(self, "Invalid URL", "Unknown freak:/ URL")
         
             else:
+                # if (sb_key != "no key"):
+                #     if ("true" in data['threats']):
+                #         print(q + "is likely unsafe! (Google Safe Browsing)")
+                #         QMessageBox.warning(self, "Site Unsafe", "The website you are navigating to is marked as unsafe by Google Safe Browsing and we have stopped the connection.\n Issues? Remove your API key from FreakyBrowse.")
+                #     else:
+                #         self.current_browser().setUrl(q)
                 self.current_browser().setUrl(q)
             
             if haveDiscord == "True" and self.rpc_enabled:
@@ -1011,6 +1040,33 @@ class MainWindow(QMainWindow):
 
         useragent_dialog.setLayout(layout)
         useragent_dialog.exec()
+    # api stuff
+    def api_settings(self):
+        api_dialog = QDialog(self)
+        api_dialog.setWindowTitle("[API] Key Settings")
+        api_dialog.setFixedSize(400, 230)
+        layout = QVBoxLayout()
+        layout.setSpacing(10)
+        layout.setContentsMargins(20, 20, 20, 20)
+        warning_label = QLabel("If you do not enter an API key, these services will be disabled.")
+        layout.addWidget(warning_label)
+        sb_label = QLabel("Enter a Google Safe Browsing API key:")
+        layout.addWidget(sb_label)
+        sb_key_input = QLineEdit()
+        layout.addWidget(sb_key_input)
+        submit_button = QPushButton("Add/Update Google Safe Browsing key")
+        layout.addWidget(submit_button)
+        close_button = QPushButton("Close")
+        layout.addWidget(close_button)
+        close_button.clicked.connect(api_dialog.accept)
+        def sb_key_change():
+            global sb_key
+            sb_key = sb_key_input.text().strip()
+            global sBrowsing
+            sBrowsing = SafeBrowsing(sb_key)
+        submit_button.clicked.connect(sb_key_change)
+        api_dialog.setLayout(layout)
+        api_dialog.exec()
     # im extension yabbie dee yabbie die
     def extension_settings(self):
         extensions_dialog = QDialog(self)
@@ -1135,7 +1191,8 @@ class MainWindow(QMainWindow):
             ("Info", self.open_info_button),
             ("Shortcut", self.shortcut_settings),
             ("[Guard] UserAgent", self.useragent_settings),
-            ("[Beta] Extensions", self.extension_settings)
+            ("[Beta] Extensions", self.extension_settings),
+            ("[API] Key Settings", self.api_settings)
         ]
 
         for label, func in buttons:
