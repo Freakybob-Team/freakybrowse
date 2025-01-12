@@ -531,7 +531,7 @@ class MainWindow(QMainWindow):
                 data = json.load(safeResult)
                 print(data)
             except:
-                QMessageBox.warning(self, "Safe Browsing Error", "This URL was unable to be checked by Safe Browsing.")
+                QMessageBox.warning(self, "Safe Browsing Error", "This URL was unable to be checked by Safe Browsing. Try restarting FreakyBrowse or updating to a new version.")
                 self.current_browser().setUrl(QUrl(self.HOME_URL))
                 error = "True"
         if q.scheme() == "":
