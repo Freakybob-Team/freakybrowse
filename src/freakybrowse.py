@@ -1011,6 +1011,28 @@ class MainWindow(QMainWindow):
 
         useragent_dialog.setLayout(layout)
         useragent_dialog.exec()
+    # im extension yabbie dee yabbie die
+    def extension_settings(self):
+        extensions_dialog = QDialog(self)
+        extensions_dialog.setWindowTitle("[Beta] Extensions")
+        extensions_dialog.setFixedSize(400, 230)
+        layout = QVBoxLayout()
+        layout.setSpacing(10)
+        layout.setContentsMargins(20, 20, 20, 20)
+        warning_label = QLabel("WARNING: This feature is in dev! It does NOT work, and is just UI.")
+        layout.addWidget(warning_label)
+        extension_button = QPushButton("Select Extension Folder")
+        layout.addWidget(extension_button)   
+        def filepicker():
+            file_picker, _ = QFileDialog.getOpenFileName(self, "Select Extension Folder", "")
+        extension_button.clicked.connect(filepicker)
+        submit_button = QPushButton("Load Extension")
+        layout.addWidget(submit_button)
+        close_button = QPushButton("Close")
+        layout.addWidget(close_button)
+        close_button.clicked.connect(extensions_dialog.accept)
+        extensions_dialog.setLayout(layout)
+        extensions_dialog.exec()
     # I wonder what /j shortcut stuff
     def shortcut_settings(self):
         shortcut_dialog = QDialog(self)
@@ -1112,7 +1134,8 @@ class MainWindow(QMainWindow):
             ("Browser Settings", self.open_browser_settings),
             ("Info", self.open_info_button),
             ("Shortcut", self.shortcut_settings),
-            ("[Guard] UserAgent", self.useragent_settings)
+            ("[Guard] UserAgent", self.useragent_settings),
+            ("[Beta] Extensions", self.extension_settings)
         ]
 
         for label, func in buttons:
