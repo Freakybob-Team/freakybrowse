@@ -522,21 +522,18 @@ class MainWindow(QMainWindow):
     # navigating to urls greg
     def navigate_to_url(self):
         q = QUrl(self.urlbar.text())
-        print(self.urlbar.text().strip("PyQt6.QtCore.QUrl()"))
-        # if (sb_key != "no key"):
-        #     if ("search.freakybob.site" in self.urlbar.text().strip("PyQt6.QtCore.QUrl()")):
-        #         self.urlbar.text().strip("#gsc.tab=0")
-        #     if (self.urlbar.text().strip("PyQt6.QtCore.QUrl()").endswith("/")):
-        #         safeResult = sBrowsing.lookup_urls(self.urlbar.text().strip("PyQt6.QtCore.QUrl()"))
-        #         print(safeResult)
-        #         data = json.load(safeResult)
-        #         print(data)
-        #     else:
-        #         print(self.urlbar.text().strip("PyQt6.QtCore.QUrl()") + "/")
-        #         safeResult = sBrowsing.lookup_urls(self.urlbar.text().strip("PyQt6.QtCore.QUrl()") + "/")
-        #         print(safeResult)
-        #         data = json.load(safeResult)
-        #         print(data)
+        if (sb_key != "no key"):
+            try:
+                cleanedUrl = self.urlbar.text().strip("PyQt6.QtCore.QUrl()")
+                print(cleanedUrl)
+                safeResult = sBrowsing.lookup_urls(cleanedUrl)
+                print(safeResult)
+                data = json.load(safeResult)
+                print(data)
+            except:
+                QMessageBox.warning(self, "Safe Browsing Error", "This URL was unable to be checked by Safe Browsing.")
+                self.current_browser().setUrl(QUrl(self.HOME_URL))
+                error = "True"
         if q.scheme() == "":
             q.setScheme("https")
         if q.isValid():
@@ -548,13 +545,14 @@ class MainWindow(QMainWindow):
                     QMessageBox.warning(self, "Invalid URL", "Unknown freak:/ URL")
         
             else:
-                # if (sb_key != "no key"):
-                #     if ("true" in data['threats']):
-                #         print(q + "is likely unsafe! (Google Safe Browsing)")
-                #         QMessageBox.warning(self, "Site Unsafe", "The website you are navigating to is marked as unsafe by Google Safe Browsing and we have stopped the connection.\n Issues? Remove your API key from FreakyBrowse.")
-                #     else:
-                #         self.current_browser().setUrl(q)
-                self.current_browser().setUrl(q)
+                if (error != "True"):
+                    if (sb_key != "no key"):
+                        if ("true" in data['threats']):
+                            print(q + "is likely unsafe! (Google Safe Browsing)")
+                            QMessageBox.warning(self, "Site Unsafe", "The website you are navigating to is marked as unsafe by Google Safe Browsing and we have stopped the connection.\n Issues? Remove your API key from FreakyBrowse.")
+                        else:
+                            self.current_browser().setUrl(q)
+                    self.current_browser().setUrl(q)
             
             if haveDiscord == "True" and self.rpc_enabled:
                 try:
