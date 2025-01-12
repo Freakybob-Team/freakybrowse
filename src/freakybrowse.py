@@ -545,6 +545,7 @@ class MainWindow(QMainWindow):
                     QMessageBox.warning(self, "Invalid URL", "Unknown freak:/ URL")
         
             else:
+                error = "True"
                 if (error != "True"):
                     if (sb_key != "no key"):
                         if ("true" in data['threats']):
