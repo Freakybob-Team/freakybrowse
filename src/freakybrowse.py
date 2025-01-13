@@ -8,6 +8,7 @@
 # Known bugs:
 # - Closing the tab before a new one will cause an about:blank page
 # - oceanic_blue_mode does not work
+# - api
 
 from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
@@ -37,6 +38,15 @@ parser = argparse.ArgumentParser(description='Parser for FreakyBrowse')
 parser.add_argument('--url', action="store", dest='url', default="https://search.freakybob.site")
 
 sb_key = "no key"
+if sb_key == "no key":
+    print("Warning: No Safe Browsing API key provided. Safe Browsing features will be disabled.")
+else:
+    try:
+        sBrowsing = SafeBrowsing(sb_key)
+        print("Safe Browsing initialized successfully.")
+    except Exception as e:
+        print(f"Error initializing Safe Browsing: {e}")
+        sBrowsing = None
 
 # change this when new version release - wish
 appname = "FreakyBrowse 2.4"
@@ -521,21 +531,25 @@ class MainWindow(QMainWindow):
 
     # navigating to urls greg
     def navigate_to_url(self):
+        # help
         q = QUrl(self.urlbar.text())
-        if (sb_key != "no key"):
+        if sb_key != "no key":
             try:
                 cleanedUrl = self.urlbar.text().strip("PyQt6.QtCore.QUrl()")
-                print(cleanedUrl)
                 safeResult = sBrowsing.lookup_urls(cleanedUrl)
-                print(safeResult)
-                data = json.load(safeResult)
-                print(data)
+                data = json.loads(safeResult)
+                if "true" in data['threats']:
+                    QMessageBox.warning(self, "Site Unsafe", "The website you are navigating to is marked as unsafe by Google Safe Browsing and we have stopped the connection.\nIssues? Remove your API key from FreakyBrowse.")
+                    self.current_browser().setUrl(QUrl(self.HOME_URL))
+                    return
             except:
                 QMessageBox.warning(self, "Safe Browsing Error", "This URL was unable to be checked by Safe Browsing. Try restarting FreakyBrowse or updating to a new version.")
                 self.current_browser().setUrl(QUrl(self.HOME_URL))
-                error = "True"
+                return
+
         if q.scheme() == "":
             q.setScheme("https")
+
         if q.isValid():
             if q.scheme() == "freak":
                 freak_path = q.path().lstrip('/')
@@ -543,22 +557,13 @@ class MainWindow(QMainWindow):
                     self.current_browser().load(QUrl("https://freakybrowse.freakybob.site/freak/changelog"))
                 else:
                     QMessageBox.warning(self, "Invalid URL", "Unknown freak:/ URL")
-        
             else:
-                error = "True"
-                if (error != "True"):
-                    if (sb_key != "no key"):
-                        if ("true" in data['threats']):
-                            print(q + "is likely unsafe! (Google Safe Browsing)")
-                            QMessageBox.warning(self, "Site Unsafe", "The website you are navigating to is marked as unsafe by Google Safe Browsing and we have stopped the connection.\n Issues? Remove your API key from FreakyBrowse.")
-                        else:
-                            self.current_browser().setUrl(q)
-                    self.current_browser().setUrl(q)
-            
+                self.current_browser().setUrl(q)
+
             if haveDiscord == "True" and self.rpc_enabled:
                 try:
                     RPC.update(
-                        state="Looking at " + str( self.urlbar.text()),
+                        state="Looking at " + str(self.urlbar.text()),
                         buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
                         large_image="icon.png",
                         large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
@@ -566,18 +571,11 @@ class MainWindow(QMainWindow):
                     print("Updated RPC! (Navigated to URL)")
                 except Exception as e:
                     print(f"Error updating RPC: {e}")
-                    if "style" in RPC.state:
-                        RPC.update(
-                            details="Browsing the interwebs!",
-                            buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
-                            large_image="icon.png",
-                            large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
-                        )
-                        # tried showing the URL but it also showed the style, if we can fix that this would be fire fr
-                        # HOLY CRAP I FIXED IT - wish
-                        # gg !! - greg
         else:
             QMessageBox.warning(self, "Invalid URL", "Please enter a valid URL.")
+
+
+
             # holy fuck, this is all the random ass rpc
         if haveDiscord == "True" and self.rpc_enabled and "chrome" in str(self.urlbar.text()):
             try:
@@ -1042,28 +1040,52 @@ class MainWindow(QMainWindow):
     # api stuff
     def api_settings(self):
         api_dialog = QDialog(self)
-        api_dialog.setWindowTitle("[API] Key Settings")
+        api_dialog.setWindowTitle("[API] (VERY BROKEN) Key Settings")
         api_dialog.setFixedSize(400, 230)
         layout = QVBoxLayout()
         layout.setSpacing(10)
         layout.setContentsMargins(20, 20, 20, 20)
+
         warning_label = QLabel("If you do not enter an API key, these services will be disabled.")
         layout.addWidget(warning_label)
+
         sb_label = QLabel("Enter a Google Safe Browsing API key:")
         layout.addWidget(sb_label)
+
         sb_key_input = QLineEdit()
         layout.addWidget(sb_key_input)
+
+        key_file = "api_key.json"
+
+        if os.path.exists(key_file):
+            with open(key_file, "r") as file:
+                saved_key = json.load(file).get("sb_key", "")
+            if saved_key:
+                QMessageBox.information(api_dialog, "Existing Key", "btw, you already have one connected. just so you know lol")
+                sb_key_input.setText(saved_key)
+
         submit_button = QPushButton("Add/Update Google Safe Browsing key")
         layout.addWidget(submit_button)
+
         close_button = QPushButton("Close")
         layout.addWidget(close_button)
+
         close_button.clicked.connect(api_dialog.accept)
+
         def sb_key_change():
             global sb_key
             sb_key = sb_key_input.text().strip()
-            global sBrowsing
-            sBrowsing = SafeBrowsing(sb_key)
+            if not sb_key:
+                QMessageBox.warning(api_dialog, "Invalid Key", "You must enter a valid API key to enable the services.")
+            else:
+                self.sb_key = sb_key
+                self.sBrowsing = SafeBrowsing(self.sb_key)
+                with open(key_file, "w") as file:
+                    json.dump({"sb_key": sb_key}, file)
+                QMessageBox.information(api_dialog, "API Key Updated", "Google Safe Browsing API key has been successfully updated and saved.")
+
         submit_button.clicked.connect(sb_key_change)
+
         api_dialog.setLayout(layout)
         api_dialog.exec()
     # im extension yabbie dee yabbie die
@@ -1168,7 +1190,7 @@ class MainWindow(QMainWindow):
     def open_settings(self):
         settings_dialog = QDialog(self)
         settings_dialog.setWindowTitle("Settings")
-        settings_dialog.setFixedSize(490, 370)
+        settings_dialog.setFixedSize(600, 470)
         settings_dialog.setStyleSheet("""
             background-color: #a3d8f4;
             border-radius: 10px;
