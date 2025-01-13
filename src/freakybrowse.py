@@ -38,7 +38,13 @@ import subprocess
 parser = argparse.ArgumentParser(description='Parser for FreakyBrowse')
 parser.add_argument('--url', action="store", dest='url', default="https://search.freakybob.site")
 
-sb_key = "no key"
+key_file = "api_key.json"
+sb_key = None
+
+if (os.path.exists(key_file)):
+    print("Safe Browsing API key found!")
+else:
+    sb_key = "no key"
 if sb_key == "no key":
     print("Warning: No Safe Browsing API key provided. Safe Browsing features will be disabled.")
 else:
@@ -1059,8 +1065,6 @@ class MainWindow(QMainWindow):
         sb_key_input = QLineEdit()
         layout.addWidget(sb_key_input)
 
-        key_file = "api_key.json"
-
         if os.path.exists(key_file):
             with open(key_file, "r") as file:
                 saved_key = json.load(file).get("sb_key", "")
@@ -1070,6 +1074,9 @@ class MainWindow(QMainWindow):
 
         submit_button = QPushButton("Add/Update Google Safe Browsing key")
         layout.addWidget(submit_button)
+
+        delete_button = QPushButton("Delete API key")
+        layout.addWidget(delete_button)
 
         close_button = QPushButton("Close")
         layout.addWidget(close_button)
@@ -1090,7 +1097,13 @@ class MainWindow(QMainWindow):
                 print("executed command: safebrowsing config --key " + sb_key)
                 QMessageBox.information(api_dialog, "API Key Updated", "Google Safe Browsing API key has been successfully updated and saved.")
 
+        def deleteSBKey():
+            os.remove(key_file)
+            QMessageBox.warning(api_dialog, "Key Deleted", "Google Safe Browsing key deleted. Please restart FreakyBrowse.")
+            raise SystemExit
+
         submit_button.clicked.connect(sb_key_change)
+        delete_button.clicked.connect(deleteSBKey)
 
         api_dialog.setLayout(layout)
         api_dialog.exec()
