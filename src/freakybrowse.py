@@ -33,6 +33,7 @@ from pypresence.exceptions import InvalidPipe
 import argparse
 from pysafebrowsing import SafeBrowsing
 import json
+import subprocess
 
 parser = argparse.ArgumentParser(description='Parser for FreakyBrowse')
 parser.add_argument('--url', action="store", dest='url', default="https://search.freakybob.site")
@@ -536,12 +537,15 @@ class MainWindow(QMainWindow):
         if sb_key != "no key":
             try:
                 cleanedUrl = self.urlbar.text().strip("PyQt6.QtCore.QUrl()")
-                safeResult = sBrowsing.lookup_urls(cleanedUrl)
-                data = json.loads(safeResult)
-                if "true" in data['threats']:
+                safeResult = subprocess.getoutput("safebrowsing url " + cleanedUrl)
+                print(safeResult)
+                print("executed safebrowsing url " + cleanedUrl)
+                if "Malicious: Yes" in safeResult:
                     QMessageBox.warning(self, "Site Unsafe", "The website you are navigating to is marked as unsafe by Google Safe Browsing and we have stopped the connection.\nIssues? Remove your API key from FreakyBrowse.")
                     self.current_browser().setUrl(QUrl(self.HOME_URL))
                     return
+                else:
+                    print(cleanedUrl + " is not malicious!")
             except:
                 QMessageBox.warning(self, "Safe Browsing Error", "This URL was unable to be checked by Safe Browsing. Try restarting FreakyBrowse or updating to a new version.")
                 self.current_browser().setUrl(QUrl(self.HOME_URL))
@@ -1040,7 +1044,7 @@ class MainWindow(QMainWindow):
     # api stuff
     def api_settings(self):
         api_dialog = QDialog(self)
-        api_dialog.setWindowTitle("[API] (VERY BROKEN) Key Settings")
+        api_dialog.setWindowTitle("[API] Key Settings")
         api_dialog.setFixedSize(400, 230)
         layout = QVBoxLayout()
         layout.setSpacing(10)
@@ -1082,6 +1086,8 @@ class MainWindow(QMainWindow):
                 self.sBrowsing = SafeBrowsing(self.sb_key)
                 with open(key_file, "w") as file:
                     json.dump({"sb_key": sb_key}, file)
+                os.system("safebrowsing config --key " + sb_key)
+                print("executed command: safebrowsing config --key " + sb_key)
                 QMessageBox.information(api_dialog, "API Key Updated", "Google Safe Browsing API key has been successfully updated and saved.")
 
         submit_button.clicked.connect(sb_key_change)
