@@ -543,6 +543,8 @@ class MainWindow(QMainWindow):
         if sb_key != "no key":
             try:
                 cleanedUrl = self.urlbar.text().strip("PyQt6.QtCore.QUrl()")
+                if (cleanedUrl.endswith(".htm")):
+                    cleanedUrl = cleanedUrl + "l"
                 safeResult = subprocess.getoutput("safebrowsing url " + cleanedUrl)
                 print(safeResult)
                 print("executed safebrowsing url " + cleanedUrl)
