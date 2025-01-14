@@ -549,7 +549,7 @@ class MainWindow(QMainWindow):
                 print(safeResult)
                 print("executed safebrowsing url " + cleanedUrl)
                 if "Malicious: Yes" in safeResult:
-                    QMessageBox.warning(self, "Site Unsafe", "The website you are navigating to is marked as unsafe by Google Safe Browsing and we have stopped the connection.\nIssues? Remove your API key from FreakyBrowse.")
+                    QMessageBox.warning(self, "Site Unsafe", "The website you are navigating to is marked as unsafe by Google Safe Browsing and we have stopped the connection.\n Details: " + safeResult.strip("Malicious: Yes\nPlatforms: ANY_PLATFORM\n Threats: ") +"\nIssues? Remove your API key from FreakyBrowse.")
                     self.current_browser().setUrl(QUrl(self.HOME_URL))
                     return
                 else:
