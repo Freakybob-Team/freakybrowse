@@ -549,7 +549,17 @@ class MainWindow(QMainWindow):
                 print(safeResult)
                 print("executed safebrowsing url " + cleanedUrl)
                 if "Malicious: Yes" in safeResult:
-                    QMessageBox.warning(self, "Site Unsafe", "The website you are navigating to is marked as unsafe by Google Safe Browsing and we have stopped the connection.\n Details: " + safeResult.strip("Malicious: Yes\nPlatforms: ANY_PLATFORM\n Threats: ") +"\nIssues? Remove your API key from FreakyBrowse.")
+                    unsafeCause = safeResult.strip("Malicious: Yes\nPlatforms: ANY_PLATFORM\n Threats: ")
+                    hUnsafeCause = "FreakyBrowse was unable to find a human-readable warning. Code: " + unsafeCause
+                    if (unsafeCause == "SOCIAL_ENGINEERING"):
+                        hUnsafeCause = "This website may try to trick you into giving away gift cards or other information. Code: " + unsafeCause
+                    elif (unsafeCause == "UNWANTED_SOFTWARE"):
+                        hUnsafeCause = "This website may try to get you to install software you did not intend/want to install. Code: " + unsafeCause
+                    elif (unsafeCause == "WARE"):
+                        hUnsafeCause = "This website may try to get you to install malware or other types of bad programs. (ex: Adware, Ransomware, Spyware) Code: " + unsafeCause
+                    elif (unsafeCause == "MALWARE"):
+                        hUnsafeCause = "This website may try to get you to install malware or other types of bad programs. (ex: Adware, Ransomware, Spyware) Code: " + unsafeCause
+                    QMessageBox.warning(self, "Site Unsafe", "The website you are navigating to is marked as unsafe by Google Safe Browsing and we have stopped the connection.\nDetails: " + hUnsafeCause +"\nIssues? Remove your API key from FreakyBrowse.")
                     self.current_browser().setUrl(QUrl(self.HOME_URL))
                     return
                 else:
