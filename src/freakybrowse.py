@@ -1144,7 +1144,7 @@ class MainWindow(QMainWindow):
     # I wonder what /j shortcut stuff
     def shortcut_settings(self):
         shortcut_dialog = QDialog(self)
-        shortcut_dialog.setWindowTitle("Shortcut stuff")
+        shortcut_dialog.setWindowTitle("Shortcuts")
         shortcut_dialog.setFixedSize(400, 230)
 
         layout = QVBoxLayout()
@@ -1170,6 +1170,11 @@ class MainWindow(QMainWindow):
         def create_shortcut():
             url = url_input.text().strip()
             name = name_input.text().strip()
+            shortcut_folder = "Shortcuts"
+
+            if os.path.exists(shortcut_folder + "/" + name + ".bat"):
+                QMessageBox.warning(self, "Issue creating shortcut", "Shortcut with the same name already exists.")
+                return
 
             if not url:
                 QMessageBox.warning(self, "Warning", "vro. Put the url :sob:")
@@ -1183,7 +1188,6 @@ class MainWindow(QMainWindow):
                 QMessageBox.warning(self, "Warning", "URL must contain a '.' (e.g., .com, .net) !")
                 return
 
-            shortcut_folder = "Shortcuts"
             if not os.path.exists(shortcut_folder):
                 os.makedirs(shortcut_folder)
 
