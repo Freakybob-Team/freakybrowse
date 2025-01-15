@@ -3,10 +3,12 @@ import requests
 
 def versions_menu():
     print("These are all of the versions that you can install!!! You can also use this to update!")
-    print("2.3\n2.2\n2.1\n2\n1.9\n1.8\n1.7\n1.6\n1.5\n1.4\n1.3\n1.2\n1.1\n1.0\n")
+    print("2.4.1\n2.4\n2.3\n2.2\n2.1\n2\n1.9\n1.8\n1.7\n1.6\n1.5\n1.4\n1.3\n1.2\n1.1\n1.0\n")
     choice = input()
 
     urls = {
+        "2.4.1": "https://github.com/Freakybob-Team/freakybrowse/releases/download/v2.4.1/FreakyBrowse.2.4.1.zip",
+        "2.4": "https://github.com/Freakybob-Team/freakybrowse/releases/download/v2.4/FreakyBrowse.2.4.zip",
         "2.3": "https://github.com/Freakybob-Team/freakybrowse/releases/download/V.2.3/FreakyBrowse.2.3.zip",
         "2.2": "https://github.com/Freakybob-Team/freakybrowse/releases/download/v2.2/2.2.zip",
         "2.1": "https://github.com/Freakybob-Team/freakybrowse/releases/download/V.2.1/2.1.zip",
