@@ -40,11 +40,27 @@
         <h3>Secure. This is only stored in your browser and api_key.json</h3>
         <form>
             <input type="text" id="key" name="key">
-            <input type="submit" value="Submit" id="submit">
+            <input type="submit" value="Submit" id="submit" onclick="getApi(); return false">
         </form>
         <footer><small>Freakybob Team is not associated with Google, Google Safe Browsing, or any other entities mentioned. Any trademarked products mentioned are owned by their companies, not us. Emojis are using your Emoji pack, and are not owned by us.</small></footer>
     </div>
     <!-- this'll have to interact with freakybrowse somehow, idk tho /shrug 
     i def feel like its possible -->
+    <!-- ok so it is possible i just have to rewrite this website in python -->
+    <script>
+    function getApi() {
+        const link = document.createElement("a");
+        const api = document.getElementById("key").value
+
+        const file = new Blob([api], { type: 'text/plain' });
+
+        link.href = URL.createObjectURL(file);
+
+        link.download = "auth.txt";
+
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+    </script>
 </body>
 </html>
