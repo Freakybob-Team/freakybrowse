@@ -2,7 +2,7 @@ import requests
 from urllib.request import urlretrieve
 from urllib.error import URLError, HTTPError
 
-current_url = "https://github.com/Freakybob-Team/freakybrowse/releases/download/v2.4.1/FreakyBrowse.2.4.1.zip" # change this upon release
+current_url = "https://github.com/Freakybob-Team/freakybrowse/releases/download/v2.4.2/FreakyBrowse.2.4.2.zip" # change this upon release
 url = "https://github.com/Freakybob-Team/freakybrowse/blob/main/newest_release.txt?raw=true"
 
 try:
