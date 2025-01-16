@@ -40,6 +40,7 @@ parser.add_argument('--url', action="store", dest='url', default="https://search
 
 key_file = "api_key.json"
 sb_key = None
+downloadIsCompleted = "False"
 
 if (os.path.exists(key_file)):
     print("Safe Browsing API key found!")
@@ -162,7 +163,11 @@ class DownloadManagerWindow(QDialog):
         # a label to show the status
         self.status_label = QLabel("Status:")
         layout.addWidget(self.status_label)
-
+        # inherit the URL
+        # try:
+        #     self.url_input.setText(iUrl)
+        # except:
+        #     return
     def update_progress(self, progress):
         # updaye the progress bar
         self.progress_bar.setValue(progress)
@@ -170,6 +175,7 @@ class DownloadManagerWindow(QDialog):
     def download_complete(self, file_name):
         # show the download complete message gregd
         self.status_label.setText(f"Download complete: {file_name}")
+        downloadIsCompleted = "True"
         self.progress_bar.setValue(100)
 
     def download_error(self, error_message):
@@ -540,9 +546,26 @@ class MainWindow(QMainWindow):
     def navigate_to_url(self):
         # help
         q = QUrl(self.urlbar.text())
+        cleanedUrl = self.urlbar.text().strip("PyQt6.QtCore.QUrl()")
+
+# this currently IGNORES Safe Browsing preferences, add LATER
+
+#         if cleanedUrl.endswith(".png"):
+#             questionUrl = QMessageBox.question(self, "Alert", "This is a downloadable URL! Do you want to download " + cleanedUrl + "?\n We are not liable for any downloads FreakyBrowse is used for.", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, 
+# QMessageBox.StandardButton.No)
+#             if (questionUrl == QMessageBox.StandardButton.No):
+#                 return
+#             elif (questionUrl == QMessageBox.StandardButton.Yes):
+#                 global iUrl
+#                 iUrl = cleanedUrl
+#                 print("Created Inherit URL " + str(iUrl))
+#                 self.open_download_manager()
+#                 print("Opened Download Manager")
+#                 if (downloadIsCompleted == "True"):
+#                     iUrl = None
+
         if sb_key != "no key":
             try:
-                cleanedUrl = self.urlbar.text().strip("PyQt6.QtCore.QUrl()")
                 if (cleanedUrl.endswith(".htm")):
                     cleanedUrl = cleanedUrl + "l"
                 safeResult = subprocess.getoutput("safebrowsing url " + cleanedUrl)
