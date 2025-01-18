@@ -1124,7 +1124,7 @@ class MainWindow(QMainWindow):
         layout.setSpacing(10)
         layout.setContentsMargins(20, 20, 20, 20)
 
-        warning_label = QLabel("If you do not enter an API key, these services will be disabled.")
+        warning_label = QLabel("If you do not enter an API key, these services will be disabled.\nYou MUST add both keys at once.")
         layout.addWidget(warning_label)
 
         sb_label = QLabel("Enter a Google Safe Browsing API key:")
@@ -1169,7 +1169,7 @@ class MainWindow(QMainWindow):
                 self.sb_key = sb_key
                 self.sBrowsing = SafeBrowsing(self.sb_key)
                 with open(key_file, "w") as file:
-                    json.dump({"sb_key": sb_key}, file)
+                    json.dump({"news_key": news_key, "sb_key": sb_key}, file)
                 os.system("safebrowsing config --key " + sb_key)
                 print("executed command: safebrowsing config --key " + sb_key)
                 QMessageBox.information(api_dialog, "API Key Updated", "Your Google Safe Browsing API key has been successfully updated and saved.")
@@ -1182,7 +1182,7 @@ class MainWindow(QMainWindow):
             else:
                 self.news_key = news_key
                 with open(key_file, "w") as file:
-                    json.dump({"news_key": news_key}, file)
+                    json.dump({"news_key": news_key, "sb_key": sb_key}, file)
                 QMessageBox.information(api_dialog, "API Key Updated", "Your NewsAPI(.org) API key has been successfully updated and saved.")
 
         def deleteSBKey():
