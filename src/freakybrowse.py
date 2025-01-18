@@ -397,10 +397,10 @@ class MainWindow(QMainWindow):
 
         news_button = QAction(QIcon(resource_path("assets/icons/news.png")), "News (NewsAPI.org)", self)
         news_button.setStatusTip("Read news, right here, right now! (NewsAPI key required)")
-        #TODO: Add news button function
-        def news_button_error():
-            QMessageBox.warning(self, "Not Implemented", "News features have not been implemented (yet!)\n - FreakyBrowse Staff")
-        news_button.triggered.connect(news_button_error)
+        # Added the news popup, the error is useless
+        # def news_button_error():
+        #     QMessageBox.warning(self, "Not Implemented", "News features have not been implemented (yet!)\n - FreakyBrowse Staff")
+        news_button.triggered.connect(self.news)
         self.navtb.addAction(news_button)
 
         # opens the notes stuff
@@ -1092,6 +1092,20 @@ class MainWindow(QMainWindow):
 
         useragent_dialog.setLayout(layout)
         useragent_dialog.exec()
+    def news(self):
+        news_dialog = QDialog(self)
+        news_dialog.setWindowTitle("Catch⬆")
+        news_dialog.setFixedSize(400, 330)
+        layout = QVBoxLayout()
+        layout.setSpacing(10)
+        layout.setContentsMargins(20, 20, 20, 20)
+
+        close_button = QPushButton("Exit Catch⬆")
+
+        layout.addWidget(close_button)
+        close_button.clicked.connect(news_dialog.accept)
+        news_dialog.setLayout(layout)
+        news_dialog.exec()
     # api stuff
     def api_settings(self):
         api_dialog = QDialog(self)
