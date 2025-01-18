@@ -64,7 +64,7 @@ try:
     sBrowsing = SafeBrowsing(sb_key) # type: ignore
 except:
     print("debug start sbrowsing 404")
-parser.add_argument('--name', action="store", dest='name', default="FreakyBrowse 2.4")
+parser.add_argument('--name', action="store", dest='name', default=appname)
 try:
     args = parser.parse_args()
 except:
