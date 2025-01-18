@@ -1,9 +1,9 @@
 # FreakyBrowse!
-This is a browser completly written in Python! It has many features, such as:
+This is a browser completely written in Python! It has many features, such as:
 - Notes
 - Downloads
-- PikiDiary button
-- More!
+- Themes
+and many more!
 
 # How to run it 
 To run FreakyBrowse, just run the command `py freakybrowse.py` inside the directory where freakybrowse.py is located.
