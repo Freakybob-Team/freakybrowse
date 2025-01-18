@@ -398,7 +398,9 @@ class MainWindow(QMainWindow):
         news_button = QAction(QIcon(resource_path("assets/icons/news.png")), "News (NewsAPI.org)", self)
         news_button.setStatusTip("Read news, right here, right now! (NewsAPI key required)")
         #TODO: Add news button function
-        #news_button.triggered.connect(self.)
+        def news_button_error():
+            QMessageBox.warning(self, "Not Implemented", "News features have not been implemented (yet!)\n - FreakyBrowse Staff")
+        news_button.triggered.connect(news_button_error)
         self.navtb.addAction(news_button)
 
         # opens the notes stuff
