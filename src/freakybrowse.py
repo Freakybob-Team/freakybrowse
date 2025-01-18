@@ -1099,8 +1099,17 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout()
         layout.setSpacing(10)
         layout.setContentsMargins(20, 20, 20, 20)
+        
+        def getNews():
+            try:
+                newsData = json.load("https://newsapi.org/v2/everything&sortBy=publishedAt&apiKey=" + key_file['news_key'])
+            except:
+                QMessageBox.critical(self, "Issue Fetching API", "We were unable to fetch from https://newsapi.org/v2/everything&sortBy=publishedAt&apiKey=API_KEY_CENSORED.\nTry adding a NewsAPI key, if you haven't already.\nYou may continue to open Catch⬆, but services may be impacted.")
+                
 
         close_button = QPushButton("Exit Catch⬆")
+
+        getNews()
 
         layout.addWidget(close_button)
         close_button.clicked.connect(news_dialog.accept)
