@@ -1092,110 +1092,109 @@ class MainWindow(QMainWindow):
 
         useragent_dialog.setLayout(layout)
         useragent_dialog.exec()
+    # neews
     def news(self):
         news_dialog = QDialog(self)
         news_dialog.setWindowTitle("Catch⬆")
-        news_dialog.setFixedSize(400, 330)
+        news_dialog.setFixedSize(900, 600)
+
+        web_view = QWebEngineView(news_dialog)
+
+
+        web_view.setUrl(QUrl.fromLocalFile("/pages/news.html"))
+
         layout = QVBoxLayout()
-        layout.setSpacing(10)
-        layout.setContentsMargins(20, 20, 20, 20)
-        
-        def getNews():
-            try:
-                newsData = json.load("https://newsapi.org/v2/everything&sortBy=publishedAt&apiKey=" + key_file['news_key'])
-            except:
-                QMessageBox.critical(self, "Issue Fetching API", "We were unable to fetch from https://newsapi.org/v2/everything&sortBy=publishedAt&apiKey=API_KEY_CENSORED.\nTry adding a NewsAPI key, if you haven't already.\nYou may continue to open Catch⬆, but services may be impacted.")
-                
-
-        close_button = QPushButton("Exit Catch⬆")
-
-        getNews()
-
-        layout.addWidget(close_button)
-        close_button.clicked.connect(news_dialog.accept)
+        layout.addWidget(web_view)
         news_dialog.setLayout(layout)
+
         news_dialog.exec()
+
     # api stuff
     def api_settings(self):
         api_dialog = QDialog(self)
-        api_dialog.setWindowTitle("[API] Key Settings")
-        api_dialog.setFixedSize(400, 330)
-        layout = QVBoxLayout()
-        layout.setSpacing(10)
-        layout.setContentsMargins(20, 20, 20, 20)
+        api_dialog.setWindowTitle("API Key Settings")
+        api_dialog.setFixedSize(400, 350)
 
-        warning_label = QLabel("If you do not enter an API key, these services will be disabled.\nYou MUST add both keys at once.")
-        layout.addWidget(warning_label)
+        main_layout = QVBoxLayout()
+        main_layout.setSpacing(15)
+        main_layout.setContentsMargins(20, 20, 20, 20)
 
-        sb_label = QLabel("Enter a Google Safe Browsing API key:")
-        layout.addWidget(sb_label)
+        warning_label = QLabel(
+            "If you do not enter an API key, these services will be disabled.\n"
+        )
+        warning_label.setWordWrap(True)
+        warning_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        main_layout.addWidget(warning_label)
 
+
+        sb_label = QLabel("Google Safe Browsing API Key:")
         sb_key_input = QLineEdit()
-        layout.addWidget(sb_key_input)
+        sb_key_input.setPlaceholderText("Enter your Google Safe Browsing API key")
+        main_layout.addWidget(sb_label)
+        main_layout.addWidget(sb_key_input)
 
-        news_label = QLabel("Enter a NewsAPI(.org) key:")
-        layout.addWidget(news_label)
 
+        news_label = QLabel("NewsAPI.org API Key:")
         news_key_input = QLineEdit()
-        layout.addWidget(news_key_input)
+        news_key_input.setPlaceholderText("Enter your NewsAPI.org API key")
+        main_layout.addWidget(news_label)
+        main_layout.addWidget(news_key_input)
+
 
         if os.path.exists(key_file):
             with open(key_file, "r") as file:
-                saved_key = json.load(file).get("sb_key", "")
-            if saved_key:
-                QMessageBox.information(api_dialog, "Existing Key", "btw, you already have one connected. just so you know lol")
-                sb_key_input.setText(saved_key)
+                saved_keys = json.load(file)
+                sb_key_input.setText(saved_keys.get("sb_key", ""))
+                news_key_input.setText(saved_keys.get("news_key", ""))
 
-        submit_button = QPushButton("Add/Update Google Safe Browsing key")
-        layout.addWidget(submit_button)
 
-        news_submit_button = QPushButton("Add/Update NewsAPI(.org) key")
-        layout.addWidget(news_submit_button)
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(10)
 
-        delete_button = QPushButton("Delete API key(s)")
-        layout.addWidget(delete_button)
-
+        submit_button = QPushButton("Save Keys")
+        delete_button = QPushButton("Delete Keys")
         close_button = QPushButton("Close")
-        layout.addWidget(close_button)
 
+        button_layout.addWidget(submit_button)
+        button_layout.addWidget(delete_button)
+        button_layout.addWidget(close_button)
+
+        main_layout.addLayout(button_layout)
+
+
+        def save_keys():
+            sb_key = sb_key_input.text().strip()
+            news_key = news_key_input.text().strip()
+            keys_to_save = {}
+
+            if sb_key:
+                keys_to_save["sb_key"] = sb_key
+            if news_key:
+                keys_to_save["news_key"] = news_key
+
+            if not keys_to_save:
+                QMessageBox.warning(api_dialog, "Missing Keys", "At least one API key must be provided.")
+                return
+
+            with open(key_file, "w") as file:
+                json.dump(keys_to_save, file)
+
+            QMessageBox.information(api_dialog, "Keys Saved", "API keys have been successfully saved.")
+
+        def delete_keys():
+            if os.path.exists(key_file):
+                os.remove(key_file)
+                QMessageBox.information(api_dialog, "Keys Deleted", "API keys have been deleted. Restart the application.")
+            else:
+                QMessageBox.warning(api_dialog, "No Keys Found", "No keys found to delete.")
+
+        submit_button.clicked.connect(save_keys)
+        delete_button.clicked.connect(delete_keys)
         close_button.clicked.connect(api_dialog.accept)
 
-        def sb_key_change():
-            global sb_key
-            sb_key = sb_key_input.text().strip()
-            if not sb_key:
-                QMessageBox.warning(api_dialog, "Invalid Key", "You must enter a valid API key to enable Safe Browsing.")
-            else:
-                self.sb_key = sb_key
-                self.sBrowsing = SafeBrowsing(self.sb_key)
-                with open(key_file, "w") as file:
-                    json.dump({"news_key": news_key, "sb_key": sb_key}, file)
-                os.system("safebrowsing config --key " + sb_key)
-                print("executed command: safebrowsing config --key " + sb_key)
-                QMessageBox.information(api_dialog, "API Key Updated", "Your Google Safe Browsing API key has been successfully updated and saved.")
-
-        def news_key_change():
-            global news_key
-            news_key = news_key_input.text().strip()
-            if not news_key:
-                QMessageBox.warning(api_dialog, "Invalid Key", "You must enter a valid API key to enable News features in FreakyBrowse.")
-            else:
-                self.news_key = news_key
-                with open(key_file, "w") as file:
-                    json.dump({"news_key": news_key, "sb_key": sb_key}, file)
-                QMessageBox.information(api_dialog, "API Key Updated", "Your NewsAPI(.org) API key has been successfully updated and saved.")
-
-        def deleteSBKey():
-            os.remove(key_file)
-            QMessageBox.warning(api_dialog, "Key Deleted", "Google Safe Browsing key deleted. Please restart FreakyBrowse.")
-            raise SystemExit
-
-        submit_button.clicked.connect(sb_key_change)
-        news_submit_button.clicked.connect(news_key_change)
-        delete_button.clicked.connect(deleteSBKey)
-
-        api_dialog.setLayout(layout)
+        api_dialog.setLayout(main_layout)
         api_dialog.exec()
+
     # im extension yabbie dee yabbie die
     def extension_settings(self):
         extensions_dialog = QDialog(self)
