@@ -10,4 +10,5 @@ To run FreakyBrowse, just run the command `py freakybrowse.py` inside the direct
 <hr>
 Latest Version: v2.4.2
 <hr>
+
 Licensed under GPL-3 :3
