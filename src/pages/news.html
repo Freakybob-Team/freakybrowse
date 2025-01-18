@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catch⬆</title>
+    <title>Catch⬆ | Your Daily News</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -147,7 +147,7 @@
         I'm cumming
     </footer>
     <script>
-        const API_KEY = 'greg'; // add support from freakybrowse or smth wish
+        const API_KEY = 'sigma'; // add support from freakybrowse or smth wish
         const container = document.getElementById('news-container');
         const searchBar = document.getElementById('search-bar');
 
@@ -164,7 +164,7 @@
 
         function displayArticles(articles) {
             container.innerHTML = '';
-            if (!articles.length) {
+            if (!articles || !articles.length) {
                 container.innerHTML = '<p>No articles found.</p>';
                 return;
             }
@@ -201,3 +201,4 @@
     </script>
 </body>
 </html>
+
