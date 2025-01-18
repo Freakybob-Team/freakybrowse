@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catch⬆</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: linear-gradient(to bottom right, #1B2C76, #189A9C);
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #DD47FF37;
+            backdrop-filter: blur(20px);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(21 127 125 / 0.46);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        header p {
+            margin: 5px 0 0;
+            font-size: 1.2em;
+            font-style: italic;
+        }
+        nav {
+            background-color: #E2E2E21E;
+            backdrop-filter: blur(29px);
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+        }
+        nav a {
+            text-decoration: none;
+            color: #EFE822;
+            margin: 0 10px;
+            font-size: 1em;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        nav a:hover {
+            color: #3DA0CE;
+        }
+        #search-bar::placeholder {
+            color: #15F3F7;
+        }
+        #search-bar {
+            color: gainsboro;
+            backdrop-filter: blur(20px);
+            background-color: #1109673C;
+            padding: 5px 10px;
+            font-size: 1em;
+            border: 1px solid #A1119A;
+            border-radius: 4px;
+            width: 200px;
+        }
+        #news-container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 20px auto;
+            background: indigo;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .article {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #00B7FF;
+            padding-bottom: 20px;
+        }
+        .article img {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            object-fit: cover;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .article-content {
+            flex: 1;
+            padding-left: 20px;
+        }
+        .article-content h3 {
+            margin: 0;
+            font-size: 1.5em;
+            color: #1FE3A2;
+        }
+        .article-content p {
+            margin: 10px 0;
+            font-size: 1em;
+            color: #19C6C6;
+        }
+        .article-content a {
+            text-decoration: none;
+            color: #3E8A1D;
+            font-weight: bold;
+            transition: color 0.5s ease;
+        }
+        .article-content a:hover {
+            color: #00B7FF;
+            text-decoration: underline;
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            backdrop-filter: blur(20px);
+            background: #9E12B43C;
+            color: #fff;
+        }
+        @media (max-width: 768px) {
+            nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            #search-bar {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 class="title">Catch⬆</h1>
+        <p>idk</p>
+    </header>
+    <nav>
+        <div>
+            <a href="#" onclick="filterNews('home')">Home</a>
+            <a href="#" onclick="filterNews('world')">World</a>
+            <a href="#" onclick="filterNews('technology')">Technology</a>
+            <a href="#" onclick="filterNews('sports')">Sports</a>
+            <a href="#" onclick="filterNews('entertainment')">Entertainment</a>
+        </div>
+        <input type="text" id="search-bar" placeholder="Search news..." onkeyup="searchNews(event)">
+    </nav>
+    <div id="news-container">Loading latest news...</div>
+    <footer>
+        I'm cumming
+    </footer>
+    <script>
+        const API_KEY = 'greg'; // add support from freakybrowse or smth wish
+        const container = document.getElementById('news-container');
+        const searchBar = document.getElementById('search-bar');
+
+        function fetchNews(query = 'technology') {
+            const API_URL = `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&apiKey=${API_KEY}`;
+            container.innerHTML = 'Loading...';
+            fetch(API_URL)
+                .then(response => response.json())
+                .then(data => displayArticles(data.articles))
+                .catch(error => {
+                    container.innerHTML = `Error: ${error.message}... guess you can't look at random fucking news...`;
+                });
+        }
+
+        function displayArticles(articles) {
+            container.innerHTML = '';
+            if (!articles.length) {
+                container.innerHTML = '<p>No articles found.</p>';
+                return;
+            }
+            articles.forEach(article => {
+                const articleDiv = document.createElement('div');
+                articleDiv.className = 'article';
+                articleDiv.innerHTML = `
+                    <img src="${article.urlToImage || 'https://www.greg.com/images/resized_and_crop/250/200/eyJpZCI6IjgzYWU3NjQ2YjljYWZkYjBiYjAzY2MwY2U2Y2E3NmVmIiwic3RvcmFnZSI6InN0b3JlIn0?signature=87f4495c39748e4459b4f3ad69f5843a9acc005e7b3baa33ccad7d6e47f198dd'}" alt="Article Image">
+                    <div class="article-content">
+                        <h3>${article.title}</h3>
+                        <p>${article.description || 'No description available.'}</p>
+                        <a href="${article.url}" onclick="openArticle('${article.url}'); return false;">Read more</a>
+                    </div>
+                `;
+                container.appendChild(articleDiv);
+            });
+        }
+
+        function openArticle(url) {
+            window.location.href = url;
+        }
+
+        function filterNews(category) {
+            fetchNews(category);
+        }
+
+        function searchNews(event) {
+            if (event.key === 'Enter') {
+                fetchNews(searchBar.value);
+            }
+        }
+
+        fetchNews();
+    </script>
+</body>
+</html>
