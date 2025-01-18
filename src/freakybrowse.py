@@ -395,6 +395,12 @@ class MainWindow(QMainWindow):
         pikidiary_btn.triggered.connect(self.pikidiary)
         self.navtb.addAction(pikidiary_btn)
 
+        news_button = QAction(QIcon(resource_path("assets/icons/news.png")), "News (NewsAPI.org)", self)
+        news_button.setStatusTip("Read news, right here, right now! (NewsAPI key required)")
+        #TODO: Add news button function
+        #news_button.triggered.connect(self.)
+        self.navtb.addAction(news_button)
+
         # opens the notes stuff
         notes_button = QAction(QIcon(resource_path("assets/icons/notes1.png")), "Manage Notes", self)
         notes_button.setStatusTip("Manage your notes")
@@ -946,20 +952,20 @@ class MainWindow(QMainWindow):
         layout.addWidget(below_label1)
 
         version_layout = QHBoxLayout()
-        version_label = QLabel("Version: 2.3!!!!")
+        version_label = QLabel("Version: 2.5")
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         version_label.setFont(QFont("Arial", 11, QFont.Weight.Normal))
         version_label.setStyleSheet("color: white;")
         version_layout.addWidget(version_label)
         layout.addLayout(version_layout)
 
-        title_label2 = QLabel("Sorta History")
+        title_label2 = QLabel("History")
         title_label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title_label2.setFont(QFont("Arial", 16, QFont.Weight.Bold))
         title_label2.setStyleSheet("color: #333333;")
         layout.addWidget(title_label2)
 
-        info_label = QLabel("FreakyBrowse was made on Oct 13th 2024. It first started out as code stolen from stackoverflow but was updated to work and look better.\nThe first time we started to try to distribute FreakyBrowse, it was flagged as a trojan. It was a false positive from what wish13yt used to turn the code into an exe.\nSince Pyinstaller sucks and gave false positives, we are starting to use the direct python file!!")
+        info_label = QLabel("FreakyBrowse was made on October 13th, 2024. It first started out as code stolen from GeeksForGeeks but was updated to work and look better.\nThe first time we started to try to distribute FreakyBrowse, it was flagged as a trojan. It was a false positive from PyInstaller. It was originally thought to be auto-py-to-exe, but was actually PyInstaller.")
         info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         info_label.setFont(QFont("Arial", 10, QFont.Weight.Normal))
         info_label.setStyleSheet("color: white;")
@@ -983,7 +989,7 @@ class MainWindow(QMainWindow):
         gpl_label.setStyleSheet("color: #333333;")
         layout.addWidget(gpl_label)
 
-        info_label2 = QLabel("Everything is GPL-3")
+        info_label2 = QLabel("Most, if not everything, is GPL-3")
         info_label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         info_label2.setFont(QFont("Arial", 10, QFont.Weight.Normal))
         info_label2.setStyleSheet("color: white;  ")
@@ -1037,6 +1043,7 @@ class MainWindow(QMainWindow):
                 print(f"Error disabling RPC: {e}")
     # useragent thingy
     def useragent_settings(self):
+    # ID: 12344
         useragent_dialog = QDialog(self)
         useragent_dialog.setWindowTitle("[Guard] UserAgent Settings")
         useragent_dialog.setFixedSize(400, 230)
