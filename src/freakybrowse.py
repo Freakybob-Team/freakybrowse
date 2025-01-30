@@ -23,7 +23,7 @@ from PyQt6.QtWidgets import QApplication, QTextEdit, QInputDialog
 from PyQt6.QtCore import Qt
 from PyQt6.QtNetwork import QNetworkReply
 from PyQt6.QtCore import QObject, pyqtSignal, QThread
-from PyQt6.QtWebEngineCore import QWebEnginePage, QWebEngineUrlRequestInterceptor
+from PyQt6.QtWebEngineCore import QWebEnginePage, QWebEngineUrlRequestInterceptor, QWebEngineProfile
 import requests
 import mimetypes
 import sys
@@ -98,21 +98,17 @@ except Exception as e:
 # hello this does the http request ig - wish
 # mwah https://stackoverflow.com/questions/42942295/pyqt-webengine-set-http-headers
 # screw that above thread try this https://stackoverflow.com/questions/50786186/qwebengineurlrequestinterceptor-not-working - wish from like 2 months later
-# note: i am extremely tired and had a busy day
+# screw that above thread - wish, the same day
+# yeah screw this
 # please fix later & uncomment
 
 #class NWUrlRequestInterceptor(QWebEngineUrlRequestInterceptor):
-#    def __init__(self, headers):
+#    def __init__(self):
 #        super(QWebEngineUrlRequestInterceptor, self).__init__()
-#        self.headers = headers
-#
-#    def set_headers(self,headers):
-#        self.headers = headers
 #
 #    def interceptRequest(self, info):
-#        print(info + self.headers)
-#        for header, value in self.headers:
-#            info.setHttpHeader(header, value)
+#        print("I think GPC is on! Try it out here: https://global-privacy-control.glitch.me/")
+#        info.setHttpHeader("Sec-GPC", "1")
 
 #gteg
 def resource_path(relative_path):
@@ -1601,6 +1597,10 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     global web
     web = QWebEngineView()
+    # interceptor = QWebEngineUrlRequestInterceptor()
+    # global profile
+    # profile = QWebEngineProfile()
+    # profile.setRequestInterceptor(interceptor)
     # set user agent
     try:
         web.page().profile().setHttpUserAgent(
