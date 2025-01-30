@@ -97,21 +97,22 @@ except Exception as e:
 
 # hello this does the http request ig - wish
 # mwah https://stackoverflow.com/questions/42942295/pyqt-webengine-set-http-headers
+# screw that above thread try this https://stackoverflow.com/questions/50786186/qwebengineurlrequestinterceptor-not-working - wish from like 2 months later
 # note: i am extremely tired and had a busy day
 # please fix later & uncomment
 
-# class NWUrlRequestInterceptor(QWebEngineUrlRequestInterceptor):
-#     def __init__(self, headers):
-#         super(QWebEngineUrlRequestInterceptor, self).__init__()
-#         self.headers = headers
-# 
-#     def set_headers(self,headers):
-#         self.headers = headers
-# 
-#     def interceptRequest(self, info):
-#         print(info + self.headers)
-#         for header, value in self.headers:
-#             info.setHttpHeader(header, value);
+#class NWUrlRequestInterceptor(QWebEngineUrlRequestInterceptor):
+#    def __init__(self, headers):
+#        super(QWebEngineUrlRequestInterceptor, self).__init__()
+#        self.headers = headers
+#
+#    def set_headers(self,headers):
+#        self.headers = headers
+#
+#    def interceptRequest(self, info):
+#        print(info + self.headers)
+#        for header, value in self.headers:
+#            info.setHttpHeader(header, value)
 
 #gteg
 def resource_path(relative_path):
