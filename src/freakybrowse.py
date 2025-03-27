@@ -960,7 +960,7 @@ class MainWindow(QMainWindow):
         version_layout.addWidget(version_label)
         layout.addLayout(version_layout)
 
-        title_label2 = QLabel("FreakyBrowse in a Nutshell")
+        title_label2 = QLabel("FreakyBrowse History in a Nutshell")
         title_label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title_label2.setFont(QFont("Arial", 16, QFont.Weight.Bold))
         title_label2.setStyleSheet("color: #333333;")
