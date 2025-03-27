@@ -35,6 +35,8 @@ from pysafebrowsing import SafeBrowsing
 import json
 import subprocess
 
+print("Pre-Load: FreakyBrowse is loading! This may take some time.")
+
 parser = argparse.ArgumentParser(description='Parser for FreakyBrowse')
 parser.add_argument('--url', action="store", dest='url', default="https://search.freakybob.site")
 
@@ -951,20 +953,20 @@ class MainWindow(QMainWindow):
         layout.addWidget(below_label1)
 
         version_layout = QHBoxLayout()
-        version_label = QLabel("Version: 2.5")
+        version_label = QLabel("Version: 2.6")
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         version_label.setFont(QFont("Arial", 11, QFont.Weight.Normal))
         version_label.setStyleSheet("color: white;")
         version_layout.addWidget(version_label)
         layout.addLayout(version_layout)
 
-        title_label2 = QLabel("History")
+        title_label2 = QLabel("FreakyBrowse in a Nutshell")
         title_label2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title_label2.setFont(QFont("Arial", 16, QFont.Weight.Bold))
         title_label2.setStyleSheet("color: #333333;")
         layout.addWidget(title_label2)
 
-        info_label = QLabel("FreakyBrowse was made on October 13th, 2024. It first started out as code stolen from GeeksForGeeks but was updated to work and look better.\nThe first time we started to try to distribute FreakyBrowse, it was flagged as a trojan. It was a false positive from PyInstaller. It was originally thought to be auto-py-to-exe, but was actually PyInstaller.")
+        info_label = QLabel("FreakyBrowse was made on October 13th, 2024. It first started out as code stolen from GeeksForGeeks but was updated to work and look better.\nThe first time we started to try to distribute FreakyBrowse, it was flagged as a trojan. This was due to a false positive a PyInstaller library.")
         info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         info_label.setFont(QFont("Arial", 10, QFont.Weight.Normal))
         info_label.setStyleSheet("color: white;")
@@ -976,7 +978,7 @@ class MainWindow(QMainWindow):
         your_info_title.setStyleSheet("color: #333333;")
         layout.addWidget(your_info_title)
 
-        your_info_label = QLabel("FreakyBrowse does not use your personal info. Every website you visit is your choice or the website's choice to collect information on you.\nYou do have to agree to the Privacy Policy on search.freakybob.site.\nYou can find it by pressing 'here' on search.freakybob.site.\n Some dependencies we use may also use your data. We can't do anything about this.")
+        your_info_label = QLabel("FreakyBrowse does not use your personal information except for communication with third-parties (ex: websites, NewsAPI [for news], Google Safe Browsing). Every website you visit is your choice or the website's choice to collect information on you.\nTo use Elvira Search, you need to agree to the Privacy Policy on Elvira.\nYou can find it by pressing 'here' on search.freakybob.site.\n Some dependencies we use may also use your data. We can't do anything about this.")
         your_info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         your_info_label.setFont(QFont("Arial", 10, QFont.Weight.Normal))
         your_info_label.setStyleSheet("color: white;")
