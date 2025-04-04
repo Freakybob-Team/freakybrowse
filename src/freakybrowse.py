@@ -84,7 +84,7 @@ try:
     RPC = Presence("1312584606637101156")
     RPC.connect()
     RPC.update(
-        details="Browsing the interwebs!",
+        details="Browsing the freakynet!",
         buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
         large_image="icon.png",
         large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
@@ -507,6 +507,7 @@ class MainWindow(QMainWindow):
 
     # updates the tab titles greg
     def update_tab_title(self, title, browser):
+        global shortened_title
         index = self.tabs.indexOf(browser)
         tab_bar = self.tabs.tabBar()
     
@@ -517,6 +518,11 @@ class MainWindow(QMainWindow):
             shortened_title = title
     
         self.tabs.setTabText(index, shortened_title)
+    
+    global api_tab_read
+
+    def api_tab_read(self):
+        return shortened_title
 
     # updates the tab icon for the tabs
     def update_tab_icon(self, icon, browser):
