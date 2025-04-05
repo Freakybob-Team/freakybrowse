@@ -7,7 +7,6 @@
 
 # Known bugs:
 # - Closing the tab before a new one will cause an about:blank page
-# - oceanic_blue_mode does not work
 # - api
 
 from PyQt6.QtCore import *
@@ -21,9 +20,7 @@ from PyQt6.QtCore import QUrl, QSettings
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QListWidget, QTextEdit, QInputDialog, QMessageBox
 from PyQt6.QtWidgets import QApplication, QTextEdit, QInputDialog
 from PyQt6.QtCore import Qt
-from PyQt6.QtNetwork import QNetworkReply
 from PyQt6.QtCore import QObject, pyqtSignal, QThread
-from PyQt6.QtWebEngineCore import QWebEnginePage, QWebEngineUrlRequestInterceptor, QWebEngineProfile
 import requests
 import mimetypes
 import sys
@@ -42,7 +39,6 @@ parser.add_argument('--url', action="store", dest='url', default="https://search
 
 key_file = "api_key.json"
 sb_key = None
-news_key = None
 downloadIsCompleted = "False"
 
 if (os.path.exists(key_file)):
@@ -394,13 +390,6 @@ class MainWindow(QMainWindow):
         pikidiary_btn.triggered.connect(self.pikidiary)
         self.navtb.addAction(pikidiary_btn)
 
-        news_button = QAction(QIcon(resource_path("assets/icons/news.png")), "News (NewsAPI.org)", self)
-        news_button.setStatusTip("Read news, right here, right now! (NewsAPI key required)")
-        # Added the news popup, the error is useless
-        # def news_button_error():
-        #     QMessageBox.warning(self, "Not Implemented", "News features have not been implemented (yet!)\n - FreakyBrowse Staff")
-        news_button.triggered.connect(self.news)
-        self.navtb.addAction(news_button)
 
         # opens the notes stuff
         notes_button = QAction(QIcon(resource_path("assets/icons/notes1.png")), "Manage Notes", self)
@@ -442,7 +431,7 @@ class MainWindow(QMainWindow):
         self.green_mode_enabled = self.settings.value("green_mode", False, type=bool)
         self.orange_mode_enabled = self.settings.value("orange_mode", False, type=bool)
         self.red_mode_enabled = self.settings.value("red_mode", False, type=bool)
-        self.oceanic_blue_enabled = self.settings.value("oceanic_blue_mode", False, type=bool)
+        self.oceanic_blue_mode_enabled = self.settings.value("oceanic_blue_mode", False, type=bool)
         self.lavender_mode_enabled = self.settings.value("lavender_mode", False, type=bool)
         self.retro_green_mode_enabled = self.settings.value("retro_green_mode", False, type=bool)
         self.purple_mode_enabled = self.settings.value("purple_mode", False, type=bool)
@@ -856,7 +845,7 @@ class MainWindow(QMainWindow):
             "green_mode": self.green_mode_enabled,
             "red_mode": self.red_mode_enabled,
             "orange_mode": self.orange_mode_enabled,
-            "oceanic_blue_mode": self.oceanic_blue_enabled,
+            "oceanic_blue_mode": self.oceanic_blue_mode_enabled,
             "lavender_mode": self.lavender_mode_enabled,
             "retro_green_mode": self.retro_green_mode_enabled,
             "purple_mode": self.purple_mode_enabled,
@@ -910,7 +899,7 @@ class MainWindow(QMainWindow):
             ("Green Mode", self.green_mode_enabled, lambda enabled: self.toggle_mode_enabled("green_mode", enabled)),
             ("Red Mode", self.red_mode_enabled, lambda enabled: self.toggle_mode_enabled("red_mode", enabled)),
             ("Orange Mode", self.orange_mode_enabled, lambda enabled: self.toggle_mode_enabled("orange_mode", enabled)),
-            ("Oceanic Blue Mode", self.oceanic_blue_enabled, lambda enabled: self.toggle_mode_enabled("oceanic_blue_mode", enabled)),
+            ("Oceanic Blue Mode", self.oceanic_blue_mode_enabled, lambda enabled: self.toggle_mode_enabled("oceanic_blue_mode", enabled)),
             ("Lavender Mode", self.lavender_mode_enabled, lambda enabled: self.toggle_mode_enabled("lavender_mode", enabled)),
             ("Retro Green Mode", self.retro_green_mode_enabled, lambda enabled: self.toggle_mode_enabled("retro_green_mode", enabled)),
             ("Dark Purple", self.purple_mode_enabled, lambda enabled: self.toggle_mode_enabled("purple_mode", enabled)),
@@ -1035,7 +1024,7 @@ class MainWindow(QMainWindow):
         your_info_title.setStyleSheet("color: #333333;")
         layout.addWidget(your_info_title)
 
-        your_info_label = QLabel("FreakyBrowse does not use your personal information except for communication with third-parties (ex: websites, NewsAPI [for news], Google Safe Browsing). Every website you visit is your choice or the website's choice to collect information on you.\nTo use Elvira Search, you need to agree to the Privacy Policy on Elvira.\nYou can find it by pressing 'here' on search.freakybob.site.\n Some dependencies we use may also use your data. We can't do anything about this.")
+        your_info_label = QLabel("FreakyBrowse does not use your personal information except for communication with third-parties (ex: websites, Google Safe Browsing). Every website you visit is your choice or the website's choice to collect information on you.\nTo use Elvira Search, you need to agree to the Privacy Policy on Elvira.\nYou can find it by pressing 'here' on search.freakybob.site.\n Some dependencies we use may also use your data. We can't do anything about this.")
         your_info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         your_info_label.setFont(QFont("Arial", 10, QFont.Weight.Normal))
         your_info_label.setStyleSheet("color: white;")
@@ -1149,21 +1138,7 @@ class MainWindow(QMainWindow):
         useragent_dialog.setLayout(layout)
         useragent_dialog.exec()
     # neews
-    def news(self):
-        news_dialog = QDialog(self)
-        news_dialog.setWindowTitle("Catch⬆")
-        news_dialog.setFixedSize(900, 600)
 
-        web_view = QWebEngineView(news_dialog)
-
-
-        web_view.setUrl(QUrl.fromLocalFile("/pages/news.html"))
-
-        layout = QVBoxLayout()
-        layout.addWidget(web_view)
-        news_dialog.setLayout(layout)
-
-        news_dialog.exec()
 
     # api stuff
     def api_settings(self):
@@ -1190,24 +1165,16 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(sb_key_input)
 
 
-        news_label = QLabel("NewsAPI.org API Key:")
-        news_key_input = QLineEdit()
-        news_key_input.setPlaceholderText("Enter your NewsAPI.org API key")
-        main_layout.addWidget(news_label)
-        main_layout.addWidget(news_key_input)
-
-
         if os.path.exists(key_file):
             with open(key_file, "r") as file:
                 saved_keys = json.load(file)
                 sb_key_input.setText(saved_keys.get("sb_key", ""))
-                news_key_input.setText(saved_keys.get("news_key", ""))
 
 
         button_layout = QHBoxLayout()
         button_layout.setSpacing(10)
 
-        submit_button = QPushButton("Save Keys")
+        submit_button = QPushButton("Save Key")
         delete_button = QPushButton("Delete Keys")
         close_button = QPushButton("Close")
 
@@ -1220,29 +1187,26 @@ class MainWindow(QMainWindow):
 
         def save_keys():
             sb_key = sb_key_input.text().strip()
-            news_key = news_key_input.text().strip()
             keys_to_save = {}
 
             if sb_key:
                 keys_to_save["sb_key"] = sb_key
-            if news_key:
-                keys_to_save["news_key"] = news_key
 
             if not keys_to_save:
-                QMessageBox.warning(api_dialog, "Missing Keys", "At least one API key must be provided.")
+                QMessageBox.warning(api_dialog, "Missing Key", "grr give api")
                 return
 
             with open(key_file, "w") as file:
                 json.dump(keys_to_save, file)
 
-            QMessageBox.information(api_dialog, "Keys Saved", "API keys have been successfully saved.")
+            QMessageBox.information(api_dialog, "Key Saved", "API key have been successfully saved.")
 
         def delete_keys():
             if os.path.exists(key_file):
                 os.remove(key_file)
-                QMessageBox.information(api_dialog, "Keys Deleted", "API keys have been deleted. Restart the application.")
+                QMessageBox.information(api_dialog, "Key Deleted", "API key have been deleted. Restart the application.")
             else:
-                QMessageBox.warning(api_dialog, "No Keys Found", "No keys found to delete.")
+                QMessageBox.warning(api_dialog, "No Key Found", "No key found to delete.")
 
         submit_button.clicked.connect(save_keys)
         delete_button.clicked.connect(delete_keys)
