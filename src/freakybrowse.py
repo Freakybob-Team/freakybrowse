@@ -7,6 +7,7 @@
 
 # Known bugs:
 # - Closing the tab before a new one will cause an about:blank page
+# - oceanic_blue_mode does not work
 # - api
 
 from PyQt6.QtCore import *
@@ -56,7 +57,7 @@ else:
         sBrowsing = None
 
 # change this when new version release - wish
-appname = "FreakyBrowse 2.5"
+appname = "FreakyBrowse 2.6"
 app = QApplication(sys.argv)
 try:
     sBrowsing = SafeBrowsing(sb_key) # type: ignore
