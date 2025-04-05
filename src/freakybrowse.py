@@ -432,8 +432,11 @@ class MainWindow(QMainWindow):
         download_btn.triggered.connect(self.open_download_manager)
         self.navtb.addAction(download_btn)
 
-        # supposed to be for the styles, doesn't fucking work
-        self.settings = QSettings("FreakyBrowse", "UserSettings1")
+        self.user_config_dir = os.path.expanduser("~/user/freakybrowse")
+        os.makedirs(self.user_config_dir, exist_ok=True)
+    
+        self.settings = QSettings(os.path.join(self.user_config_dir, "settings.ini"), QSettings.Format.IniFormat)
+    
         self.pink_mode_enabled = self.settings.value("pink_mode", False, type=bool)
         self.blue_mode_enabled = self.settings.value("blue_mode", False, type=bool)
         self.green_mode_enabled = self.settings.value("green_mode", False, type=bool)
@@ -443,6 +446,9 @@ class MainWindow(QMainWindow):
         self.lavender_mode_enabled = self.settings.value("lavender_mode", False, type=bool)
         self.retro_green_mode_enabled = self.settings.value("retro_green_mode", False, type=bool)
         self.purple_mode_enabled = self.settings.value("purple_mode", False, type=bool)
+    
+
+        self.load_last_theme()
 
         # rpc stuff greg
         self.settings = QSettings("FreakyBrowse", "RPC4Settings")
@@ -509,7 +515,6 @@ class MainWindow(QMainWindow):
     def update_tab_title(self, title, browser):
         global shortened_title
         index = self.tabs.indexOf(browser)
-        tab_bar = self.tabs.tabBar()
     
         max_length = 35
         if len(title) > max_length:
@@ -786,6 +791,14 @@ class MainWindow(QMainWindow):
     
     # loads the styles from the folder
     def load_style_from_file(self, style_name):
+        user_config_dir = os.path.expanduser("~/user/freakybrowse")
+        os.makedirs(user_config_dir, exist_ok=True)
+    
+        theme_config_path = os.path.join(user_config_dir, "theme_config.ini")
+    
+        with open(theme_config_path, "w") as config_file:
+            config_file.write(style_name)
+    
         if hasattr(sys, '_MEIPASS'):
             styles_folder = os.path.join(sys._MEIPASS, 'styles')
         else:
@@ -800,6 +813,41 @@ class MainWindow(QMainWindow):
         else:
             print(f"Style file '{style_name}.qss' not found at {style_path}!")
 
+    def load_last_theme(self):
+        theme_config_path = os.path.join(self.user_config_dir, "theme_config.ini")
+    
+        if os.path.exists(theme_config_path):
+            try:
+                with open(theme_config_path, "r") as config_file:
+                    last_theme = config_file.read().strip()
+                
+                if last_theme in ["pink_mode", "blue_mode", "green_mode", "red_mode", 
+                              "orange_mode", "oceanic_blue_mode", "lavender_mode", 
+                              "retro_green_mode", "purple_mode", "default_mode"]:
+                
+
+                    modes = ["pink_mode", "blue_mode", "green_mode", "red_mode", 
+                         "orange_mode", "oceanic_blue_mode", "lavender_mode", 
+                         "retro_green_mode", "purple_mode"]
+                
+                    for mode in modes:
+                        setattr(self, f"{mode}_enabled", False)
+                
+
+                    if last_theme != "default_mode":
+                        setattr(self, f"{last_theme}_enabled", True)
+                
+                    self.load_style_from_file(last_theme)
+                    print(f"Loaded last used theme: {last_theme}")
+                else:
+                    print(f"Invalid theme name in config: {last_theme}")
+                    self.toggle_mode()
+            except Exception as e:
+                print(f"Error loading theme configuration: {e}")
+                self.toggle_mode()
+        else:
+            self.toggle_mode()
+            
     # more style code greg
     def toggle_mode(self):
         modes = {
@@ -823,15 +871,18 @@ class MainWindow(QMainWindow):
     # a simplified version of the original style code, don't mess with it if you no understand
     def toggle_mode_enabled(self, mode_name, enabled):
         modes = [
-            "pink_mode", "blue_mode", "green_mode", "red_mode", "orange_mode", 
-            "oceanic_blue_mode", "lavender_mode", "retro_green_mode", "purple_mode"
+        "pink_mode", "blue_mode", "green_mode", "red_mode", "orange_mode", 
+        "oceanic_blue_mode", "lavender_mode", "retro_green_mode", "purple_mode"
         ]
         for mode in modes:
             setattr(self, f"{mode}_enabled", False)
+    
         setattr(self, f"{mode_name}_enabled", enabled)
+    
         self.settings.setValue(f"{mode_name}", enabled)
         for mode in modes:
             self.settings.setValue(f"{mode}", getattr(self, f"{mode}_enabled"))
+    
         self.toggle_mode()
 
 
