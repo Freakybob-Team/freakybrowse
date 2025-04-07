@@ -7,7 +7,6 @@
 
 # Known bugs:
 # - Closing the tab before a new one will cause an about:blank page
-# - oceanic_blue_mode does not work
 # - api
 
 from PyQt6.QtCore import *
@@ -427,7 +426,6 @@ class MainWindow(QMainWindow):
     
         self.settings = QSettings(os.path.join(self.user_config_dir, "settings.ini"), QSettings.Format.IniFormat)
     
-        self.pink_mode_enabled = self.settings.value("pink_mode", False, type=bool)
         self.blue_mode_enabled = self.settings.value("blue_mode", False, type=bool)
         self.green_mode_enabled = self.settings.value("green_mode", False, type=bool)
         self.orange_mode_enabled = self.settings.value("orange_mode", False, type=bool)
@@ -436,12 +434,15 @@ class MainWindow(QMainWindow):
         self.lavender_mode_enabled = self.settings.value("lavender_mode", False, type=bool)
         self.retro_green_mode_enabled = self.settings.value("retro_green_mode", False, type=bool)
         self.purple_mode_enabled = self.settings.value("purple_mode", False, type=bool)
+        self.dark_forest_mode_enabled = self.settings.value("dark_forest_mode", False, type=bool)
+        self.dark_mode_enabled = self.settings.value("dark_mode", False, type=bool)
+        self.brown_mode_enabled = self.settings.value("brown_mode", False, type=bool)
     
 
         self.load_last_theme()
 
         # rpc stuff greg
-        self.settings = QSettings("FreakyBrowse", "RPC4Settings")
+        self.settings = QSettings("FreakyBrowse", "RPC5Settings")
         self.rpc_enabled = self.settings.value("rpc_enabled", True, type=bool)
         self.warned_about_rpc = False
         self.update_rpc_state()
@@ -811,14 +812,18 @@ class MainWindow(QMainWindow):
                 with open(theme_config_path, "r") as config_file:
                     last_theme = config_file.read().strip()
                 
-                if last_theme in ["pink_mode", "blue_mode", "green_mode", "red_mode", 
+                if last_theme in ["blue_mode", "green_mode", "red_mode", 
                               "orange_mode", "oceanic_blue_mode", "lavender_mode", 
-                              "retro_green_mode", "purple_mode", "default_mode"]:
+                              "retro_green_mode", "purple_mode", "dark_forest_mode", 
+                              "dark_mode", "brown_mode"
+                              ]:
                 
 
-                    modes = ["pink_mode", "blue_mode", "green_mode", "red_mode", 
-                         "orange_mode", "oceanic_blue_mode", "lavender_mode", 
-                         "retro_green_mode", "purple_mode"]
+                    modes = ["blue_mode", "green_mode", "red_mode", 
+                              "orange_mode", "oceanic_blue_mode", "lavender_mode", 
+                              "retro_green_mode", "purple_mode", "dark_forest_mode", 
+                              "dark_mode", "brown_mode"
+                              ]
                 
                     for mode in modes:
                         setattr(self, f"{mode}_enabled", False)
@@ -841,7 +846,6 @@ class MainWindow(QMainWindow):
     # more style code greg
     def toggle_mode(self):
         modes = {
-            "pink_mode": self.pink_mode_enabled,
             "blue_mode": self.blue_mode_enabled,
             "green_mode": self.green_mode_enabled,
             "red_mode": self.red_mode_enabled,
@@ -850,6 +854,9 @@ class MainWindow(QMainWindow):
             "lavender_mode": self.lavender_mode_enabled,
             "retro_green_mode": self.retro_green_mode_enabled,
             "purple_mode": self.purple_mode_enabled,
+            "dark_forest_mode": self.dark_forest_mode_enabled,
+            "dark_mode": self.dark_mode_enabled,
+            "brown_mode": self.brown_mode_enabled
         }
         for mode, enabled in modes.items():
             if enabled:
@@ -861,8 +868,8 @@ class MainWindow(QMainWindow):
     # a simplified version of the original style code, don't mess with it if you no understand
     def toggle_mode_enabled(self, mode_name, enabled):
         modes = [
-        "pink_mode", "blue_mode", "green_mode", "red_mode", "orange_mode", 
-        "oceanic_blue_mode", "lavender_mode", "retro_green_mode", "purple_mode"
+        "blue_mode", "green_mode", "red_mode", "orange_mode", 
+        "oceanic_blue_mode", "lavender_mode", "retro_green_mode", "purple_mode", "dark_forest_mode", "dark_mode", "brown_mode"
         ]
         for mode in modes:
             setattr(self, f"{mode}_enabled", False)
@@ -880,11 +887,11 @@ class MainWindow(QMainWindow):
     def open_style_settings(self):
         style_dialog = QDialog(self)
         style_dialog.setWindowTitle("Style Settings")
-        style_dialog.setFixedSize(400, 400)
+        style_dialog.setFixedSize(500, 500)
         style_dialog.setStyleSheet("""
-            background-color: #17786d;
-            border-radius: 10px;
-        """)
+				background-color: #17786d;
+				border-radius: 10px;
+		""")
 
         layout = QVBoxLayout()
 
@@ -895,7 +902,6 @@ class MainWindow(QMainWindow):
         layout.addWidget(main_label)
 
         styles = [
-            ("Pink Mode", self.pink_mode_enabled, lambda enabled: self.toggle_mode_enabled("pink_mode", enabled)),
             ("Blue Mode", self.blue_mode_enabled, lambda enabled: self.toggle_mode_enabled("blue_mode", enabled)),
             ("Green Mode", self.green_mode_enabled, lambda enabled: self.toggle_mode_enabled("green_mode", enabled)),
             ("Red Mode", self.red_mode_enabled, lambda enabled: self.toggle_mode_enabled("red_mode", enabled)),
@@ -903,7 +909,10 @@ class MainWindow(QMainWindow):
             ("Oceanic Blue Mode", self.oceanic_blue_mode_enabled, lambda enabled: self.toggle_mode_enabled("oceanic_blue_mode", enabled)),
             ("Lavender Mode", self.lavender_mode_enabled, lambda enabled: self.toggle_mode_enabled("lavender_mode", enabled)),
             ("Retro Green Mode", self.retro_green_mode_enabled, lambda enabled: self.toggle_mode_enabled("retro_green_mode", enabled)),
-            ("Dark Purple", self.purple_mode_enabled, lambda enabled: self.toggle_mode_enabled("purple_mode", enabled)),
+            ("Dark Purple mode", self.purple_mode_enabled, lambda enabled: self.toggle_mode_enabled("purple_mode", enabled)),
+            ("Dark Forest Mode", self.dark_forest_mode_enabled, lambda enabled: self.toggle_mode_enabled("dark_forest_mode", enabled)),
+            ("Dark Mode", self.dark_mode_enabled, lambda enabled: self.toggle_mode_enabled("dark_mode", enabled)),
+            ("Brown Mode", self.brown_mode_enabled, lambda enabled: self.toggle_mode_enabled("brown_mode", enabled)),
         ]
 
         for label, enabled, toggle_func in styles:
@@ -915,12 +924,12 @@ class MainWindow(QMainWindow):
 
         close_button = QPushButton("Close")
         close_button.setStyleSheet("""
-            background-color: #0078d4;
-            color: white;
-            padding: 4px;
-            border-radius: 5px;
-            font-size: 14px;
-        """)
+				background-color: #0078d4;
+				color: white;
+				padding: 4px;
+				border-radius: 5px;
+				font-size: 14px;
+		""")
         close_button.clicked.connect(style_dialog.accept)
         layout.addWidget(close_button)
 
@@ -1322,20 +1331,23 @@ class MainWindow(QMainWindow):
     def open_settings(self):
         settings_dialog = QDialog(self)
         settings_dialog.setWindowTitle("Settings")
-        settings_dialog.setFixedSize(600, 470)
+        settings_dialog.setFixedSize(700, 570)
         settings_dialog.setStyleSheet("""
-            background-color: #a3d8f4;
-            border-radius: 10px;
+            QDialog {
+                background-color: rgb(34 69 103);
+                border-radius: 10px;
+                border: 1px solid #e0e0e0;
+            }
         """)
 
         layout = QVBoxLayout()
-        layout.setSpacing(10)
-        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(15)
+        layout.setContentsMargins(25, 25, 25, 25)
 
         main_label = QLabel("Settings")
         main_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        main_label.setFont(QFont("Arial", 16, QFont.Weight.Bold))
-        main_label.setStyleSheet("color: #2c3e50; margin-bottom: 20px;")
+        main_label.setFont(QFont("Segoe UI", 18, QFont.Weight.Bold))
+        main_label.setStyleSheet("color: #13787D; margin-bottom: 20px;")
         layout.addWidget(main_label)
 
         buttons = [
@@ -1348,25 +1360,55 @@ class MainWindow(QMainWindow):
             ("[API] Key Settings", self.api_settings)
         ]
 
+        button_container = QWidget()
+        button_layout = QVBoxLayout(button_container)
+        button_layout.setSpacing(16)
+        button_layout.setContentsMargins(0, 0, 0, 0)
+    
         for label, func in buttons:
             button = QPushButton(label)
+            button.setCursor(Qt.CursorShape.PointingHandCursor)
+            button.setFont(QFont("Segoe UI", 11))
+            button.setFixedHeight(45)
             button.setStyleSheet("""
-                background-color: #3498db;
+                QPushButton {
+                background-color: #4c7eff;
                 color: white;
+                border-radius: 6px;
                 padding: 10px;
-                border-radius: 5px;
-                font-size: 14px;
+                text-align: left;
+                padding-left: 15px;
+            }
+            QPushButton:hover {
+                background-color: #3a6be0;
+            }
+            QPushButton:pressed {
+                background-color: #2856c7;
+            }
             """)
             button.clicked.connect(func)
-            layout.addWidget(button)
+            button_layout.addWidget(button)
+    
+        layout.addWidget(button_container)
+        layout.addStretch()
 
         close_button = QPushButton("Close")
+        close_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        close_button.setFont(QFont("Segoe UI", 11))
+        close_button.setFixedHeight(45)
         close_button.setStyleSheet("""
-            background-color: #1abc9c;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 14px;
+            QPushButton {
+                background-color: #FFA07A;
+                color: #333333;
+                border-radius: 6px;
+                padding: 10px;
+            }
+            QPushButton:hover {
+                background-color: #9A6F54;
+            }
+            QPushButton:pressed {
+                background-color: #813C3C;
+            }
         """)
         close_button.clicked.connect(settings_dialog.accept)
         layout.addWidget(close_button)
