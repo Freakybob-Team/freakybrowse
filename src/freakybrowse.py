@@ -1009,7 +1009,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(below_label1)
 
         version_layout = QHBoxLayout()
-        version_label = QLabel("Version: 2.6")
+        version_label = QLabel("Version: 2.5")
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         version_label.setFont(QFont("Arial", 11, QFont.Weight.Normal))
         version_label.setStyleSheet("color: white;")
