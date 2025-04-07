@@ -56,7 +56,7 @@ else:
         sBrowsing = None
 
 # change this when new version release - wish
-appname = "FreakyBrowse 2.6"
+appname = "FreakyBrowse 2.5"
 app = QApplication(sys.argv)
 try:
     sBrowsing = SafeBrowsing(sb_key) # type: ignore
