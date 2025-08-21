@@ -56,7 +56,7 @@ else:
         sBrowsing = None
 
 # change this when new version release - wish
-appname = "FreakyBrowse 2.5"
+appname = "FreakyBrowse 2.6"
 app = QApplication(sys.argv)
 try:
     sBrowsing = SafeBrowsing(sb_key) # type: ignore
@@ -384,13 +384,6 @@ class MainWindow(QMainWindow):
         self.urlbar.addAction(logo_action, QLineEdit.ActionPosition.LeadingPosition)
         self.urlbar.setClearButtonEnabled(True)
 
-        # pikidiary button
-        pikidiary_btn = QAction(QIcon(resource_path("assets/icons/piki.png")), "PikiDiary", self)
-        pikidiary_btn.setStatusTip("Go to PikiDiary!")
-        pikidiary_btn.triggered.connect(self.pikidiary)
-        self.navtb.addAction(pikidiary_btn)
-
-
         # opens the notes stuff
         notes_button = QAction(QIcon(resource_path("assets/icons/notes1.png")), "Manage Notes", self)
         notes_button.setStatusTip("Manage your notes")
@@ -403,7 +396,7 @@ class MainWindow(QMainWindow):
         bookmark_btn.triggered.connect(self.bookmark_page)
         self.navtb.addAction(bookmark_btn)
 
-        # the fuck you think, retard
+        # the fuck you think, kind person
         view_bookmarks_btn = QAction(QIcon(resource_path("assets/icons/bookmarks.png")), "Bookmarks", self)
         view_bookmarks_btn.setStatusTip("View all bookmarks")
         view_bookmarks_btn.triggered.connect(self.show_bookmarks)
@@ -524,29 +517,6 @@ class MainWindow(QMainWindow):
     def update_tab_icon(self, icon, browser):
         index = self.tabs.indexOf(browser)
         self.tabs.setTabIcon(index, icon)
-
-    # pikidiary...
-    def pikidiary(self):
-        url = QUrl("https://pikidiary.lol")
-        self.add_new_tab(url, "FUCKING PEAK YAYAY")
-        if haveDiscord == "True" and self.rpc_enabled:
-            try:
-                RPC.update(
-                    state="Looking at " + str( self.urlbar.text()),
-                    buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
-                    large_image="icons/piki.png",
-                    large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
-                )
-                print("Updated RPC! (Navigated to URL)")
-            except Exception as e:
-                print(f"Error updating RPC: {e}")
-                if "style" in RPC.state:
-                    RPC.update(
-                        details="Browsing the interwebs!",
-                        buttons=[{"label": "Get FreakyBrowse", "url": "https://github.com/Freakybob-Team/Freakybrowse/releases/latest"}],
-                        large_image="icon.png",
-                        large_text="FreakyBrowse next to a search glass with Freakybob inside of the glass."
-                    )
 
     # changes the tab to home greg
     def navigate_home(self):
