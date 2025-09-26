@@ -306,7 +306,7 @@ class MainWindow(QMainWindow):
         
         self.resize(900, 700)
         # the title
-        self.setWindowTitle(appname + " By Freakybob Team")
+        self.setWindowTitle(appname + ", by Freakybob Team")
         
         # icon
         try:
